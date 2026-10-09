@@ -15,17 +15,14 @@
             touch-action: manipulation;
         }
         canvas { 
-            touch-action: none;
-            display: block;
-            width: 100%;
-            height: 100%;
+            touch-action: none; 
+            display: block; 
+            width: 100%; 
+            height: 100%; 
         }
 
         @media (orientation: landscape) and (max-height: 550px) {
-            body {
-                overflow: hidden !important;
-                height: 100vh !important;
-            }
+            body { overflow: hidden !important; height: 100vh !important; }
             #main-workspace {
                 display: flex !important;
                 flex-direction: row !important;
@@ -41,11 +38,7 @@
                 flex-direction: column !important;
                 padding: 6px !important;
             }
-            #canvas-container {
-                flex: 1 1 auto !important;
-                height: auto !important;
-                min-height: 0 !important;
-            }
+            #canvas-container { flex: 1 1 auto !important; height: auto !important; min-height: 0 !important; }
             #controls-sidebar {
                 flex: 0 0 35% !important;
                 max-width: 380px !important;
@@ -53,16 +46,13 @@
                 overflow-y: auto !important;
                 padding-right: 4px !important;
             }
-            .landscape-compact-header {
-                padding-top: 4px !important;
-                padding-bottom: 4px !important;
-            }
+            .landscape-compact-header { padding-top: 4px !important; padding-bottom: 4px !important; }
         }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
 
-    <!-- Header Compact cu Comutator RO / EN și Badge v3.2.0 -->
+    <!-- Antet Principal -->
     <header class="bg-slate-900 border-b border-slate-800 px-3 sm:px-4 py-2 sm:py-2.5 flex justify-between items-center shadow-lg sticky top-0 z-50 landscape-compact-header">
         <div class="flex items-center space-x-2">
             <div class="bg-indigo-600 p-1.5 sm:p-2 rounded-lg text-white shadow-md">
@@ -71,38 +61,33 @@
             <div>
                 <div class="flex items-center space-x-1.5 sm:space-x-2">
                     <h1 class="text-xs sm:text-base font-bold tracking-wide text-white leading-tight">TECTONO-LAB</h1>
-                    <span id="app-version-badge" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v3.2.0</span>
+                    <span id="app-version-badge" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v3.4.0</span>
                 </div>
                 <p id="header-subtitle" class="hidden sm:block text-[10px] text-slate-400">Simulator Tectonic & Scara Stratigrafică Internațională</p>
             </div>
         </div>
 
         <div class="flex items-center space-x-1.5 sm:space-x-2">
-            <!-- Selector Limbă RO / EN -->
             <div class="flex bg-slate-950 p-0.5 rounded-lg border border-slate-800 text-[10px] font-bold">
                 <button onclick="setLanguage('ro')" id="lang-btn-ro" class="px-2 py-1 rounded bg-indigo-600 text-white transition-all">RO</button>
                 <button onclick="setLanguage('en')" id="lang-btn-en" class="px-2 py-1 rounded text-slate-400 hover:text-white transition-all">EN</button>
             </div>
 
-            <!-- Buton Scara Stratigrafică IUGS (deschide modal-stratigraphy.html) -->
             <button onclick="openStratigraphyModal()" class="bg-amber-600 hover:bg-amber-500 text-white px-2 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all shadow-sm">
                 <i class="fa-solid fa-book-atlas text-[10px]"></i>
                 <span id="btn-label-stratigraphy" class="text-[11px] sm:text-xs">Scara Stratigrafică</span>
             </button>
             
-            <!-- Buton Editor Strate Secțiune (deschide modal-simulation.html) -->
             <button onclick="openSimulationModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all shadow-sm">
                 <i class="fa-solid fa-layer-group text-[10px]"></i>
                 <span id="btn-label-simulation" class="text-[11px] sm:text-xs">Strate Secțiune</span>
             </button>
             
-            <!-- Buton Toggle Eroziune -->
             <button onclick="toggleErosion()" id="btn-toggle-erosion" class="bg-cyan-600 text-white px-2 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all">
                 <i id="icon-toggle-erosion" class="fa-solid fa-wind text-[10px]"></i>
                 <span id="label-toggle-erosion" class="text-[11px] sm:text-xs">Eroziune</span>
             </button>
             
-            <!-- Buton Resetare -->
             <button onclick="resetAll()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold px-2 py-1 rounded-lg border border-slate-700 transition-all flex items-center space-x-1" title="Resetare">
                 <i class="fa-solid fa-rotate-right text-[10px]"></i>
                 <span id="btn-label-reset" class="text-[11px] sm:text-xs">Reset</span>
@@ -110,15 +95,15 @@
         </div>
     </header>
 
-    <!-- Main Workspace -->
+    <!-- Spațiu Principal de Lucru -->
     <main id="main-workspace" class="flex-1 max-w-[1700px] w-full mx-auto p-2 sm:p-4 md:p-6 flex flex-col lg:grid lg:grid-cols-4 gap-3 sm:gap-4">
 
-        <!-- Canvas Display Area -->
+        <!-- Zona Canvas -->
         <div id="canvas-wrapper" class="order-1 lg:order-2 lg:col-span-3 bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl shadow-xl p-2 sm:p-4 flex flex-col justify-between">
-            
             <div class="flex justify-between items-center mb-1.5 sm:mb-2 text-xs">
                 <div class="flex items-center space-x-1.5">
                     <span id="process-title-badge" class="bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold border border-indigo-500/30">Falie Normală (Extensie)</span>
+                    <span id="folding-badge" class="bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold border border-purple-500/30 hidden">Cutare: 0%</span>
                     <span id="erosion-badge" class="bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold border border-cyan-500/30">Eroziune Activă</span>
                 </div>
                 <div class="text-[10px] text-slate-400">
@@ -126,12 +111,10 @@
                 </div>
             </div>
 
-            <!-- Canvas Viewport 1:1 -->
             <div id="canvas-container" class="w-full bg-slate-950 rounded-lg sm:rounded-xl border border-slate-800 relative overflow-hidden flex items-center justify-center h-[260px] sm:h-[420px] lg:h-[540px]">
                 <canvas id="geologyCanvas" class="cursor-crosshair"></canvas>
             </div>
 
-            <!-- Status Bar Compact -->
             <div class="mt-1.5 sm:mt-2 bg-slate-950 border border-slate-800 px-2.5 py-1.5 rounded-lg sm:rounded-xl flex items-center justify-between text-[10px] sm:text-xs">
                 <div class="flex items-center space-x-3 sm:space-x-6">
                     <div><span id="stat-throw-lbl" class="text-slate-400">Rejet vertical:</span> <span id="stat-throw" class="font-bold text-cyan-400">38.9m</span></div>
@@ -140,14 +123,13 @@
                 </div>
                 <div class="flex items-center space-x-2">
                     <div id="stat-dip-type" class="hidden sm:block text-slate-400 font-mono text-[10px]">Cădere spre Dreapta</div>
-                    <span class="text-[9px] font-mono text-slate-500 bg-slate-900 px-1 py-0.5 rounded border border-slate-800">v3.2.0</span>
+                    <span class="text-[9px] font-mono text-slate-500 bg-slate-900 px-1 py-0.5 rounded border border-slate-800">v3.4.0</span>
                 </div>
             </div>
         </div>
 
-        <!-- Controls Sidebar -->
+        <!-- Panou Lateral -->
         <div id="controls-sidebar" class="order-2 lg:order-1 lg:col-span-1 space-y-2.5 sm:space-y-4">
-            
             <!-- 1. Tectonică de Falie -->
             <div class="bg-slate-900 border border-slate-800 p-2.5 sm:p-4 rounded-xl sm:rounded-2xl shadow-xl space-y-2.5">
                 <h2 id="section-title-tecto" class="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center">
@@ -241,19 +223,18 @@
                     </div>
                     <div id="strat-legend" class="grid grid-cols-2 sm:grid-cols-1 gap-1 text-[9px] sm:text-[11px]"></div>
                 </div>
-
             </div>
         </div>
 
     </main>
 
-    <!-- Containere pentru injectarea asincronă a celor 2 fișiere html de meniu -->
+    <!-- Containere goale pentru injectarea modalelor externe -->
     <div id="modal-stratigraphy-container"></div>
     <div id="modal-simulation-container"></div>
 
-    <!-- Motor JavaScript Principal -->
+    <!-- Motor JavaScript Central -->
     <script>
-        const APP_VERSION = "3.2.0";
+        const APP_VERSION = "3.4.0";
         console.log(`TECTONO-LAB inițializat la versiunea: ${APP_VERSION}`);
 
         let currentLang = 'ro';
@@ -300,7 +281,7 @@
                 stratigraphyAllRanks: "Toate rangurile",
                 stratigraphyUnitsSuffix: "unități",
                 btnClose: "Închide",
-                simulationModalTitle: "Editor Stratigrafie Secțiune",
+                simulationModalTitle: "Editor Stratigrafie & Cutare",
                 btnAddStratum: "Adaugă Strat Nou",
                 btnCancel: "Anulează",
                 btnApply: "Aplică pe Model",
@@ -347,7 +328,7 @@
                 stratigraphyAllRanks: "All Ranks",
                 stratigraphyUnitsSuffix: "units",
                 btnClose: "Close",
-                simulationModalTitle: "Cross-Section Stratigraphy Editor",
+                simulationModalTitle: "Cross-Section Stratigraphy & Folding",
                 btnAddStratum: "Add New Layer",
                 btnCancel: "Cancel",
                 btnApply: "Apply to Model",
@@ -357,49 +338,6 @@
 
         const canvas = document.getElementById('geologyCanvas');
         const ctx = canvas.getContext('2d');
-
-        // BAZA OFICIALĂ IUGS / ICS (utilizată și de modale)
-        const iugsChronodata = [
-            { nameRo: "Fanerozoic", nameEn: "Phanerozoic", rankRo: "Eonotem / Eon", rankEn: "Eonothem / Eon", ageInterval: "0.00 – 538.8 Ma", hex: "#9ee0eb", rgb: "RGB(158, 224, 235)", colorRo: "Bleu / Azuriu deschis", colorEn: "Light Cyan / Sky Blue", border: "#38bdf8" },
-            { nameRo: "Proterozoic", nameEn: "Proterozoic", rankRo: "Eonotem / Eon", rankEn: "Eonothem / Eon", ageInterval: "538.8 – 2500 Ma", hex: "#f74370", rgb: "RGB(247, 67, 112)", colorRo: "Roz-trandafiriu strălucitor", colorEn: "Bright Rose Pink", border: "#e11d48" },
-            { nameRo: "Arhean", nameEn: "Archean", rankRo: "Eonotem / Eon", rankEn: "Eonothem / Eon", ageInterval: "2500 – 4031 Ma", hex: "#f02368", rgb: "RGB(240, 35, 104)", colorRo: "Roz-magenta intens", colorEn: "Deep Magenta Pink", border: "#be123c" },
-            { nameRo: "Hadean", nameEn: "Hadean", rankRo: "Eonotem informal", rankEn: "Informal Eon", ageInterval: "4031 – 4567 Ma", hex: "#ae027e", rgb: "RGB(174, 2, 126)", colorRo: "Purpuriu-roșiatic bogat", colorEn: "Rich Reddish Purple", border: "#86198f" },
-            { nameRo: "Cenozoic", nameEn: "Cenozoic", rankRo: "Eratem / Eră", rankEn: "Erathem / Era", ageInterval: "0.00 – 66.0 Ma", hex: "#f2f91d", rgb: "RGB(242, 249, 29)", colorRo: "Galben-lămâie intens", colorEn: "Bright Lemon Yellow", border: "#eab308" },
-            { nameRo: "Mezozoic", nameEn: "Mesozoic", rankRo: "Eratem / Eră", rankEn: "Erathem / Era", ageInterval: "66.0 – 251.9 Ma", hex: "#67c5ca", rgb: "RGB(103, 197, 202)", colorRo: "Turcoaz mediu", colorEn: "Medium Turquoise Blue", border: "#06b6d4" },
-            { nameRo: "Paleozoic", nameEn: "Paleozoic", rankRo: "Eratem / Eră", rankEn: "Erathem / Era", ageInterval: "251.9 – 538.8 Ma", hex: "#99c08d", rgb: "RGB(153, 192, 141)", colorRo: "Verde-salvie măsliniu", colorEn: "Muted Olive Sage", border: "#84cc16" },
-            { nameRo: "Neoproterozoic", nameEn: "Neoproterozoic", rankRo: "Eratem / Eră", rankEn: "Erathem / Era", ageInterval: "538.8 – 1000 Ma", hex: "#feb342", rgb: "RGB(254, 179, 66)", colorRo: "Galben-auriu cald", colorEn: "Warm Golden Yellow", border: "#f59e0b" },
-            { nameRo: "Mezoproterozoic", nameEn: "Mesoproterozoic", rankRo: "Eratem / Eră", rankEn: "Erathem / Era", ageInterval: "1000 – 1600 Ma", hex: "#feb784", rgb: "RGB(254, 183, 132)", colorRo: "Portocaliu-piersică", colorEn: "Soft Peach Orange", border: "#f97316" },
-            { nameRo: "Paleoproterozoic", nameEn: "Paleoproterozoic", rankRo: "Eratem / Eră", rankEn: "Erathem / Era", ageInterval: "1600 – 2500 Ma", hex: "#f6778f", rgb: "RGB(246, 119, 143)", colorRo: "Roz-coral deschis", colorEn: "Soft Coral Pink", border: "#f43f5e" },
-            { nameRo: "Neoarhean", nameEn: "Neoarchean", rankRo: "Eratem / Eră", rankEn: "Erathem / Era", ageInterval: "2500 – 2800 Ma", hex: "#f695ba", rgb: "RGB(246, 149, 186)", colorRo: "Roz-pastel", colorEn: "Pastel Blossom Pink", border: "#ec4899" },
-            { nameRo: "Mezoarhean", nameEn: "Mesoarchean", rankRo: "Eratem / Eră", rankEn: "Erathem / Era", ageInterval: "2800 – 3200 Ma", hex: "#f7adc8", rgb: "RGB(247, 173, 200)", colorRo: "Roz-orhidee deschis", colorEn: "Light Orchid Pink", border: "#f472b6" },
-            { nameRo: "Paleoarhean", nameEn: "Paleoarchean", rankRo: "Eratem / Eră", rankEn: "Erathem / Era", ageInterval: "3200 – 3600 Ma", hex: "#f8c5d7", rgb: "RGB(248, 197, 215)", colorRo: "Roz-garoafă pal", colorEn: "Pale Carnation Pink", border: "#f9a8d4" },
-            { nameRo: "Eoarhean", nameEn: "Eoarchean", rankRo: "Eratem / Eră", rankEn: "Erathem / Era", ageInterval: "3600 – 4031 Ma", hex: "#f9dbe4", rgb: "RGB(249, 219, 228)", colorRo: "Roz cețos foarte pal", colorEn: "Very Pale Misty Rose", border: "#fbcfe8" },
-            { nameRo: "Cuaternar", nameEn: "Quaternary", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "0.00 – 2.58 Ma", hex: "#f9f97f", rgb: "RGB(249, 249, 127)", colorRo: "Galben-pastel deschis", colorEn: "Light Pastel Yellow", border: "#eab308" },
-            { nameRo: "Neogen", nameEn: "Neogene", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "2.58 – 23.04 Ma", hex: "#ffe619", rgb: "RGB(255, 230, 25)", colorRo: "Galben-auriu strălucitor", colorEn: "Goldenrod Yellow", border: "#ca8a04" },
-            { nameRo: "Paleogen", nameEn: "Paleogene", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "23.04 – 66.0 Ma", hex: "#fd9a52", rgb: "RGB(253, 154, 82)", colorRo: "Portocaliu-mandarină viu", colorEn: "Bright Mandarin Orange", border: "#ea580c" },
-            { nameRo: "Cretacic", nameEn: "Cretaceous", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "66.0 – 143.1 Ma", hex: "#7fc64e", rgb: "RGB(127, 198, 78)", colorRo: "Verde-măr deschis", colorEn: "Apple / Leaf Green", border: "#65a30d" },
-            { nameRo: "Jurasic", nameEn: "Jurassic", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "143.1 – 201.4 Ma", hex: "#34b2c9", rgb: "RGB(52, 178, 201)", colorRo: "Albastru-azuriu / ceruleum", colorEn: "Sky / Cerulean Blue", border: "#0891b2" },
-            { nameRo: "Triasic", nameEn: "Triassic", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "201.4 – 251.9 Ma", hex: "#812b92", rgb: "RGB(129, 43, 146)", colorRo: "Violet-regal profund", colorEn: "Deep Royal Violet", border: "#7e22ce" },
-            { nameRo: "Permian", nameEn: "Permian", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "251.9 – 298.9 Ma", hex: "#f04028", rgb: "RGB(240, 64, 40)", colorRo: "Roșu-vermilion strălucitor", colorEn: "Bright Vermilion Red", border: "#dc2626" },
-            { nameRo: "Carbonifer", nameEn: "Carboniferous", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "298.9 – 358.9 Ma", hex: "#67a599", rgb: "RGB(103, 165, 153)", colorRo: "Turcoaz-oceanic mediu", colorEn: "Medium Ocean Teal", border: "#0d9488" },
-            { nameRo: "Pensilvanian", nameEn: "Pennsylvanian", rankRo: "Sub-sistem", rankEn: "Sub-System", ageInterval: "298.9 – 323.2 Ma", hex: "#99c2b5", rgb: "RGB(153, 194, 181)", colorRo: "Verde-spumă marină pal", colorEn: "Pale Seafoam Green", border: "#14b8a6" },
-            { nameRo: "Misisipian", nameEn: "Mississippian", rankRo: "Sub-sistem", rankEn: "Sub-System", ageInterval: "323.2 – 358.9 Ma", hex: "#678f85", rgb: "RGB(103, 143, 133)", colorRo: "Verde-teal de molid", colorEn: "Deep Spruce Teal", border: "#0f766e" },
-            { nameRo: "Devonian", nameEn: "Devonian", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "358.9 – 419.6 Ma", hex: "#cb8c37", rgb: "RGB(203, 140, 55)", colorRo: "Brun-chihlimbariu pământos", colorEn: "Earthy Amber Brown", border: "#d97706" },
-            { nameRo: "Silurian", nameEn: "Silurian", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "419.6 – 443.1 Ma", hex: "#b3e1b6", rgb: "RGB(179, 225, 182)", colorRo: "Verde-mentă pal", colorEn: "Pale Mint Green", border: "#22c55e" },
-            { nameRo: "Ordovician", nameEn: "Ordovician", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "443.1 – 486.9 Ma", hex: "#009270", rgb: "RGB(0, 146, 112)", colorRo: "Verde-smarald profund", colorEn: "Deep Emerald Green", border: "#15803d" },
-            { nameRo: "Cambrian", nameEn: "Cambrian", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "486.9 – 538.8 Ma", hex: "#7fa056", rgb: "RGB(127, 160, 86)", colorRo: "Verde-ferigă stins", colorEn: "Muted Fern Green", border: "#4d7c0f" },
-            { nameRo: "Ediacaran", nameEn: "Ediacaran", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "538.8 – 635 Ma", hex: "#fed966", rgb: "RGB(254, 217, 102)", colorRo: "Galben-floarea soarelui", colorEn: "Light Sunflower Yellow", border: "#eab308" },
-            { nameRo: "Criogenian", nameEn: "Cryogenian", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "635 – 720 Ma", hex: "#fec056", rgb: "RGB(254, 192, 86)", colorRo: "Galben-caisă deschis", colorEn: "Light Apricot Yellow", border: "#f59e0b" },
-            { nameRo: "Tonian", nameEn: "Tonian", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "720 – 1000 Ma", hex: "#feb784", rgb: "RGB(254, 183, 132)", colorRo: "Piersică-cantalup", colorEn: "Soft Cantaloupe Peach", border: "#f97316" },
-            { nameRo: "Stenian", nameEn: "Stenian", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "1000 – 1200 Ma", hex: "#feb342", rgb: "RGB(254, 179, 66)", colorRo: "Auriu-chihlimbar cald", colorEn: "Warm Amber Gold", border: "#d97706" },
-            { nameRo: "Ectasian", nameEn: "Ectasian", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "1200 – 1400 Ma", hex: "#ffaa66", rgb: "RGB(255, 170, 102)", colorRo: "Portocaliu-nisipiu deschis", colorEn: "Soft Sandy Orange", border: "#ea580c" },
-            { nameRo: "Calymmian", nameEn: "Calymmian", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "1400 – 1600 Ma", hex: "#ff9955", rgb: "RGB(255, 153, 85)", colorRo: "Portocaliu-teracotă stins", colorEn: "Muted Terracotta Orange", border: "#c2410c" },
-            { nameRo: "Statherian", nameEn: "Statherian", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "1600 – 1800 Ma", hex: "#f6778f", rgb: "RGB(246, 119, 143)", colorRo: "Roz-somon prăfuit", colorEn: "Dusty Salmon Pink", border: "#e11d48" },
-            { nameRo: "Orosirian", nameEn: "Orosirian", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "1800 – 2050 Ma", hex: "#f78aa0", rgb: "RGB(247, 138, 160)", colorRo: "Roz-coral deschis", colorEn: "Light Coral Pink", border: "#f43f5e" },
-            { nameRo: "Rhyacian", nameEn: "Rhyacian", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "2050 – 2300 Ma", hex: "#f89db2", rgb: "RGB(248, 157, 178)", colorRo: "Roz-pudrat pal", colorEn: "Pale Rouge Pink", border: "#fb7185" },
-            { nameRo: "Siderian", nameEn: "Siderian", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "2300 – 2500 Ma", hex: "#f9b0c3", rgb: "RGB(249, 176, 195)", colorRo: "Roz-camee pal", colorEn: "Soft Cameo Pink", border: "#fda4af" },
-            { nameRo: "Precambrian", nameEn: "Precambrian", rankRo: "Supraeon / Fundament", rankEn: "Supereon / Basement", ageInterval: "> 538.8 Ma", hex: "#f74370", rgb: "RGB(247, 67, 112)", colorRo: "Roz-trandafiriu de fundament", colorEn: "Basement Rose Pink", border: "#be123c" }
-        ];
 
         let strata = [
             { name: "Fundament Cristalin", age: "Precambrian", thickness: 110 },
@@ -413,6 +351,8 @@
             process: 'normal',
             dip: 60,
             slip: 45,
+            foldShortening: 0,
+            foldWavelength: 220,
             animating: false,
             erosionActive: true,
             baseCutOffset: 0,
@@ -424,6 +364,7 @@
         let isCarving = false;
 
         function findIugsItem(key) {
+            if (typeof iugsChronodata === 'undefined') return null;
             const k = (key || '').toLowerCase();
             return iugsChronodata.find(item => item.nameEn.toLowerCase() === k || item.nameRo.toLowerCase() === k);
         }
@@ -432,6 +373,7 @@
             const found = findIugsItem(age);
             return found ? found.hex : "#718096";
         }
+
         function getStratumBorder(age) {
             const found = findIugsItem(age);
             return found ? found.border : "#4a5568";
@@ -501,7 +443,7 @@
             document.getElementById('lbl-strat-col').innerText = t.lblStratCol;
             document.getElementById('btn-strat-modify').innerHTML = t.btnStratModify;
 
-            // Actualizare texte dacă modalele sunt deja încărcate
+            // Actualizare texte dacă modalele sunt deja injectate
             if (document.getElementById('stratigraphy-modal-title')) {
                 document.getElementById('stratigraphy-modal-title').innerText = t.stratigraphyModalTitle;
                 document.getElementById('stratigraphy-modal-sub').innerText = t.stratigraphyModalSub;
@@ -566,6 +508,14 @@
 
             const badge = document.getElementById('process-title-badge');
             badge.innerText = (simState.process === 'normal') ? t.badgeNormal : t.badgeReverse;
+
+            const foldBadge = document.getElementById('folding-badge');
+            if (simState.foldShortening > 0) {
+                foldBadge.classList.remove('hidden');
+                foldBadge.innerText = (currentLang === 'ro' ? 'Cutare: ' : 'Folding: ') + simState.foldShortening + '%';
+            } else {
+                foldBadge.classList.add('hidden');
+            }
 
             document.getElementById('stat-throw-lbl').innerText = t.statThrow;
             document.getElementById('stat-heave-lbl').innerText = t.statHeave;
@@ -719,16 +669,19 @@
         function resetAll() {
             simState.slip = 0;
             simState.baseCutOffset = 0;
+            simState.foldShortening = 0;
+            simState.foldWavelength = 220;
             document.getElementById('slider-slip').value = 0;
             document.getElementById('val-slip').innerText = '0 m';
             document.getElementById('slider-level-cut').value = 0;
             document.getElementById('val-level-cut').innerText = '0 m';
+            document.getElementById('folding-badge').classList.add('hidden');
             initTopoProfile();
             drawSimulation();
         }
 
         // ==========================================
-        // RANDARE 1:1 FĂRĂ SCALARE
+        // RANDARE GRAFICĂ TECTONICĂ & CUTARE (1:1)
         // ==========================================
         function drawSimulation() {
             const W = canvas.width;
@@ -737,6 +690,7 @@
 
             ctx.clearRect(0, 0, W, H);
 
+            // Grid
             ctx.strokeStyle = '#1e293b';
             ctx.lineWidth = 1;
             for (let x = 0; x < W; x += 45) {
@@ -783,9 +737,11 @@
                 currY = yTop;
             }
 
-            const topOriginalY = layerBounds[strata.length - 1].yTop;
-            const topTranslatedY = topOriginalY + dy;
-            const botTranslatedY = baseY + dy;
+            // Calcul deformare cutare
+            const foldAmp = ((simState.foldShortening || 0) / 100) * 85;
+            const lambda = Math.max(60, simState.foldWavelength || 220);
+            const k = (2 * Math.PI) / lambda;
+            const getFoldOffset = (x) => foldAmp * Math.sin((x - anchorX) * k);
 
             // 1. FOOTWALL
             layerBounds.forEach(({ layer, yTop, yBot }) => {
@@ -797,10 +753,19 @@
                 ctx.lineWidth = 1.5;
 
                 ctx.beginPath();
-                ctx.moveTo(modelLeftX, yTop);
-                ctx.lineTo(xTopFault, yTop);
-                ctx.lineTo(xBotFault, yBot);
-                ctx.lineTo(modelLeftX, yBot);
+                ctx.moveTo(modelLeftX, yTop + getFoldOffset(modelLeftX));
+                const step = 4;
+                for (let x = modelLeftX; x <= xTopFault; x += step) {
+                    ctx.lineTo(x, yTop + getFoldOffset(x));
+                }
+                ctx.lineTo(xTopFault, yTop + getFoldOffset(xTopFault));
+                ctx.lineTo(xBotFault, yBot + getFoldOffset(xBotFault));
+
+                for (let x = xBotFault; x >= modelLeftX; x -= step) {
+                    ctx.lineTo(x, yBot + getFoldOffset(x));
+                }
+                ctx.lineTo(modelLeftX, yBot + getFoldOffset(modelLeftX));
+
                 ctx.closePath();
                 ctx.fill();
                 ctx.stroke();
@@ -818,16 +783,30 @@
                 ctx.lineWidth = 1.5;
 
                 ctx.beginPath();
-                ctx.moveTo(xTopFaultTrans, yTopTrans);
-                ctx.lineTo(modelRightX, yTopTrans);
-                ctx.lineTo(modelRightX, yBotTrans);
-                ctx.lineTo(xBotFaultTrans, yBotTrans);
+                ctx.moveTo(xTopFaultTrans, yTopTrans + getFoldOffset(xTopFaultTrans - dx));
+
+                const step = 4;
+                for (let x = xTopFaultTrans; x <= modelRightX; x += step) {
+                    ctx.lineTo(x, yTopTrans + getFoldOffset(x - dx));
+                }
+                ctx.lineTo(modelRightX, yTopTrans + getFoldOffset(modelRightX - dx));
+                ctx.lineTo(modelRightX, yBotTrans + getFoldOffset(modelRightX - dx));
+
+                for (let x = modelRightX; x >= xBotFaultTrans; x -= step) {
+                    ctx.lineTo(x, yBotTrans + getFoldOffset(x - dx));
+                }
+                ctx.lineTo(xBotFaultTrans, yBotTrans + getFoldOffset(xBotFaultTrans - dx));
+
                 ctx.closePath();
                 ctx.fill();
                 ctx.stroke();
             });
 
             // 3. Plan de Falie
+            const topOriginalY = layerBounds[strata.length - 1].yTop;
+            const topTranslatedY = topOriginalY + dy;
+            const botTranslatedY = baseY + dy;
+
             const faultY1 = Math.min(topOriginalY, topTranslatedY) - 50;
             const faultY2 = Math.max(baseY, botTranslatedY) + 50;
             const faultX1 = getFaultX(faultY1);
@@ -872,20 +851,20 @@
             ctx.strokeStyle = '#334155';
             ctx.lineWidth = 1.5;
             ctx.beginPath();
-            ctx.moveTo(modelLeftX, topOriginalY);
-            ctx.lineTo(modelLeftX, baseY);
-            ctx.moveTo(modelRightX, topTranslatedY);
-            ctx.lineTo(modelRightX, botTranslatedY);
+            ctx.moveTo(modelLeftX, topOriginalY + getFoldOffset(modelLeftX));
+            ctx.lineTo(modelLeftX, baseY + getFoldOffset(modelLeftX));
+            ctx.moveTo(modelRightX, topTranslatedY + getFoldOffset(modelRightX - dx));
+            ctx.lineTo(modelRightX, botTranslatedY + getFoldOffset(modelRightX - dx));
             ctx.stroke();
 
-            // Etichete bilingve pe blocuri
+            // Etichete blocuri
             const t = translations[currentLang];
             ctx.font = 'bold 10px Inter, sans-serif';
             ctx.fillStyle = '#94a3b8';
-            ctx.fillText(t.footwall, modelLeftX + 10, topOriginalY - 10);
+            ctx.fillText(t.footwall, modelLeftX + 10, topOriginalY - 10 + getFoldOffset(modelLeftX));
 
             ctx.fillStyle = '#cbd5e1';
-            let hwLabelY = topTranslatedY - 10;
+            let hwLabelY = topTranslatedY - 10 + getFoldOffset(modelRightX - 85 - dx);
             ctx.fillText(t.hangingWall, modelRightX - 85, hwLabelY);
         }
 
@@ -908,36 +887,46 @@
             observer.observe(container);
         }
 
-        // ==========================================
-        // ÎNCĂRCARE ASINCRONĂ A MODALELOR EXTERNE
-        // ==========================================
-        async function loadExternalModals() {
+        // ========================================================
+        // ÎNCĂRCARE ASINCRONĂ A MODALELOR & EXECUȚIE SCRIPTURI
+        // ========================================================
+        async function loadModalComponent(url, containerId) {
             try {
-                // Încărcare Scara Stratigrafică (modal-stratigraphy.html)
-                const resStrat = await fetch('modal-stratigraphy.html');
-                if (resStrat.ok) {
-                    document.getElementById('modal-stratigraphy-container').innerHTML = await resStrat.text();
-                }
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP ${response.status} pentru ${url}`);
+                const htmlText = await response.text();
+                
+                const container = document.getElementById(containerId);
+                container.innerHTML = htmlText;
 
-                // Încărcare Editor Strate Secțiune (modal-simulation.html)
-                const resSim = await fetch('modal-simulation.html');
-                if (resSim.ok) {
-                    document.getElementById('modal-simulation-container').innerHTML = await resSim.text();
-                }
-
-                // Actualizare texte cu limba curentă
-                setLanguage(currentLang);
+                // Re-atașăm și executăm scripturile din interiorul modalului injectat
+                const scripts = container.querySelectorAll('script');
+                scripts.forEach(oldScript => {
+                    const newScript = document.createElement('script');
+                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                    newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                    oldScript.parentNode.replaceChild(newScript, oldScript);
+                });
             } catch (err) {
-                console.warn("Încărcarea modalelor externe a eșuat (dacă rulează pe file:// folosiți un server local sau GitHub Pages):", err);
+                console.error(`Eroare la încărcarea fișierului ${url}:`, err);
             }
         }
 
-        // Funcții trigger apelate de butoane
+        async function loadAllModals() {
+            await Promise.all([
+                loadModalComponent('modal-stratigraphy.html?v=1.0.0', 'modal-stratigraphy-container'),
+                loadModalComponent('modal-simulation.html?v=1.1.0', 'modal-simulation-container')
+            ]);
+            setLanguage(currentLang);
+        }
+
         function openStratigraphyModal() {
             const m = document.getElementById('stratigraphy-modal');
             if (m) {
                 m.classList.remove('hidden');
                 if (typeof filterStratigraphyList === 'function') filterStratigraphyList();
+            } else {
+                console.warn("modal-stratigraphy.html nu este încărcat încă.");
             }
         }
 
@@ -950,8 +939,11 @@
             const m = document.getElementById('simulation-modal');
             if (m) {
                 tempStrataEdit = JSON.parse(JSON.stringify(strata));
+                if (typeof syncFoldingControls === 'function') syncFoldingControls();
                 if (typeof renderSimulationEditorList === 'function') renderSimulationEditorList();
                 m.classList.remove('hidden');
+            } else {
+                console.warn("modal-simulation.html nu este încărcat încă.");
             }
         }
 
@@ -963,7 +955,7 @@
         window.onload = () => {
             setLanguage('ro');
             setupResponsiveCanvas();
-            loadExternalModals();
+            loadAllModals();
             requestAnimationFrame(() => {
                 const container = document.getElementById('canvas-container');
                 const rect = container.getBoundingClientRect();
