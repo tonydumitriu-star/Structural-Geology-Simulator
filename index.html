@@ -57,7 +57,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
 
-    <!-- Header Compact cu Comutator RO / EN și Badge v3.0.0 -->
+    <!-- Header Compact cu Comutator RO / EN și Badge v3.0.1 -->
     <header class="bg-slate-900 border-b border-slate-800 px-3 sm:px-4 py-2 sm:py-2.5 flex justify-between items-center shadow-lg sticky top-0 z-50 landscape-compact-header">
         <div class="flex items-center space-x-2">
             <div class="bg-indigo-600 p-1.5 sm:p-2 rounded-lg text-white shadow-md">
@@ -66,7 +66,7 @@
             <div>
                 <div class="flex items-center space-x-1.5 sm:space-x-2">
                     <h1 class="text-xs sm:text-base font-bold tracking-wide text-white leading-tight">TECTONO-LAB</h1>
-                    <span id="app-version-badge" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v3.0.0</span>
+                    <span id="app-version-badge" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v3.0.1</span>
                 </div>
                 <p id="header-subtitle" class="hidden sm:block text-[10px] text-slate-400">Simulator Tectonic & Scara Stratigrafică Internațională</p>
             </div>
@@ -118,7 +118,7 @@
                 </div>
             </div>
 
-            <!-- Canvas Viewport 1:1 -->
+            <!-- Canvas Viewport 1:1 fără scalare parazită -->
             <div id="canvas-container" class="w-full bg-slate-950 rounded-lg sm:rounded-xl border border-slate-800 relative overflow-hidden flex items-center justify-center h-[260px] sm:h-[420px] lg:h-[540px]">
                 <canvas id="geologyCanvas" class="w-full h-full cursor-crosshair"></canvas>
             </div>
@@ -132,7 +132,7 @@
                 </div>
                 <div class="flex items-center space-x-2">
                     <div id="stat-dip-type" class="hidden sm:block text-slate-400 font-mono text-[10px]">Cădere spre Dreapta</div>
-                    <span class="text-[9px] font-mono text-slate-500 bg-slate-900 px-1 py-0.5 rounded border border-slate-800">v3.0.0</span>
+                    <span class="text-[9px] font-mono text-slate-500 bg-slate-900 px-1 py-0.5 rounded border border-slate-800">v3.0.1</span>
                 </div>
             </div>
         </div>
@@ -239,7 +239,7 @@
 
     </main>
 
-    <!-- Modal 1: Dicționar / Căutare Scara Stratigrafică IUGS -->
+    <!-- Modal 1: Scara Stratigrafică IUGS -->
     <div id="iugs-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
         <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
             <div class="px-4 py-3 border-b border-slate-800 flex justify-between items-center bg-slate-900/90">
@@ -259,7 +259,7 @@
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex flex-col sm:flex-row gap-2">
                 <div class="relative flex-1">
                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-xs"></i>
-                    <input type="text" id="iugs-search-input" oninput="filterIugsList()" placeholder="Caută după nume sau culoare (ex: Jurasic, albastru, verde, Jurassic, blue...)" class="w-full bg-slate-900 border border-slate-700 pl-9 pr-4 py-2 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
+                    <input type="text" id="iugs-search-input" oninput="filterIugsList()" placeholder="Caută după nume sau culoare (ex: Jurasic, albastru, verde, Jurassic...)" class="w-full bg-slate-900 border border-slate-700 pl-9 pr-4 py-2 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
                 </div>
                 <select id="iugs-rank-filter" onchange="filterIugsList()" class="bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-amber-500">
                     <option value="ALL">Toate rangurile</option>
@@ -311,7 +311,7 @@
 
     <!-- JavaScript Engine -->
     <script>
-        const APP_VERSION = "3.0.0";
+        const APP_VERSION = "3.0.1";
         console.log(`TECTONO-LAB inițializat la versiunea: ${APP_VERSION}`);
 
         let currentLang = 'ro';
@@ -333,7 +333,7 @@
                 reverseTitle: "Falie Inversă",
                 reverseSub: "Compresiune",
                 lblDip: "Unghi de înclinare falie (&theta;):",
-                lblSlip: "Deplasare pe falie (0 - 250m):",
+                lblSlip: "Deplasare falie (0 - 250m):",
                 btnAnimate: "Animează Deplasarea",
                 secRelief: "<i class='fa-solid fa-wind text-cyan-400 mr-1.5'></i> 2. Relief & Nivelare",
                 lblLevelCut: "Nivelare (Sus/Jos):",
@@ -350,8 +350,8 @@
                 dipLeft: "Cădere spre Stânga",
                 dipHoriz: "Orizontală / Decollement",
                 dipVert: "Verticală",
-                footwall: "FOOTWALL (Bloc Fix)",
-                hangingWall: "HANGING WALL (Bloc Mobil)",
+                footwall: "FOOTWALL",
+                hangingWall: "HANGING WALL",
                 iugsModalTitle: "Scara Stratigrafică Internațională (IUGS / ICS)",
                 iugsModalSub: "Bază completă cu vârste, nuanțe și denumirile standard ale culorilor",
                 iugsSearchPlaceholder: "Caută după nume sau culoare (ex: Jurasic, albastru, verde, Cretacic...)",
@@ -397,8 +397,8 @@
                 dipLeft: "Dipping Left",
                 dipHoriz: "Horizontal / Decollement",
                 dipVert: "Vertical Fault",
-                footwall: "FOOTWALL (Footwall Block)",
-                hangingWall: "HANGING WALL (Hanging Block)",
+                footwall: "FOOTWALL",
+                hangingWall: "HANGING WALL",
                 iugsModalTitle: "International Chronostratigraphic Chart (IUGS / ICS)",
                 iugsModalSub: "Official chart: numeric ages, colors & standard color names",
                 iugsSearchPlaceholder: "Search by name or color (e.g. Jurassic, blue, green, Cretaceous...)",
@@ -416,7 +416,7 @@
         const canvas = document.getElementById('geologyCanvas');
         const ctx = canvas.getContext('2d');
 
-        // BAZA COMPLETĂ DE DATE BILINGVĂ CONFORM SCĂRII STRATIGRAFICE INTERNAȚIONALE (IUGS / ICS)
+        // BAZA COMPLETĂ DE DATE CONFORM SCĂRII STRATIGRAFICE INTERNAȚIONALE
         const iugsChronodata = [
             // EONI
             { nameRo: "Fanerozoic", nameEn: "Phanerozoic", rankRo: "Eonotem / Eon", rankEn: "Eonothem / Eon", ageInterval: "0.00 – 538.8 Ma", hex: "#9ee0eb", rgb: "RGB(158, 224, 235)", colorRo: "Bleu / Azuriu deschis", colorEn: "Light Cyan / Sky Blue", border: "#38bdf8" },
@@ -595,19 +595,19 @@
         let tempStrataEdit = [];
         let isCarving = false;
 
+        // REDIMENSIONARE 1:1 FĂRĂ MULTIPLICARE DPR SAU SCALE
         function resizeCanvas() {
             const container = document.getElementById('canvas-container');
             const rect = container.getBoundingClientRect();
-            const dpr = window.devicePixelRatio || 1;
             
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            // Atribuire directă 1:1 în pixeli CSS
+            canvas.width = Math.round(rect.width);
+            canvas.height = Math.round(rect.height);
 
-            canvas.style.width = `${rect.width}px`;
-            canvas.style.height = `${rect.height}px`;
+            canvas.style.width = `${Math.round(rect.width)}px`;
+            canvas.style.height = `${Math.round(rect.height)}px`;
 
-            if (simState.topoProfile.length !== Math.round(rect.width)) {
+            if (simState.topoProfile.length !== canvas.width) {
                 initTopoProfile();
             }
             drawSimulation();
@@ -866,7 +866,7 @@
         }
 
         function getBaseGroundY() {
-            const H = parseFloat(canvas.style.height) || 420;
+            const H = canvas.height || 420;
             const totalThickness = strata.reduce((acc, l) => acc + l.thickness, 0);
             const anchorY = H * 0.52;
             const baseY = anchorY + (totalThickness * 0.44);
@@ -874,7 +874,7 @@
         }
 
         function initTopoProfile() {
-            const W = Math.round(parseFloat(canvas.style.width) || 700);
+            const W = canvas.width || 700;
             const groundY = getBaseGroundY();
             simState.topoProfile = new Array(W).fill(groundY + simState.baseCutOffset);
             simState.rawNoise = new Array(W).fill(0);
@@ -914,7 +914,7 @@
         }
 
         function recalculateTopoProfile() {
-            const W = Math.round(parseFloat(canvas.style.width) || 700);
+            const W = canvas.width || 700;
             const groundY = getBaseGroundY();
             for (let x = 0; x < W; x++) {
                 simState.topoProfile[x] = groundY + simState.baseCutOffset + (simState.rawNoise[x] || 0);
@@ -922,7 +922,7 @@
         }
 
         function generateRandomErosion() {
-            const W = Math.round(parseFloat(canvas.style.width) || 700);
+            const W = canvas.width || 700;
             const depth = parseInt(document.getElementById('slider-erode-depth').value);
 
             const f1 = 0.005;
@@ -945,7 +945,7 @@
             const mouseX = Math.round(clientX - rect.left);
             const mouseY = clientY - rect.top;
             const radius = 30;
-            const W = Math.round(parseFloat(canvas.style.width) || 700);
+            const W = canvas.width;
 
             for (let x = Math.max(0, mouseX - radius); x <= Math.min(W - 1, mouseX + radius); x++) {
                 let dist = Math.abs(x - mouseX);
@@ -1021,12 +1021,12 @@
         }
 
         // ==========================================
-        // RANDARE 1:1 STABILĂ
+        // RANDARE 1:1 FĂRĂ SCALARE PARAZITĂ
         // ==========================================
 
         function drawSimulation() {
-            const W = parseFloat(canvas.style.width) || 700;
-            const H = parseFloat(canvas.style.height) || 420;
+            const W = canvas.width;
+            const H = canvas.height;
             ctx.clearRect(0, 0, W, H);
 
             // Grid discret
@@ -1179,7 +1179,7 @@
 
             ctx.fillStyle = '#cbd5e1';
             let hwLabelY = topTranslatedY - 10;
-            ctx.fillText(t.hangingWall, modelRightX - 140, hwLabelY);
+            ctx.fillText(t.hangingWall, modelRightX - 85, hwLabelY);
         }
 
         window.onload = () => {
