@@ -1,0 +1,119 @@
+<!-- Modal: Scara Stratigrafică Internațională (IUGS / ICS) -->
+<div id="stratigraphy-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+        <!-- Header Modal -->
+        <div class="px-4 py-3 border-b border-slate-800 flex justify-between items-center bg-slate-900/90">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-book-atlas text-amber-400"></i>
+                <div>
+                    <h3 id="stratigraphy-modal-title" class="font-bold text-white text-sm sm:text-base">Scara Stratigrafică Internațională (IUGS / ICS)</h3>
+                    <p id="stratigraphy-modal-sub" class="text-[10px] text-slate-400">Bază completă cu vârste, nuanțe și denumirile standard ale culorilor</p>
+                </div>
+            </div>
+            <button onclick="closeStratigraphyModal()" class="text-slate-400 hover:text-white p-1">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Căutare & Filtru Rang -->
+        <div class="p-3 bg-slate-950 border-b border-slate-800 flex flex-col sm:flex-row gap-2">
+            <div class="relative flex-1">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-xs"></i>
+                <input type="text" id="stratigraphy-search-input" oninput="filterStratigraphyList()" placeholder="Caută după nume sau culoare (ex: Jurasic, albastru, verde, Jurassic...)" class="w-full bg-slate-900 border border-slate-700 pl-9 pr-4 py-2 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
+            </div>
+            <select id="stratigraphy-rank-filter" onchange="filterStratigraphyList()" class="bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-amber-500">
+                <option value="ALL">Toate rangurile / All Ranks</option>
+                <option value="Eon">Eonotem / Eon</option>
+                <option value="Erathem">Eratem / Eră</option>
+                <option value="System">Sistem / Perioadă</option>
+                <option value="Series">Serie / Epocă</option>
+                <option value="Stage">Etaj / Vârstă</option>
+            </select>
+        </div>
+
+        <!-- Listă Rezultate Dicționar -->
+        <div class="p-3 overflow-y-auto space-y-2 flex-1" id="stratigraphy-results-list"></div>
+
+        <!-- Footer Modal -->
+        <div class="p-3 border-t border-slate-800 bg-slate-900/90 flex justify-between items-center text-xs text-slate-400">
+            <span id="stratigraphy-count-badge">0 rezultate</span>
+            <button onclick="closeStratigraphyModal()" id="btn-close-stratigraphy" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-1.5 rounded-xl font-semibold transition-all">Închide</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Filtrare dinamică bilingvă pentru Scara Stratigrafică
+    function filterStratigraphyList() {
+        const searchInput = document.getElementById('stratigraphy-search-input');
+        const rankFilter = document.getElementById('stratigraphy-rank-filter');
+        const listContainer = document.getElementById('stratigraphy-results-list');
+        const countBadge = document.getElementById('stratigraphy-count-badge');
+        
+        if (!listContainer || typeof iugsChronodata === 'undefined') return;
+
+        const query = (searchInput ? searchInput.value : '').trim().toLowerCase();
+        const selectedRank = rankFilter ? rankFilter.value : 'ALL';
+        listContainer.innerHTML = '';
+
+        const results = iugsChronodata.filter(item => {
+            const matchesQuery = item.nameRo.toLowerCase().includes(query) ||
+                                 item.nameEn.toLowerCase().includes(query) ||
+                                 item.rankRo.toLowerCase().includes(query) ||
+                                 item.rankEn.toLowerCase().includes(query) ||
+                                 item.colorRo.toLowerCase().includes(query) ||
+                                 item.colorEn.toLowerCase().includes(query) ||
+                                 item.hex.toLowerCase().includes(query) ||
+                                 item.ageInterval.toLowerCase().includes(query);
+            const matchesRank = (selectedRank === 'ALL') || (item.rankEn.toLowerCase().includes(selectedRank.toLowerCase()));
+            return matchesQuery && matchesRank;
+        });
+
+        const t = (typeof translations !== 'undefined' && typeof currentLang !== 'undefined') ? translations[currentLang] : { stratigraphyUnitsSuffix: 'unități' };
+        if (countBadge) {
+            countBadge.innerText = `${results.length} / ${iugsChronodata.length} ${t.stratigraphyUnitsSuffix}`;
+        }
+
+        if (results.length === 0) {
+            listContainer.innerHTML = `<div class="text-center py-8 text-slate-500 text-xs">${currentLang === 'ro' ? 'Nicio unitate găsită.' : 'No stratigraphic units found.'}</div>`;
+            return;
+        }
+
+        results.forEach(item => {
+            const name = (typeof currentLang !== 'undefined' && currentLang === 'ro') ? item.nameRo : item.nameEn;
+            const rank = (typeof currentLang !== 'undefined' && currentLang === 'ro') ? item.rankRo : item.rankEn;
+            const colorDesc = (typeof currentLang !== 'undefined' && currentLang === 'ro') ? item.colorRo : item.colorEn;
+
+            listContainer.innerHTML += `
+                <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex items-center justify-between hover:border-slate-700 transition-all">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-lg border shadow-sm flex items-center justify-center font-bold text-[10px] text-slate-900 flex-shrink-0" style="background-color: ${item.hex}; border-color: ${item.border}">
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <span class="font-bold text-white text-xs sm:text-sm">${name}</span>
+                                <span class="text-[10px] text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">${rank}</span>
+                            </div>
+                            <div class="text-[11px] text-amber-300 font-mono mt-0.5 flex items-center space-x-1">
+                                <i class="fa-regular fa-clock text-[10px] text-amber-400/80"></i>
+                                <span>${item.ageInterval}</span>
+                            </div>
+                            <div class="text-[10px] text-slate-400 mt-0.5 flex items-center space-x-1">
+                                <i class="fa-solid fa-palette text-[9px] text-indigo-400"></i>
+                                <span class="text-slate-300 font-medium">${colorDesc}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-right font-mono text-[11px] space-y-0.5 flex-shrink-0">
+                        <div class="text-slate-200 font-bold tracking-wider">${item.hex.toUpperCase()}</div>
+                        <div class="text-slate-400 text-[10px]">${item.rgb}</div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    // Inițializare listă imediat după injectarea în pagină
+    filterStratigraphyList();
+</script>
