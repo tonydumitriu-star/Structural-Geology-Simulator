@@ -57,7 +57,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
 
-    <!-- Header Compact cu Badge de Versiune v2.4.0 -->
+    <!-- Header Compact cu Badge v2.5.0 -->
     <header class="bg-slate-900 border-b border-slate-800 px-3 sm:px-4 py-2 sm:py-2.5 flex justify-between items-center shadow-lg sticky top-0 z-50 landscape-compact-header">
         <div class="flex items-center space-x-2">
             <div class="bg-indigo-600 p-1.5 sm:p-2 rounded-lg text-white shadow-md">
@@ -66,12 +66,16 @@
             <div>
                 <div class="flex items-center space-x-1.5 sm:space-x-2">
                     <h1 class="text-xs sm:text-base font-bold tracking-wide text-white leading-tight">TECTONO-LAB</h1>
-                    <span id="app-version-badge" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v2.4.0</span>
+                    <span id="app-version-badge" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v2.5.0</span>
                 </div>
-                <p class="hidden sm:block text-[10px] text-slate-400">Simulator Tectonic & Relief (Auto-Scale)</p>
+                <p class="hidden sm:block text-[10px] text-slate-400">Simulator Tectonic & Editor Stratigrafic</p>
             </div>
         </div>
         <div class="flex items-center space-x-2">
+            <button onclick="openStrataModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all shadow-sm">
+                <i class="fa-solid fa-layer-group text-[10px]"></i>
+                <span class="text-[11px] sm:text-xs">Editează Strate</span>
+            </button>
             <button onclick="toggleErosion()" id="btn-toggle-erosion" class="bg-cyan-600 text-white px-2 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all">
                 <i id="icon-toggle-erosion" class="fa-solid fa-wind text-[10px]"></i>
                 <span id="label-toggle-erosion" class="text-[11px] sm:text-xs">Eroziune</span>
@@ -96,11 +100,11 @@
                     <span id="erosion-badge" class="bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold border border-cyan-500/30">Eroziune Activă</span>
                 </div>
                 <div class="text-[10px] text-slate-400">
-                    <span><i class="fa-solid fa-expand text-emerald-400 mr-1"></i> Auto-centrare dinamică activă</span>
+                    <span><i class="fa-solid fa-expand text-emerald-400 mr-1"></i> Auto-scale la grosimea stratelor</span>
                 </div>
             </div>
 
-            <!-- Canvas Viewport adaptiv cu Auto-Fit -->
+            <!-- Canvas Viewport -->
             <div id="canvas-container" class="w-full bg-slate-950 rounded-lg sm:rounded-xl border border-slate-800 relative overflow-hidden flex items-center justify-center h-[260px] sm:h-[420px] lg:h-[540px]">
                 <canvas id="geologyCanvas" class="w-full h-full cursor-crosshair"></canvas>
             </div>
@@ -114,7 +118,7 @@
                 </div>
                 <div class="flex items-center space-x-2">
                     <div id="stat-dip-type" class="hidden sm:block text-slate-400 font-mono text-[10px]">Cădere spre Dreapta</div>
-                    <span class="text-[9px] font-mono text-slate-500 bg-slate-900 px-1 py-0.5 rounded border border-slate-800">v2.4.0</span>
+                    <span class="text-[9px] font-mono text-slate-500 bg-slate-900 px-1 py-0.5 rounded border border-slate-800">v2.5.0</span>
                 </div>
             </div>
         </div>
@@ -175,7 +179,6 @@
                     <i class="fa-solid fa-wind text-cyan-400 mr-1.5"></i> 2. Relief & Nivelare
                 </h2>
 
-                <!-- Nivelare -->
                 <div class="space-y-1">
                     <div class="flex justify-between text-[11px]">
                         <span class="text-slate-400">Nivelare (Sus/Jos):</span>
@@ -194,7 +197,6 @@
                     </div>
                 </div>
 
-                <!-- Sculptare relief aleator -->
                 <div class="pt-1.5 border-t border-slate-800/80 space-y-1.5">
                     <div class="flex justify-between text-[11px]">
                         <span class="text-slate-400">Amplitudine Văi:</span>
@@ -207,9 +209,14 @@
                     </button>
                 </div>
 
-                <!-- Litologie -->
+                <!-- Litologie și buton de editare -->
                 <div class="pt-1.5 border-t border-slate-800">
-                    <h3 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Litologie</h3>
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">Coloană Stratigrafică</h3>
+                        <button onclick="openStrataModal()" class="text-[10px] text-indigo-400 hover:text-indigo-300 font-semibold underline flex items-center">
+                            <i class="fa-solid fa-pen-to-square mr-1"></i> Modifică
+                        </button>
+                    </div>
                     <div id="strat-legend" class="grid grid-cols-2 sm:grid-cols-1 gap-1 text-[9px] sm:text-[11px]"></div>
                 </div>
 
@@ -218,13 +225,70 @@
 
     </main>
 
+    <!-- Modal pentru Editarea Stratelor și Vârstelor Geologice -->
+    <div id="strata-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+            <div class="px-4 py-3 border-b border-slate-800 flex justify-between items-center bg-slate-900/90">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-layer-group text-indigo-400"></i>
+                    <h3 class="font-bold text-white text-sm sm:text-base">Editor Stratigrafie & Vârste Geologice</h3>
+                </div>
+                <button onclick="closeStrataModal()" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Listă de strate editabile -->
+            <div class="p-3 sm:p-4 overflow-y-auto space-y-2 flex-1" id="strata-edit-list">
+                <!-- Generat dinamic prin JavaScript -->
+            </div>
+
+            <div class="p-3 border-t border-slate-800 bg-slate-900/90 flex justify-between items-center">
+                <button onclick="addNewStratum()" class="bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Adaugă Strat Nou</span>
+                </button>
+                <div class="flex space-x-2">
+                    <button onclick="closeStrataModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-1.5 rounded-xl text-xs font-semibold">Anulează</button>
+                    <button onclick="saveStrataChanges()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded-xl text-xs font-semibold shadow-md">Aplică pe Model</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript Engine -->
     <script>
-        const APP_VERSION = "2.4.0";
+        const APP_VERSION = "2.5.0";
         console.log(`TECTONO-LAB inițializat la versiunea: ${APP_VERSION}`);
 
         const canvas = document.getElementById('geologyCanvas');
         const ctx = canvas.getContext('2d');
+
+        // Paletă cronostratigrafică oficială (IUGS - Comisia Internațională de Stratigrafie)
+        const geologicalAges = {
+            "Cuaternar": { color: "#fff282", border: "#f6e05e", name: "Cuaternar (0 - 2.6 Ma)" },
+            "Neogen": { color: "#ffe619", border: "#d69e2e", name: "Neogen (2.6 - 23 Ma)" },
+            "Paleogen": { color: "#fd9a52", border: "#dd6b20", name: "Paleogen (23 - 66 Ma)" },
+            "Cretacic": { color: "#7fc64e", border: "#48bb78", name: "Cretacic (66 - 145 Ma)" },
+            "Jurasic": { color: "#34b2c9", border: "#319795", name: "Jurasic (145 - 201 Ma)" },
+            "Triasic": { color: "#812b92", border: "#6b46c1", name: "Triasic (201 - 252 Ma)" },
+            "Permian": { color: "#f04028", border: "#e53e3e", name: "Permian (252 - 298 Ma)" },
+            "Carbonifer": { color: "#67a599", border: "#319795", name: "Carbonifer (298 - 358 Ma)" },
+            "Devonian": { color: "#cb8c37", border: "#b7791f", name: "Devonian (358 - 419 Ma)" },
+            "Silurian": { color: "#b3e1b6", border: "#68d391", name: "Silurian (419 - 443 Ma)" },
+            "Ordovician": { color: "#009270", border: "#22543d", name: "Ordovician (443 - 485 Ma)" },
+            "Cambrian": { color: "#7fa056", border: "#4f772d", name: "Cambrian (485 - 541 Ma)" },
+            "Precambrian": { color: "#f74370", border: "#b83280", name: "Precambrian / Fundament Cristalin" }
+        };
+
+        // Strate inițiale (ordonate de la fundament în sus)
+        let strata = [
+            { name: "Sisturi Cristaline", age: "Precambrian", thickness: 110 },
+            { name: "Calcare Mezozoice", age: "Jurasic", thickness: 75 },
+            { name: "Gresii de Tarcău (Fliș)", age: "Cretacic", thickness: 70 },
+            { name: "Marne și Argile", age: "Paleogen", thickness: 60 },
+            { name: "Aluviuni Cuaternare", age: "Cuaternar", thickness: 45 }
+        ];
 
         let simState = {
             process: 'normal',
@@ -237,15 +301,7 @@
             rawNoise: []
         };
 
-        const baseStrata = [
-            { name: "Sisturi Cristaline", color: "#1e293b", stroke: "#0f172a", thickness: 110 },
-            { name: "Calcare Mezozoice", color: "#334155", stroke: "#1e293b", thickness: 75 },
-            { name: "Gresii de Tarcău", color: "#b45309", stroke: "#92400e", thickness: 70 },
-            { name: "Marne și Argile", color: "#1d4ed8", stroke: "#1e40af", thickness: 60 },
-            { name: "Depozite Cuaternare", color: "#64748b", stroke: "#475569", thickness: 45 }
-        ];
-
-        let strata = JSON.parse(JSON.stringify(baseStrata));
+        let tempStrataEdit = [];
         let isCarving = false;
         let viewTransform = { scale: 1, offsetX: 0, offsetY: 0 };
 
@@ -261,18 +317,6 @@
             canvas.style.width = `${rect.width}px`;
             canvas.style.height = `${rect.height}px`;
 
-            let scaleFactor = 1.0;
-            if (rect.height < 320) {
-                scaleFactor = 0.72;
-            } else if (rect.height < 440) {
-                scaleFactor = 0.85;
-            }
-
-            strata = baseStrata.map(layer => ({
-                ...layer,
-                thickness: Math.round(layer.thickness * scaleFactor)
-            }));
-
             if (simState.topoProfile.length !== Math.round(rect.width)) {
                 initTopoProfile();
             }
@@ -283,20 +327,113 @@
             setTimeout(resizeCanvas, 150);
         });
 
+        function getStratumColor(age) {
+            return geologicalAges[age] ? geologicalAges[age].color : "#718096";
+        }
+        function getStratumBorder(age) {
+            return geologicalAges[age] ? geologicalAges[age].border : "#4a5568";
+        }
+
         function initLegend() {
             const legendContainer = document.getElementById('strat-legend');
             legendContainer.innerHTML = '';
-            baseStrata.slice().reverse().forEach((layer) => {
+            strata.slice().reverse().forEach((layer) => {
+                const color = getStratumColor(layer.age);
+                const border = getStratumBorder(layer.age);
                 legendContainer.innerHTML += `
                     <div class="flex items-center justify-between p-1 bg-slate-950/70 rounded-md border border-slate-800">
                         <div class="flex items-center space-x-1.5 overflow-hidden">
-                            <span class="w-2 h-2 rounded-sm flex-shrink-0" style="background-color: ${layer.color}; border: 1px solid ${layer.stroke}"></span>
-                            <span class="text-slate-300 truncate">${layer.name}</span>
+                            <span class="w-2.5 h-2.5 rounded-sm flex-shrink-0" style="background-color: ${color}; border: 1px solid ${border}"></span>
+                            <span class="text-slate-300 truncate font-medium">${layer.name}</span>
                         </div>
-                        <span class="text-slate-500 font-mono text-[9px] flex-shrink-0">${layer.thickness}m</span>
+                        <div class="flex items-center space-x-1 flex-shrink-0">
+                            <span class="text-indigo-300 font-mono text-[9px] bg-slate-900 px-1 rounded">${layer.age}</span>
+                            <span class="text-slate-500 font-mono text-[9px]">${layer.thickness}m</span>
+                        </div>
                     </div>
                 `;
             });
+        }
+
+        // ==========================================
+        // MODAL EDITOR STRATIGRAFIE
+        // ==========================================
+
+        function openStrataModal() {
+            tempStrataEdit = JSON.parse(JSON.stringify(strata));
+            renderStrataEditorList();
+            document.getElementById('strata-modal').classList.remove('hidden');
+        }
+
+        function closeStrataModal() {
+            document.getElementById('strata-modal').classList.add('hidden');
+        }
+
+        function renderStrataEditorList() {
+            const list = document.getElementById('strata-edit-list');
+            list.innerHTML = '';
+
+            const ageOptions = Object.keys(geologicalAges).map(age => 
+                `<option value="${age}">${age}</option>`
+            ).join('');
+
+            tempStrataEdit.slice().reverse().forEach((layer, origIdxReversed) => {
+                const actualIdx = tempStrataEdit.length - 1 - origIdxReversed;
+                const color = getStratumColor(layer.age);
+
+                list.innerHTML += `
+                    <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <div class="w-6 h-6 rounded-lg flex-shrink-0 border" style="background-color: ${color}; border-color: ${getStratumBorder(layer.age)}"></div>
+                        
+                        <div class="flex-1 w-full sm:w-auto">
+                            <input type="text" value="${layer.name}" onchange="tempStrataEdit[${actualIdx}].name = this.value" placeholder="Nume Strat..." class="w-full bg-slate-900 border border-slate-700 px-2 py-1 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500">
+                        </div>
+
+                        <div class="w-full sm:w-40 flex-shrink-0">
+                            <select onchange="tempStrataEdit[${actualIdx}].age = this.value; renderStrataEditorList();" class="w-full bg-slate-900 border border-slate-700 px-2 py-1 rounded-lg text-xs text-indigo-300 focus:outline-none focus:border-indigo-500">
+                                ${Object.keys(geologicalAges).map(age => 
+                                    `<option value="${age}" ${layer.age === age ? 'selected' : ''}>${age}</option>`
+                                ).join('')}
+                            </select>
+                        </div>
+
+                        <div class="flex items-center space-x-1.5 w-full sm:w-28 flex-shrink-0">
+                            <input type="number" min="10" max="250" value="${layer.thickness}" onchange="tempStrataEdit[${actualIdx}].thickness = parseInt(this.value) || 30" class="w-full bg-slate-900 border border-slate-700 px-2 py-1 rounded-lg text-xs text-white text-center focus:outline-none focus:border-indigo-500">
+                            <span class="text-[10px] text-slate-400">m</span>
+                        </div>
+
+                        <button onclick="removeStratum(${actualIdx})" class="text-rose-400 hover:text-rose-300 p-1 px-2 text-xs rounded bg-slate-900 border border-slate-800" title="Șterge strat">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        function addNewStratum() {
+            tempStrataEdit.push({
+                name: "Strat Nou",
+                age: "Cretacic",
+                thickness: 50
+            });
+            renderStrataEditorList();
+        }
+
+        function removeStratum(index) {
+            if (tempStrataEdit.length <= 1) {
+                alert("Trebuie să existe cel puțin un strat în secțiune.");
+                return;
+            }
+            tempStrataEdit.splice(index, 1);
+            renderStrataEditorList();
+        }
+
+        function saveStrataChanges() {
+            strata = JSON.parse(JSON.stringify(tempStrataEdit));
+            closeStrataModal();
+            initLegend();
+            initTopoProfile();
+            drawSimulation();
         }
 
         function setProcess(procType) {
@@ -364,7 +501,7 @@
                 badge.className = "bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold border border-cyan-500/30";
                 badge.innerText = "Eroziune Activă";
             } else {
-                btn.className = "bg-slate-800 text-slate-400 border border-slate-700 px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all";
+                btn.className = "bg-slate-800 text-slate-400 border border-slate-700 px-2 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all";
                 badge.className = "bg-slate-700/30 text-slate-400 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold border border-slate-700";
                 badge.innerText = "Eroziune Oprită";
             }
@@ -508,7 +645,6 @@
             const H = parseFloat(canvas.style.height) || 420;
             ctx.clearRect(0, 0, W, H);
 
-            // Grid discret de fundal în spațiul ecranului
             ctx.strokeStyle = '#1e293b';
             ctx.lineWidth = 1;
             for (let x = 0; x < W; x += 45) {
@@ -559,7 +695,6 @@
             const topTranslatedY = topOriginalY + dy;
             const botTranslatedY = baseY + dy;
 
-            // Determinare limite extreme pe verticală pentru Auto-Scaling
             let minY = Math.min(topOriginalY, topTranslatedY);
             let maxY = Math.max(baseY, botTranslatedY);
 
@@ -573,7 +708,6 @@
                 }
             }
 
-            // Calcul scalare dinamică și centrare automată
             const marginY = 32;
             const targetMinY = marginY;
             const targetMaxY = H - marginY;
@@ -597,13 +731,13 @@
             ctx.translate(offsetX, offsetY);
             ctx.scale(scale, scale);
 
-            // 1. FOOTWALL (Bloc Stânga)
+            // 1. FOOTWALL (Stânga)
             layerBounds.forEach(({ layer, yTop, yBot }) => {
                 const xTopFault = getFaultX(yTop);
                 const xBotFault = getFaultX(yBot);
 
-                ctx.fillStyle = layer.color;
-                ctx.strokeStyle = layer.stroke;
+                ctx.fillStyle = getStratumColor(layer.age);
+                ctx.strokeStyle = getStratumBorder(layer.age);
                 ctx.lineWidth = 1.5;
 
                 ctx.beginPath();
@@ -616,15 +750,15 @@
                 ctx.stroke();
             });
 
-            // 2. HANGING WALL (Bloc Dreapta)
+            // 2. HANGING WALL (Dreapta)
             layerBounds.forEach(({ layer, yTop, yBot }) => {
                 const yTopTrans = yTop + dy;
                 const yBotTrans = yBot + dy;
                 const xTopFaultTrans = getFaultX(yTop) + dx;
                 const xBotFaultTrans = getFaultX(yBot) + dx;
 
-                ctx.fillStyle = layer.color;
-                ctx.strokeStyle = layer.stroke;
+                ctx.fillStyle = getStratumColor(layer.age);
+                ctx.strokeStyle = getStratumBorder(layer.age);
                 ctx.lineWidth = 1.5;
 
                 ctx.beginPath();
@@ -678,7 +812,7 @@
                 ctx.stroke();
             }
 
-            // Margini laterale de contur
+            // Margini de contur
             ctx.strokeStyle = '#334155';
             ctx.lineWidth = 1.5;
             ctx.beginPath();
@@ -688,7 +822,7 @@
             ctx.lineTo(modelRightX, botTranslatedY);
             ctx.stroke();
 
-            // 5. Etichete
+            // Etichete
             ctx.font = 'bold 10px Inter, sans-serif';
             ctx.fillStyle = '#94a3b8';
             ctx.fillText("FOOTWALL", modelLeftX + 10, topOriginalY - 10);
