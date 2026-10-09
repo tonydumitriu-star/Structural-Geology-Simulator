@@ -2,7 +2,7 @@
 <div id="simulation-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
     <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
         
-        <!-- Header Modal cu Badge de Versiune v1.1.0 -->
+        <!-- Header Modal -->
         <div class="px-4 py-3 border-b border-slate-800 flex justify-between items-center bg-slate-900/90">
             <div class="flex items-center space-x-2">
                 <i class="fa-solid fa-layer-group text-indigo-400"></i>
@@ -16,10 +16,10 @@
             </button>
         </div>
 
-        <!-- Conținut cu Scroll -->
+        <!-- Conținut Derulabil -->
         <div class="p-3 sm:p-4 overflow-y-auto space-y-4 flex-1">
             
-            <!-- Secțiunea 1: Parametri de Cutare Tectonică (Compresiune) -->
+            <!-- Secțiunea 1: Parametri de Cutare Tectonică -->
             <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-3">
                 <div class="flex items-center justify-between">
                     <span id="sim-modal-folding-title" class="text-xs font-bold text-purple-300 uppercase tracking-wider flex items-center">
@@ -74,7 +74,6 @@
 <script>
     const SIMULATION_MODAL_VERSION = "1.1.0";
 
-    // Păstrăm valori temporare pentru cutare în modal
     let tempFoldShortening = 0;
     let tempFoldWavelength = 220;
 
@@ -110,7 +109,6 @@
 
         updateModalFoldingLabels();
 
-        // Aplicare directă opțională în simState pentru preview live dacă modelul este vizibil în fundal
         if (typeof simState !== 'undefined') {
             simState.foldShortening = tempFoldShortening;
             simState.foldWavelength = tempFoldWavelength;
@@ -120,7 +118,7 @@
 
     function renderSimulationEditorList() {
         const list = document.getElementById('strata-edit-list');
-        if (!list || typeof tempStrataEdit === 'undefined' || typeof iugsChronodata === 'undefined') return;
+        if (!list || typeof tempStrataEdit === 'undefined' || !window.iugsChronodata) return;
         
         list.innerHTML = '';
         const t = (typeof translations !== 'undefined' && typeof currentLang !== 'undefined') ? translations[currentLang] : { stratumPlaceholder: 'Nume Strat...' };
@@ -140,7 +138,7 @@
 
                     <div class="w-full sm:w-52 flex-shrink-0">
                         <select onchange="tempStrataEdit[${actualIdx}].age = this.value; renderSimulationEditorList();" class="w-full bg-slate-900 border border-slate-700 px-2 py-1 rounded-lg text-xs text-indigo-300 focus:outline-none focus:border-indigo-500">
-                            ${iugsChronodata.map(item => {
+                            ${window.iugsChronodata.map(item => {
                                 const isRo = (typeof currentLang !== 'undefined' && currentLang === 'ro');
                                 const optName = isRo ? item.nameRo : item.nameEn;
                                 const optRank = isRo ? item.rankRo : item.rankEn;
@@ -200,7 +198,6 @@
         if (typeof drawSimulation === 'function') drawSimulation();
     }
 
-    // Inițializare la deschidere/încărcare
     syncFoldingControls();
     if (typeof tempStrataEdit === 'undefined' && typeof strata !== 'undefined') {
         tempStrataEdit = JSON.parse(JSON.stringify(strata));
