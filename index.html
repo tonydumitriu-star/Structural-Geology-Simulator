@@ -57,7 +57,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
 
-    <!-- Header Compact cu Badge v2.5.0 -->
+    <!-- Header Compact cu Badge v2.6.0 -->
     <header class="bg-slate-900 border-b border-slate-800 px-3 sm:px-4 py-2 sm:py-2.5 flex justify-between items-center shadow-lg sticky top-0 z-50 landscape-compact-header">
         <div class="flex items-center space-x-2">
             <div class="bg-indigo-600 p-1.5 sm:p-2 rounded-lg text-white shadow-md">
@@ -66,15 +66,20 @@
             <div>
                 <div class="flex items-center space-x-1.5 sm:space-x-2">
                     <h1 class="text-xs sm:text-base font-bold tracking-wide text-white leading-tight">TECTONO-LAB</h1>
-                    <span id="app-version-badge" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v2.5.0</span>
+                    <span id="app-version-badge" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v2.6.0</span>
                 </div>
-                <p class="hidden sm:block text-[10px] text-slate-400">Simulator Tectonic & Editor Stratigrafic</p>
+                <p class="hidden sm:block text-[10px] text-slate-400">Simulator Tectonic & Cartă IUGS</p>
             </div>
         </div>
         <div class="flex items-center space-x-2">
+            <!-- Buton Deschidere Dicționar IUGS -->
+            <button onclick="openIugsModal()" class="bg-amber-600 hover:bg-amber-500 text-white px-2 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all shadow-sm">
+                <i class="fa-solid fa-book-atlas text-[10px]"></i>
+                <span class="text-[11px] sm:text-xs">Dicționar IUGS</span>
+            </button>
             <button onclick="openStrataModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all shadow-sm">
                 <i class="fa-solid fa-layer-group text-[10px]"></i>
-                <span class="text-[11px] sm:text-xs">Editează Strate</span>
+                <span class="text-[11px] sm:text-xs">Strate</span>
             </button>
             <button onclick="toggleErosion()" id="btn-toggle-erosion" class="bg-cyan-600 text-white px-2 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all">
                 <i id="icon-toggle-erosion" class="fa-solid fa-wind text-[10px]"></i>
@@ -100,11 +105,11 @@
                     <span id="erosion-badge" class="bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold border border-cyan-500/30">Eroziune Activă</span>
                 </div>
                 <div class="text-[10px] text-slate-400">
-                    <span><i class="fa-solid fa-expand text-emerald-400 mr-1"></i> Auto-scale la grosimea stratelor</span>
+                    <span><i class="fa-solid fa-hand-pointer text-amber-400 mr-1"></i> Sapă pe ecran</span>
                 </div>
             </div>
 
-            <!-- Canvas Viewport -->
+            <!-- Canvas Viewport 1:1 (fără autoscale) -->
             <div id="canvas-container" class="w-full bg-slate-950 rounded-lg sm:rounded-xl border border-slate-800 relative overflow-hidden flex items-center justify-center h-[260px] sm:h-[420px] lg:h-[540px]">
                 <canvas id="geologyCanvas" class="w-full h-full cursor-crosshair"></canvas>
             </div>
@@ -118,7 +123,7 @@
                 </div>
                 <div class="flex items-center space-x-2">
                     <div id="stat-dip-type" class="hidden sm:block text-slate-400 font-mono text-[10px]">Cădere spre Dreapta</div>
-                    <span class="text-[9px] font-mono text-slate-500 bg-slate-900 px-1 py-0.5 rounded border border-slate-800">v2.5.0</span>
+                    <span class="text-[9px] font-mono text-slate-500 bg-slate-900 px-1 py-0.5 rounded border border-slate-800">v2.6.0</span>
                 </div>
             </div>
         </div>
@@ -209,7 +214,7 @@
                     </button>
                 </div>
 
-                <!-- Litologie și buton de editare -->
+                <!-- Litologie -->
                 <div class="pt-1.5 border-t border-slate-800">
                     <div class="flex justify-between items-center mb-1">
                         <h3 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">Coloană Stratigrafică</h3>
@@ -225,23 +230,52 @@
 
     </main>
 
-    <!-- Modal pentru Editarea Stratelor și Vârstelor Geologice -->
+    <!-- Modal 1: Dicționar / Căutare Cartă Geologică IUGS -->
+    <div id="iugs-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+            <div class="px-4 py-3 border-b border-slate-800 flex justify-between items-center bg-slate-900/90">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-book-atlas text-amber-400"></i>
+                    <h3 class="font-bold text-white text-sm sm:text-base">Cartă Cronostratigrafică & Coduri de Culori (IUGS)</h3>
+                </div>
+                <button onclick="closeIugsModal()" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="p-3 bg-slate-950 border-b border-slate-800">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-xs"></i>
+                    <input type="text" id="iugs-search-input" oninput="filterIugsList()" placeholder="Caută unitate (ex: Neogen, Jurasic, Cretacic, Arhean, Holocen...)" class="w-full bg-slate-900 border border-slate-700 pl-9 pr-4 py-2 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
+                </div>
+            </div>
+
+            <!-- Listă Rezultate Dicționar -->
+            <div class="p-3 overflow-y-auto space-y-2 flex-1" id="iugs-results-list">
+                <!-- Generat dinamic -->
+            </div>
+
+            <div class="p-3 border-t border-slate-800 bg-slate-900/90 flex justify-end">
+                <button onclick="closeIugsModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-1.5 rounded-xl text-xs font-semibold">Închide</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: Editare Strate Secțiune -->
     <div id="strata-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
         <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
             <div class="px-4 py-3 border-b border-slate-800 flex justify-between items-center bg-slate-900/90">
                 <div class="flex items-center space-x-2">
                     <i class="fa-solid fa-layer-group text-indigo-400"></i>
-                    <h3 class="font-bold text-white text-sm sm:text-base">Editor Stratigrafie & Vârste Geologice</h3>
+                    <h3 class="font-bold text-white text-sm sm:text-base">Editor Stratigrafie Secțiune</h3>
                 </div>
                 <button onclick="closeStrataModal()" class="text-slate-400 hover:text-white p-1">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
 
-            <!-- Listă de strate editabile -->
-            <div class="p-3 sm:p-4 overflow-y-auto space-y-2 flex-1" id="strata-edit-list">
-                <!-- Generat dinamic prin JavaScript -->
-            </div>
+            <div class="p-3 sm:p-4 overflow-y-auto space-y-2 flex-1" id="strata-edit-list"></div>
 
             <div class="p-3 border-t border-slate-800 bg-slate-900/90 flex justify-between items-center">
                 <button onclick="addNewStratum()" class="bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all">
@@ -258,30 +292,42 @@
 
     <!-- JavaScript Engine -->
     <script>
-        const APP_VERSION = "2.5.0";
+        const APP_VERSION = "2.6.0";
         console.log(`TECTONO-LAB inițializat la versiunea: ${APP_VERSION}`);
 
         const canvas = document.getElementById('geologyCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Paletă cronostratigrafică oficială (IUGS - Comisia Internațională de Stratigrafie)
-        const geologicalAges = {
-            "Cuaternar": { color: "#fff282", border: "#f6e05e", name: "Cuaternar (0 - 2.6 Ma)" },
-            "Neogen": { color: "#ffe619", border: "#d69e2e", name: "Neogen (2.6 - 23 Ma)" },
-            "Paleogen": { color: "#fd9a52", border: "#dd6b20", name: "Paleogen (23 - 66 Ma)" },
-            "Cretacic": { color: "#7fc64e", border: "#48bb78", name: "Cretacic (66 - 145 Ma)" },
-            "Jurasic": { color: "#34b2c9", border: "#319795", name: "Jurasic (145 - 201 Ma)" },
-            "Triasic": { color: "#812b92", border: "#6b46c1", name: "Triasic (201 - 252 Ma)" },
-            "Permian": { color: "#f04028", border: "#e53e3e", name: "Permian (252 - 298 Ma)" },
-            "Carbonifer": { color: "#67a599", border: "#319795", name: "Carbonifer (298 - 358 Ma)" },
-            "Devonian": { color: "#cb8c37", border: "#b7791f", name: "Devonian (358 - 419 Ma)" },
-            "Silurian": { color: "#b3e1b6", border: "#68d391", name: "Silurian (419 - 443 Ma)" },
-            "Ordovician": { color: "#009270", border: "#22543d", name: "Ordovician (443 - 485 Ma)" },
-            "Cambrian": { color: "#7fa056", border: "#4f772d", name: "Cambrian (485 - 541 Ma)" },
-            "Precambrian": { color: "#f74370", border: "#b83280", name: "Precambrian / Fundament Cristalin" }
-        };
+        // Baza completă de date cronostratigrafice oficiale IUGS (valori exacte HEX + RGB + Vârstă absolută Ma)
+        const iugsChronodata = [
+            { name: "Cuaternar", rank: "Perioadă / Sistem", ageInterval: "0.00 – 2.58 Ma", hex: "#fff282", rgb: "RGB(255, 242, 130)", border: "#f6e05e" },
+            { name: "Holocen", rank: "Epocă / Serie", ageInterval: "0.00 – 0.0117 Ma", hex: "#fef2e0", rgb: "RGB(254, 242, 224)", border: "#f6ad55" },
+            { name: "Pleistocen", rank: "Epocă / Serie", ageInterval: "0.0117 – 2.58 Ma", hex: "#fff2aa", rgb: "RGB(255, 242, 170)", border: "#d69e2e" },
+            { name: "Neogen", rank: "Perioadă / Sistem", ageInterval: "2.58 – 23.03 Ma", hex: "#ffe619", rgb: "RGB(255, 230, 25)", border: "#d69e2e" },
+            { name: "Pliocen", rank: "Epocă / Serie", ageInterval: "2.58 – 5.33 Ma", hex: "#ffff99", rgb: "RGB(255, 255, 153)", border: "#d69e2e" },
+            { name: "Miocen", rank: "Epocă / Serie", ageInterval: "5.33 – 23.03 Ma", hex: "#ffff00", rgb: "RGB(255, 255, 0)", border: "#b7791f" },
+            { name: "Paleogen", rank: "Perioadă / Sistem", ageInterval: "23.03 – 66.0 Ma", hex: "#fd9a52", rgb: "RGB(253, 154, 82)", border: "#dd6b20" },
+            { name: "Oligocen", rank: "Epocă / Serie", ageInterval: "23.03 – 33.9 Ma", hex: "#fdc07a", rgb: "RGB(253, 192, 122)", border: "#dd6b20" },
+            { name: "Eocen", rank: "Epocă / Serie", ageInterval: "33.9 – 56.0 Ma", hex: "#fdb462", rgb: "RGB(253, 180, 98)", border: "#c05621" },
+            { name: "Paleocen", rank: "Epocă / Serie", ageInterval: "56.0 – 66.0 Ma", hex: "#fda75a", rgb: "RGB(253, 167, 90)", border: "#9c4221" },
+            { name: "Cretacic", rank: "Perioadă / Sistem", ageInterval: "66.0 – 145.0 Ma", hex: "#7fc64e", rgb: "RGB(127, 198, 78)", border: "#48bb78" },
+            { name: "Jurasic", rank: "Perioadă / Sistem", ageInterval: "145.0 – 201.4 Ma", hex: "#34b2c9", rgb: "RGB(52, 178, 201)", border: "#319795" },
+            { name: "Triasic", rank: "Perioadă / Sistem", ageInterval: "201.4 – 251.9 Ma", hex: "#812b92", rgb: "RGB(129, 43, 146)", border: "#6b46c1" },
+            { name: "Permian", rank: "Perioadă / Sistem", ageInterval: "251.9 – 298.9 Ma", hex: "#f04028", rgb: "RGB(240, 64, 40)", border: "#e53e3e" },
+            { name: "Carbonifer", rank: "Perioadă / Sistem", ageInterval: "298.9 – 358.9 Ma", hex: "#67a599", rgb: "RGB(103, 165, 153)", border: "#319795" },
+            { name: "Devonian", rank: "Perioadă / Sistem", ageInterval: "358.9 – 419.2 Ma", hex: "#cb8c37", rgb: "RGB(203, 140, 55)", border: "#b7791f" },
+            { name: "Silurian", rank: "Perioadă / Sistem", ageInterval: "419.2 – 443.8 Ma", hex: "#b3e1b6", rgb: "RGB(179, 225, 182)", border: "#68d391" },
+            { name: "Ordovician", rank: "Perioadă / Sistem", ageInterval: "443.8 – 485.4 Ma", hex: "#009270", rgb: "RGB(0, 146, 112)", border: "#22543d" },
+            { name: "Cambrian", rank: "Perioadă / Sistem", ageInterval: "485.4 – 538.8 Ma", hex: "#7fa056", rgb: "RGB(127, 160, 86)", border: "#4f772d" },
+            { name: "Ediacaran", rank: "Perioadă (Neoproterozoic)", ageInterval: "538.8 – 635.0 Ma", hex: "#fed966", rgb: "RGB(254, 217, 102)", border: "#b7791f" },
+            { name: "Criogenian", rank: "Perioadă (Neoproterozoic)", ageInterval: "635.0 – 720.0 Ma", hex: "#fec056", rgb: "RGB(254, 192, 86)", border: "#b7791f" },
+            { name: "Proterozoic", rank: "Eon", ageInterval: "538.8 – 2500 Ma", hex: "#f74370", rgb: "RGB(247, 67, 112)", border: "#b83280" },
+            { name: "Arhean", rank: "Eon", ageInterval: "2500 – 4000 Ma", hex: "#f02368", rgb: "RGB(240, 35, 104)", border: "#97266d" },
+            { name: "Hadean", rank: "Eon informal", ageInterval: "4000 – 4567 Ma", hex: "#ae027e", rgb: "RGB(174, 2, 126)", border: "#702459" },
+            { name: "Precambrian", rank: "Supraeon / Fundament", ageInterval: "> 538.8 Ma", hex: "#f74370", rgb: "RGB(247, 67, 112)", border: "#b83280" }
+        ];
 
-        // Strate inițiale (ordonate de la fundament în sus)
+        // Strate secțiune
         let strata = [
             { name: "Sisturi Cristaline", age: "Precambrian", thickness: 110 },
             { name: "Calcare Mezozoice", age: "Jurasic", thickness: 75 },
@@ -303,7 +349,6 @@
 
         let tempStrataEdit = [];
         let isCarving = false;
-        let viewTransform = { scale: 1, offsetX: 0, offsetY: 0 };
 
         function resizeCanvas() {
             const container = document.getElementById('canvas-container');
@@ -323,15 +368,15 @@
             drawSimulation();
         }
         window.addEventListener('resize', resizeCanvas);
-        window.addEventListener('orientationchange', () => {
-            setTimeout(resizeCanvas, 150);
-        });
+        window.addEventListener('orientationchange', () => { setTimeout(resizeCanvas, 150); });
 
         function getStratumColor(age) {
-            return geologicalAges[age] ? geologicalAges[age].color : "#718096";
+            const found = iugsChronodata.find(item => item.name.toLowerCase() === (age || '').toLowerCase());
+            return found ? found.hex : "#718096";
         }
         function getStratumBorder(age) {
-            return geologicalAges[age] ? geologicalAges[age].border : "#4a5568";
+            const found = iugsChronodata.find(item => item.name.toLowerCase() === (age || '').toLowerCase());
+            return found ? found.border : "#4a5568";
         }
 
         function initLegend() {
@@ -356,7 +401,63 @@
         }
 
         // ==========================================
-        // MODAL EDITOR STRATIGRAFIE
+        // DICȚIONAR & CĂUTARE IUGS
+        // ==========================================
+
+        function openIugsModal() {
+            document.getElementById('iugs-modal').classList.remove('hidden');
+            document.getElementById('iugs-search-input').value = '';
+            filterIugsList();
+        }
+
+        function closeIugsModal() {
+            document.getElementById('iugs-modal').classList.add('hidden');
+        }
+
+        function filterIugsList() {
+            const query = (document.getElementById('iugs-search-input').value || '').trim().toLowerCase();
+            const listContainer = document.getElementById('iugs-results-list');
+            listContainer.innerHTML = '';
+
+            const results = iugsChronodata.filter(item => 
+                item.name.toLowerCase().includes(query) ||
+                item.rank.toLowerCase().includes(query) ||
+                item.ageInterval.toLowerCase().includes(query)
+            );
+
+            if (results.length === 0) {
+                listContainer.innerHTML = `<div class="text-center py-6 text-slate-500 text-xs">Nicio unitate cronostratigrafică găsită.</div>`;
+                return;
+            }
+
+            results.forEach(item => {
+                listContainer.innerHTML += `
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex items-center justify-between hover:border-slate-700 transition-all">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-9 h-9 rounded-lg border shadow-sm flex items-center justify-center font-bold text-[10px] text-slate-900" style="background-color: ${item.hex}; border-color: ${item.border}">
+                            </div>
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-bold text-white text-xs sm:text-sm">${item.name}</span>
+                                    <span class="text-[10px] text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">${item.rank}</span>
+                                </div>
+                                <div class="text-[11px] text-amber-300/90 font-mono mt-0.5">
+                                    <i class="fa-regular fa-clock mr-1"></i>${item.ageInterval}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-right font-mono text-[11px] space-y-0.5">
+                            <div class="text-slate-300 font-bold">${item.hex.toUpperCase()}</div>
+                            <div class="text-slate-500 text-[10px]">${item.rgb}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // ==========================================
+        // MODAL EDITOR STRATE
         // ==========================================
 
         function openStrataModal() {
@@ -373,10 +474,6 @@
             const list = document.getElementById('strata-edit-list');
             list.innerHTML = '';
 
-            const ageOptions = Object.keys(geologicalAges).map(age => 
-                `<option value="${age}">${age}</option>`
-            ).join('');
-
             tempStrataEdit.slice().reverse().forEach((layer, origIdxReversed) => {
                 const actualIdx = tempStrataEdit.length - 1 - origIdxReversed;
                 const color = getStratumColor(layer.age);
@@ -389,10 +486,10 @@
                             <input type="text" value="${layer.name}" onchange="tempStrataEdit[${actualIdx}].name = this.value" placeholder="Nume Strat..." class="w-full bg-slate-900 border border-slate-700 px-2 py-1 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500">
                         </div>
 
-                        <div class="w-full sm:w-40 flex-shrink-0">
+                        <div class="w-full sm:w-44 flex-shrink-0">
                             <select onchange="tempStrataEdit[${actualIdx}].age = this.value; renderStrataEditorList();" class="w-full bg-slate-900 border border-slate-700 px-2 py-1 rounded-lg text-xs text-indigo-300 focus:outline-none focus:border-indigo-500">
-                                ${Object.keys(geologicalAges).map(age => 
-                                    `<option value="${age}" ${layer.age === age ? 'selected' : ''}>${age}</option>`
+                                ${iugsChronodata.map(item => 
+                                    `<option value="${item.name}" ${layer.age === item.name ? 'selected' : ''}>${item.name} (${item.rank})</option>`
                                 ).join('')}
                             </select>
                         </div>
@@ -435,6 +532,10 @@
             initTopoProfile();
             drawSimulation();
         }
+
+        // ==========================================
+        // LOGICĂ TECTONICĂ & RELIEF
+        // ==========================================
 
         function setProcess(procType) {
             simState.process = procType;
@@ -549,21 +650,11 @@
             drawSimulation();
         }
 
-        function getSimCoords(clientX, clientY) {
-            const rect = canvas.getBoundingClientRect();
-            const canvasX = clientX - rect.left;
-            const canvasY = clientY - rect.top;
-
-            const simX = (canvasX - viewTransform.offsetX) / viewTransform.scale;
-            const simY = (canvasY - viewTransform.offsetY) / viewTransform.scale;
-            return { x: simX, y: simY };
-        }
-
         function carveAtPoint(clientX, clientY) {
             if (!simState.erosionActive) return;
-            const coords = getSimCoords(clientX, clientY);
-            const mouseX = Math.round(coords.x);
-            const mouseY = coords.y;
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = Math.round(clientX - rect.left);
+            const mouseY = clientY - rect.top;
             const radius = 30;
             const W = Math.round(parseFloat(canvas.style.width) || 700);
 
@@ -640,11 +731,16 @@
             drawSimulation();
         }
 
+        // ==========================================
+        // RANDARE DIRECTĂ 1:1 (FĂRĂ AUTOSCALE)
+        // ==========================================
+
         function drawSimulation() {
             const W = parseFloat(canvas.style.width) || 700;
             const H = parseFloat(canvas.style.height) || 420;
             ctx.clearRect(0, 0, W, H);
 
+            // Grid
             ctx.strokeStyle = '#1e293b';
             ctx.lineWidth = 1;
             for (let x = 0; x < W; x += 45) {
@@ -695,43 +791,7 @@
             const topTranslatedY = topOriginalY + dy;
             const botTranslatedY = baseY + dy;
 
-            let minY = Math.min(topOriginalY, topTranslatedY);
-            let maxY = Math.max(baseY, botTranslatedY);
-
-            if (simState.erosionActive && simState.topoProfile.length > 0) {
-                const intLeft = Math.max(0, Math.min(simState.topoProfile.length - 1, Math.round(modelLeftX)));
-                const intRight = Math.max(0, Math.min(simState.topoProfile.length - 1, Math.round(modelRightX)));
-                for (let x = intLeft; x <= intRight; x++) {
-                    if (simState.topoProfile[x] !== undefined) {
-                        minY = Math.min(minY, simState.topoProfile[x]);
-                    }
-                }
-            }
-
-            const marginY = 32;
-            const targetMinY = marginY;
-            const targetMaxY = H - marginY;
-            const targetHeight = targetMaxY - targetMinY;
-
-            const contentHeight = Math.max(10, maxY - minY);
-            let scaleY = 1.0;
-            if (contentHeight > targetHeight) {
-                scaleY = targetHeight / contentHeight;
-            }
-
-            const scale = Math.min(1.0, scaleY);
-            const contentCenterY = (minY + maxY) / 2;
-            const canvasCenterY = H / 2;
-            const offsetY = canvasCenterY - contentCenterY * scale;
-            const offsetX = (W * (1 - scale)) / 2;
-
-            viewTransform = { scale, offsetX, offsetY };
-
-            ctx.save();
-            ctx.translate(offsetX, offsetY);
-            ctx.scale(scale, scale);
-
-            // 1. FOOTWALL (Stânga)
+            // 1. FOOTWALL (Stânga - 1:1)
             layerBounds.forEach(({ layer, yTop, yBot }) => {
                 const xTopFault = getFaultX(yTop);
                 const xBotFault = getFaultX(yBot);
@@ -750,7 +810,7 @@
                 ctx.stroke();
             });
 
-            // 2. HANGING WALL (Dreapta)
+            // 2. HANGING WALL (Dreapta - 1:1)
             layerBounds.forEach(({ layer, yTop, yBot }) => {
                 const yTopTrans = yTop + dy;
                 const yBotTrans = yBot + dy;
@@ -786,10 +846,10 @@
             ctx.stroke();
             ctx.setLineDash([]);
 
-            // 4. Mască de Eroziune & Relief
+            // 4. Mască de Eroziune & Relief (1:1)
             const intW = Math.round(W);
             if (simState.erosionActive && simState.topoProfile.length >= intW) {
-                const skyTopY = Math.min(-300, minY - 100);
+                const skyTopY = -200;
                 ctx.fillStyle = '#020617';
                 ctx.beginPath();
                 ctx.moveTo(0, skyTopY);
@@ -830,8 +890,6 @@
             ctx.fillStyle = '#cbd5e1';
             let hwLabelY = topTranslatedY - 10;
             ctx.fillText("HANGING WALL", modelRightX - 85, hwLabelY);
-
-            ctx.restore();
         }
 
         window.onload = () => {
