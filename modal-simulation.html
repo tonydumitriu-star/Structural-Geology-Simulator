@@ -1,0 +1,118 @@
+<!-- Modal: Editor Stratigrafie Secțiune -->
+<div id="simulation-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+        <!-- Header Modal -->
+        <div class="px-4 py-3 border-b border-slate-800 flex justify-between items-center bg-slate-900/90">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-layer-group text-indigo-400"></i>
+                <h3 id="simulation-modal-title" class="font-bold text-white text-sm sm:text-base">Editor Stratigrafie Secțiune</h3>
+            </div>
+            <button onclick="closeSimulationModal()" class="text-slate-400 hover:text-white p-1">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Listă Strate Editabile -->
+        <div class="p-3 sm:p-4 overflow-y-auto space-y-2 flex-1" id="strata-edit-list"></div>
+
+        <!-- Footer Modal -->
+        <div class="p-3 border-t border-slate-800 bg-slate-900/90 flex justify-between items-center">
+            <button onclick="addNewStratum()" class="bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all">
+                <i class="fa-solid fa-plus"></i>
+                <span id="btn-add-stratum">Adaugă Strat Nou</span>
+            </button>
+            <div class="flex space-x-2">
+                <button onclick="closeSimulationModal()" id="btn-cancel-simulation" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-1.5 rounded-xl text-xs font-semibold transition-all">Anulează</button>
+                <button onclick="saveSimulationStrataChanges()" id="btn-apply-simulation" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded-xl text-xs font-semibold shadow-md transition-all">Aplică pe Model</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Randare dinamică a listei de strate în fereastra modală
+    function renderSimulationEditorList() {
+        const list = document.getElementById('strata-edit-list');
+        if (!list || typeof tempStrataEdit === 'undefined' || typeof iugsChronodata === 'undefined') return;
+        
+        list.innerHTML = '';
+        const t = (typeof translations !== 'undefined' && typeof currentLang !== 'undefined') ? translations[currentLang] : { stratumPlaceholder: 'Nume Strat...' };
+
+        tempStrataEdit.slice().reverse().forEach((layer, origIdxReversed) => {
+            const actualIdx = tempStrataEdit.length - 1 - origIdxReversed;
+            const color = typeof getStratumColor === 'function' ? getStratumColor(layer.age) : '#718096';
+            const border = typeof getStratumBorder === 'function' ? getStratumBorder(layer.age) : '#4a5568';
+
+            list.innerHTML += `
+                <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                    <div class="w-6 h-6 rounded-lg flex-shrink-0 border" style="background-color: ${color}; border-color: ${border}"></div>
+                    
+                    <div class="flex-1 w-full sm:w-auto">
+                        <input type="text" value="${layer.name}" onchange="tempStrataEdit[${actualIdx}].name = this.value" placeholder="${t.stratumPlaceholder}" class="w-full bg-slate-900 border border-slate-700 px-2 py-1 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+
+                    <div class="w-full sm:w-52 flex-shrink-0">
+                        <select onchange="tempStrataEdit[${actualIdx}].age = this.value; renderSimulationEditorList();" class="w-full bg-slate-900 border border-slate-700 px-2 py-1 rounded-lg text-xs text-indigo-300 focus:outline-none focus:border-indigo-500">
+                            ${iugsChronodata.map(item => {
+                                const isRo = (typeof currentLang !== 'undefined' && currentLang === 'ro');
+                                const optName = isRo ? item.nameRo : item.nameEn;
+                                const optRank = isRo ? item.rankRo : item.rankEn;
+                                const isSelected = layer.age.toLowerCase() === item.nameEn.toLowerCase() || layer.age.toLowerCase() === item.nameRo.toLowerCase();
+                                return `<option value="${item.nameEn}" ${isSelected ? 'selected' : ''}>${optName} (${optRank})</option>`;
+                            }).join('')}
+                        </select>
+                    </div>
+
+                    <div class="flex items-center space-x-1.5 w-full sm:w-28 flex-shrink-0">
+                        <input type="number" min="10" max="250" value="${layer.thickness}" onchange="tempStrataEdit[${actualIdx}].thickness = parseInt(this.value) || 30" class="w-full bg-slate-900 border border-slate-700 px-2 py-1 rounded-lg text-xs text-white text-center focus:outline-none focus:border-indigo-500">
+                        <span class="text-[10px] text-slate-400">m</span>
+                    </div>
+
+                    <button onclick="removeSimulationStratum(${actualIdx})" class="text-rose-400 hover:text-rose-300 p-1 px-2 text-xs rounded bg-slate-900 border border-slate-800" title="Delete">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            `;
+        });
+    }
+
+    // Adăugare strat nou
+    function addNewStratum() {
+        if (typeof tempStrataEdit === 'undefined') return;
+        const isRo = (typeof currentLang !== 'undefined' && currentLang === 'ro');
+        tempStrataEdit.push({
+            name: isRo ? "Strat Nou" : "New Layer",
+            age: "Cretaceous",
+            thickness: 50
+        });
+        renderSimulationEditorList();
+    }
+
+    // Ștergere strat cu validare
+    function removeSimulationStratum(index) {
+        if (typeof tempStrataEdit === 'undefined') return;
+        if (tempStrataEdit.length <= 1) {
+            const isRo = (typeof currentLang !== 'undefined' && currentLang === 'ro');
+            alert(isRo ? "Trebuie să existe cel puțin un strat în secțiune." : "At least one layer must remain in section.");
+            return;
+        }
+        tempStrataEdit.splice(index, 1);
+        renderSimulationEditorList();
+    }
+
+    // Salvare și aplicare pe secțiunea 2D din canvas
+    function saveSimulationStrataChanges() {
+        if (typeof tempStrataEdit === 'undefined') return;
+        strata = JSON.parse(JSON.stringify(tempStrataEdit));
+        closeSimulationModal();
+        if (typeof initLegend === 'function') initLegend();
+        if (typeof initTopoProfile === 'function') initTopoProfile();
+        if (typeof drawSimulation === 'function') drawSimulation();
+    }
+
+    // Inițializare listă imediat după injectarea modalului
+    if (typeof tempStrataEdit === 'undefined' && typeof strata !== 'undefined') {
+        tempStrataEdit = JSON.parse(JSON.stringify(strata));
+    }
+    renderSimulationEditorList();
+</script>
