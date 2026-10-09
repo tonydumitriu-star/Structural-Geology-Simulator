@@ -16,7 +16,7 @@
         }
         canvas { touch-action: none; }
 
-        /* Stiluri dedicate pentru modul mobil Landscape (înălțime mică de ecran) */
+        /* Stiluri dedicate pentru Landscape pe mobil */
         @media (orientation: landscape) and (max-height: 550px) {
             body {
                 overflow: hidden !important;
@@ -25,7 +25,7 @@
             #main-workspace {
                 display: flex !important;
                 flex-direction: row !important;
-                height: calc(100vh - 46px) !important;
+                height: calc(100vh - 44px) !important;
                 padding: 4px 8px !important;
                 gap: 8px !important;
                 overflow: hidden !important;
@@ -58,7 +58,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
 
-    <!-- Header Compact cu Badge de Versiune v2.2.0 -->
+    <!-- Header Compact cu Badge de Versiune v2.3.0 -->
     <header class="bg-slate-900 border-b border-slate-800 px-3 sm:px-4 py-2 sm:py-2.5 flex justify-between items-center shadow-lg sticky top-0 z-50 landscape-compact-header">
         <div class="flex items-center space-x-2">
             <div class="bg-indigo-600 p-1.5 sm:p-2 rounded-lg text-white shadow-md">
@@ -67,7 +67,7 @@
             <div>
                 <div class="flex items-center space-x-1.5 sm:space-x-2">
                     <h1 class="text-xs sm:text-base font-bold tracking-wide text-white leading-tight">TECTONO-LAB</h1>
-                    <span id="app-version-badge" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v2.2.0</span>
+                    <span id="app-version-badge" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v2.3.0</span>
                 </div>
                 <p class="hidden sm:block text-[10px] text-slate-400">Simulator Tectonic & Relief</p>
             </div>
@@ -84,10 +84,10 @@
         </div>
     </header>
 
-    <!-- Main Workspace (Flexibil pe mobil, Grid pe ecrane mari) -->
+    <!-- Main Workspace -->
     <main id="main-workspace" class="flex-1 max-w-[1700px] w-full mx-auto p-2 sm:p-4 md:p-6 flex flex-col lg:grid lg:grid-cols-4 gap-3 sm:gap-4">
 
-        <!-- Canvas Display Area (Permanent vizibil în stânga când este landscape) -->
+        <!-- Canvas Display Area -->
         <div id="canvas-wrapper" class="order-1 lg:order-2 lg:col-span-3 bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl shadow-xl p-2 sm:p-4 flex flex-col justify-between">
             
             <!-- Badges Bar -->
@@ -101,7 +101,7 @@
                 </div>
             </div>
 
-            <!-- Canvas Viewport adaptiv -->
+            <!-- Canvas Viewport adaptiv cu margini sigure -->
             <div id="canvas-container" class="w-full bg-slate-950 rounded-lg sm:rounded-xl border border-slate-800 relative overflow-hidden flex items-center justify-center h-[260px] sm:h-[420px] lg:h-[540px]">
                 <canvas id="geologyCanvas" class="w-full h-full cursor-crosshair"></canvas>
             </div>
@@ -115,12 +115,12 @@
                 </div>
                 <div class="flex items-center space-x-2">
                     <div id="stat-dip-type" class="hidden sm:block text-slate-400 font-mono text-[10px]">Cădere spre Dreapta</div>
-                    <span class="text-[9px] font-mono text-slate-500 bg-slate-900 px-1 py-0.5 rounded border border-slate-800">v2.2.0</span>
+                    <span class="text-[9px] font-mono text-slate-500 bg-slate-900 px-1 py-0.5 rounded border border-slate-800">v2.3.0</span>
                 </div>
             </div>
         </div>
 
-        <!-- Controls Sidebar (În dreapta când este landscape, scrollabil independent) -->
+        <!-- Controls Sidebar -->
         <div id="controls-sidebar" class="order-2 lg:order-1 lg:col-span-1 space-y-2.5 sm:space-y-4">
             
             <!-- 1. Tectonică de Falie -->
@@ -221,7 +221,7 @@
 
     <!-- JavaScript Engine -->
     <script>
-        const APP_VERSION = "2.2.0";
+        const APP_VERSION = "2.3.0";
         console.log(`TECTONO-LAB inițializat la versiunea: ${APP_VERSION}`);
 
         const canvas = document.getElementById('geologyCanvas');
@@ -238,7 +238,7 @@
             rawNoise: []
         };
 
-        const strata = [
+        const baseStrata = [
             { name: "Sisturi Cristaline", color: "#1e293b", stroke: "#0f172a", thickness: 110 },
             { name: "Calcare Mezozoice", color: "#334155", stroke: "#1e293b", thickness: 75 },
             { name: "Gresii de Tarcău", color: "#b45309", stroke: "#92400e", thickness: 70 },
@@ -246,6 +246,7 @@
             { name: "Depozite Cuaternare", color: "#64748b", stroke: "#475569", thickness: 45 }
         ];
 
+        let strata = JSON.parse(JSON.stringify(baseStrata));
         let isCarving = false;
 
         function resizeCanvas() {
@@ -260,6 +261,19 @@
             canvas.style.width = `${rect.width}px`;
             canvas.style.height = `${rect.height}px`;
 
+            // Scalare proporțională a grosimii stratelor când înălțimea este mică (mobil landscape)
+            let scaleFactor = 1.0;
+            if (rect.height < 320) {
+                scaleFactor = 0.72;
+            } else if (rect.height < 440) {
+                scaleFactor = 0.85;
+            }
+
+            strata = baseStrata.map(layer => ({
+                ...layer,
+                thickness: Math.round(layer.thickness * scaleFactor)
+            }));
+
             if (simState.topoProfile.length !== Math.round(rect.width)) {
                 initTopoProfile();
             }
@@ -273,7 +287,7 @@
         function initLegend() {
             const legendContainer = document.getElementById('strat-legend');
             legendContainer.innerHTML = '';
-            strata.slice().reverse().forEach((layer) => {
+            baseStrata.slice().reverse().forEach((layer) => {
                 legendContainer.innerHTML += `
                     <div class="flex items-center justify-between p-1 bg-slate-950/70 rounded-md border border-slate-800">
                         <div class="flex items-center space-x-1.5 overflow-hidden">
@@ -330,7 +344,7 @@
             const H = parseFloat(canvas.style.height) || 420;
             const totalThickness = strata.reduce((acc, l) => acc + l.thickness, 0);
             const anchorY = H * 0.52;
-            const baseY = anchorY + (totalThickness * 0.42);
+            const baseY = anchorY + (totalThickness * 0.44);
             return baseY - totalThickness;
         }
 
@@ -352,7 +366,7 @@
                 badge.innerText = "Eroziune Activă";
             } else {
                 btn.className = "bg-slate-800 text-slate-400 border border-slate-700 px-2 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all";
-                badge.className = "bg-slate-700/30 text-slate-400 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold border border-slate-700";
+                badge.className = "bg-slate-700/30 text-slate-400 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold border border-slate-700";
                 badge.innerText = "Eroziune Oprită";
             }
             drawSimulation();
@@ -485,11 +499,16 @@
             const H = parseFloat(canvas.style.height) || 420;
             ctx.clearRect(0, 0, W, H);
 
+            // Margini de siguranță (padding) pentru ca modelul să fie vizibil complet
+            const boxPaddingX = Math.max(24, W * 0.04);
+            const modelLeftX = boxPaddingX;
+            const modelRightX = W - boxPaddingX;
+
             let effectiveDip = simState.dip;
             if (effectiveDip === 0) effectiveDip = 0.001;
 
             const dipRad = (effectiveDip * Math.PI) / 180;
-            const anchorX = W * 0.46;
+            const anchorX = W * 0.48;
             const anchorY = H * 0.52;
             const getFaultX = (y) => anchorX + (y - anchorY) / Math.tan(dipRad);
 
@@ -506,7 +525,7 @@
             document.getElementById('stat-heave').innerText = Math.abs(dx).toFixed(1) + 'm';
             document.getElementById('stat-net-slip').innerText = s.toFixed(1) + 'm';
 
-            // Grid
+            // Grid discret
             ctx.strokeStyle = '#1e293b';
             ctx.lineWidth = 1;
             for (let x = 0; x < W; x += 45) {
@@ -517,7 +536,7 @@
             }
 
             const totalThickness = strata.reduce((acc, l) => acc + l.thickness, 0);
-            const baseY = anchorY + (totalThickness * 0.42);
+            const baseY = anchorY + (totalThickness * 0.44);
 
             let layerBounds = [];
             let currY = baseY;
@@ -528,7 +547,7 @@
                 currY = yTop;
             }
 
-            // 1. FOOTWALL
+            // 1. FOOTWALL (Stânga - ancorat în zona de siguranță modelLeftX)
             layerBounds.forEach(({ layer, yTop, yBot }) => {
                 const xTopFault = getFaultX(yTop);
                 const xBotFault = getFaultX(yBot);
@@ -538,16 +557,16 @@
                 ctx.lineWidth = 1.5;
 
                 ctx.beginPath();
-                ctx.moveTo(0, yTop);
+                ctx.moveTo(modelLeftX, yTop);
                 ctx.lineTo(xTopFault, yTop);
                 ctx.lineTo(xBotFault, yBot);
-                ctx.lineTo(0, yBot);
+                ctx.lineTo(modelLeftX, yBot);
                 ctx.closePath();
                 ctx.fill();
                 ctx.stroke();
             });
 
-            // 2. HANGING WALL
+            // 2. HANGING WALL (Dreapta - ancorat în zona de siguranță modelRightX)
             layerBounds.forEach(({ layer, yTop, yBot }) => {
                 const yTopTrans = yTop + dy;
                 const yBotTrans = yBot + dy;
@@ -560,17 +579,17 @@
 
                 ctx.beginPath();
                 ctx.moveTo(xTopFaultTrans, yTopTrans);
-                ctx.lineTo(W, yTopTrans);
-                ctx.lineTo(W, yBotTrans);
+                ctx.lineTo(modelRightX, yTopTrans);
+                ctx.lineTo(modelRightX, yBotTrans);
                 ctx.lineTo(xBotFaultTrans, yBotTrans);
                 ctx.closePath();
                 ctx.fill();
                 ctx.stroke();
             });
 
-            // 3. Plan de Falie
-            const faultY1 = Math.min(layerBounds[strata.length - 1].yTop, layerBounds[strata.length - 1].yTop + dy) - 50;
-            const faultY2 = Math.max(baseY, baseY + dy) + 50;
+            // 3. Plan de Falie (Linie roșie)
+            const faultY1 = Math.min(layerBounds[strata.length - 1].yTop, layerBounds[strata.length - 1].yTop + dy) - 40;
+            const faultY2 = Math.max(baseY, baseY + dy) + 40;
             const faultX1 = getFaultX(faultY1);
             const faultX2 = getFaultX(faultY2);
 
@@ -583,7 +602,7 @@
             ctx.stroke();
             ctx.setLineDash([]);
 
-            // 4. Mască de Eroziune
+            // 4. Mască de Eroziune & Relief
             const intW = Math.round(W);
             if (simState.erosionActive && simState.topoProfile.length >= intW) {
                 ctx.fillStyle = '#020617';
@@ -598,24 +617,35 @@
                 ctx.closePath();
                 ctx.fill();
 
+                // Linie de relief (pe zona activă a modelului)
                 ctx.strokeStyle = '#38bdf8';
                 ctx.lineWidth = 2.5;
                 ctx.beginPath();
-                ctx.moveTo(0, simState.topoProfile[0]);
-                for (let x = 1; x < intW; x++) {
+                ctx.moveTo(modelLeftX, simState.topoProfile[Math.round(modelLeftX)]);
+                for (let x = Math.round(modelLeftX); x <= Math.round(modelRightX); x++) {
                     ctx.lineTo(x, simState.topoProfile[x]);
                 }
                 ctx.stroke();
             }
 
-            // 5. Etichete
+            // Margini laterale de contur ale blocului secțiunii
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(modelLeftX, layerBounds[strata.length - 1].yTop);
+            ctx.lineTo(modelLeftX, baseY);
+            ctx.moveTo(modelRightX, layerBounds[strata.length - 1].yTop + dy);
+            ctx.lineTo(modelRightX, baseY + dy);
+            ctx.stroke();
+
+            // 5. Etichete compacte plasate în interiorul zonei de siguranță
             ctx.font = 'bold 10px Inter, sans-serif';
             ctx.fillStyle = '#94a3b8';
-            ctx.fillText("FOOTWALL", 15, baseY - totalThickness - 10);
+            ctx.fillText("FOOTWALL", modelLeftX + 10, baseY - totalThickness - 10);
 
             ctx.fillStyle = '#cbd5e1';
             let hwLabelY = baseY - totalThickness - 10 + dy;
-            ctx.fillText("HANGING WALL", W - 95, Math.max(30, hwLabelY));
+            ctx.fillText("HANGING WALL", modelRightX - 85, Math.max(30, hwLabelY));
         }
 
         window.onload = () => {
