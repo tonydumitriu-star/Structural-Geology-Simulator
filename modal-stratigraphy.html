@@ -9,9 +9,9 @@
                 <div>
                     <div class="flex items-center space-x-2">
                         <h3 id="stratigraphy-modal-title" class="font-bold text-white text-sm sm:text-base">Scara Stratigrafică Internațională (IUGS / ICS)</h3>
-                        <span id="stratigraphy-modal-version" class="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v1.0.0</span>
+                        <span id="stratigraphy-modal-version" class="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v1.2.0</span>
                     </div>
-                    <p id="stratigraphy-modal-sub" class="text-[10px] text-slate-400">Bază completă cu vârste, nuanțe și denumirile standard ale culorilor</p>
+                    <p id="stratigraphy-modal-sub" class="text-[10px] text-slate-400">Bază completă de date: Eoni, Ere, Sisteme, Epoci, Etaje & Culori oficiale</p>
                 </div>
             </div>
             <button onclick="closeStratigraphyModal()" class="text-slate-400 hover:text-white p-1">
@@ -23,7 +23,7 @@
         <div class="p-3 bg-slate-950 border-b border-slate-800 flex flex-col sm:flex-row gap-2">
             <div class="relative flex-1">
                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-xs"></i>
-                <input type="text" id="stratigraphy-search-input" oninput="filterStratigraphyList()" placeholder="Caută după nume sau culoare (ex: Jurasic, albastru, verde, Jurassic...)" class="w-full bg-slate-900 border border-slate-700 pl-9 pr-4 py-2 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
+                <input type="text" id="stratigraphy-search-input" oninput="filterStratigraphyList()" placeholder="Caută după nume sau culoare (ex: Jurasic, albastru, verde, Cretacic...)" class="w-full bg-slate-900 border border-slate-700 pl-9 pr-4 py-2 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
             </div>
             <select id="stratigraphy-rank-filter" onchange="filterStratigraphyList()" class="bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-amber-500">
                 <option value="ALL">Toate rangurile / All Ranks</option>
@@ -47,15 +47,15 @@
 </div>
 
 <script>
-    const STRATIGRAPHY_MODAL_VERSION = "1.0.0";
-
-    // Baza completă de date ICS / IUGS definită global pentru ambele modale
+    // Baza oficială globală IUGS/ICS
     window.iugsChronodata = [
+        // EONI
         { nameRo: "Fanerozoic", nameEn: "Phanerozoic", rankRo: "Eonotem / Eon", rankEn: "Eonothem / Eon", ageInterval: "0.00 – 538.8 Ma", hex: "#9ee0eb", rgb: "RGB(158, 224, 235)", colorRo: "Bleu / Azuriu deschis", colorEn: "Light Cyan / Sky Blue", border: "#38bdf8" },
         { nameRo: "Proterozoic", nameEn: "Proterozoic", rankRo: "Eonotem / Eon", rankEn: "Eonothem / Eon", ageInterval: "538.8 – 2500 Ma", hex: "#f74370", rgb: "RGB(247, 67, 112)", colorRo: "Roz-trandafiriu strălucitor", colorEn: "Bright Rose Pink", border: "#e11d48" },
         { nameRo: "Arhean", nameEn: "Archean", rankRo: "Eonotem / Eon", rankEn: "Eonothem / Eon", ageInterval: "2500 – 4031 Ma", hex: "#f02368", rgb: "RGB(240, 35, 104)", colorRo: "Roz-magenta intens", colorEn: "Deep Magenta Pink", border: "#be123c" },
         { nameRo: "Hadean", nameEn: "Hadean", rankRo: "Eonotem informal", rankEn: "Informal Eon", ageInterval: "4031 – 4567 Ma", hex: "#ae027e", rgb: "RGB(174, 2, 126)", colorRo: "Purpuriu-roșiatic bogat", colorEn: "Rich Reddish Purple", border: "#86198f" },
 
+        // ERE / ERATHEMS
         { nameRo: "Cenozoic", nameEn: "Cenozoic", rankRo: "Eratem / Eră", rankEn: "Erathem / Era", ageInterval: "0.00 – 66.0 Ma", hex: "#f2f91d", rgb: "RGB(242, 249, 29)", colorRo: "Galben-lămâie intens", colorEn: "Bright Lemon Yellow", border: "#eab308" },
         { nameRo: "Mezozoic", nameEn: "Mesozoic", rankRo: "Eratem / Eră", rankEn: "Erathem / Era", ageInterval: "66.0 – 251.9 Ma", hex: "#67c5ca", rgb: "RGB(103, 197, 202)", colorRo: "Turcoaz mediu", colorEn: "Medium Turquoise Blue", border: "#06b6d4" },
         { nameRo: "Paleozoic", nameEn: "Paleozoic", rankRo: "Eratem / Eră", rankEn: "Erathem / Era", ageInterval: "251.9 – 538.8 Ma", hex: "#99c08d", rgb: "RGB(153, 192, 141)", colorRo: "Verde-salvie măsliniu", colorEn: "Muted Olive Sage", border: "#84cc16" },
@@ -67,6 +67,7 @@
         { nameRo: "Paleoarhean", nameEn: "Paleoarchean", rankRo: "Eratem / Eră", rankEn: "Erathem / Era", ageInterval: "3200 – 3600 Ma", hex: "#f8c5d7", rgb: "RGB(248, 197, 215)", colorRo: "Roz-garoafă pal", colorEn: "Pale Carnation Pink", border: "#f9a8d4" },
         { nameRo: "Eoarhean", nameEn: "Eoarchean", rankRo: "Eratem / Eră", rankEn: "Erathem / Era", ageInterval: "3600 – 4031 Ma", hex: "#f9dbe4", rgb: "RGB(249, 219, 228)", colorRo: "Roz cețos foarte pal", colorEn: "Very Pale Misty Rose", border: "#fbcfe8" },
 
+        // SISTEME / PERIOADE
         { nameRo: "Cuaternar", nameEn: "Quaternary", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "0.00 – 2.58 Ma", hex: "#f9f97f", rgb: "RGB(249, 249, 127)", colorRo: "Galben-pastel deschis", colorEn: "Light Pastel Yellow", border: "#eab308" },
         { nameRo: "Neogen", nameEn: "Neogene", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "2.58 – 23.04 Ma", hex: "#ffe619", rgb: "RGB(255, 230, 25)", colorRo: "Galben-auriu strălucitor", colorEn: "Goldenrod Yellow", border: "#ca8a04" },
         { nameRo: "Paleogen", nameEn: "Paleogene", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "23.04 – 66.0 Ma", hex: "#fd9a52", rgb: "RGB(253, 154, 82)", colorRo: "Portocaliu-mandarină viu", colorEn: "Bright Mandarin Orange", border: "#ea580c" },
@@ -93,6 +94,7 @@
         { nameRo: "Siderian", nameEn: "Siderian", rankRo: "Sistem / Perioadă", rankEn: "System / Period", ageInterval: "2300 – 2500 Ma", hex: "#f9b0c3", rgb: "RGB(249, 176, 195)", colorRo: "Roz-camee pal", colorEn: "Soft Cameo Pink", border: "#fda4af" },
         { nameRo: "Precambrian", nameEn: "Precambrian", rankRo: "Supraeon / Fundament", rankEn: "Supereon / Basement", ageInterval: "> 538.8 Ma", hex: "#f74370", rgb: "RGB(247, 67, 112)", colorRo: "Roz-trandafiriu de fundament", colorEn: "Basement Rose Pink", border: "#be123c" },
 
+        // EPOCI / SERII
         { nameRo: "Holocen", nameEn: "Holocene", rankRo: "Serie / Epocă", rankEn: "Series / Epoch", ageInterval: "0.00 – 0.0117 Ma", hex: "#fef2e0", rgb: "RGB(254, 242, 224)", colorRo: "Crem cald / Fildeș", colorEn: "Warm Cream / Ivory", border: "#fde047" },
         { nameRo: "Pleistocen", nameEn: "Pleistocene", rankRo: "Serie / Epocă", rankEn: "Series / Epoch", ageInterval: "0.0117 – 2.58 Ma", hex: "#fff2aa", rgb: "RGB(255, 242, 170)", colorRo: "Galben-unt pal", colorEn: "Pale Butter Yellow", border: "#facc15" },
         { nameRo: "Pliocen", nameEn: "Pliocene", rankRo: "Serie / Epocă", rankEn: "Series / Epoch", ageInterval: "2.58 – 5.333 Ma", hex: "#ffff99", rgb: "RGB(255, 255, 153)", colorRo: "Galben-canar deschis", colorEn: "Light Canary Yellow", border: "#eab308" },
@@ -109,6 +111,7 @@
         { nameRo: "Triasic Mediu", nameEn: "Middle Triassic", rankRo: "Serie / Epocă", rankEn: "Series / Epoch", ageInterval: "237.0 – 247.2 Ma", hex: "#a15bb0", rgb: "RGB(161, 91, 176)", colorRo: "Purpuriu-ametist", colorEn: "Medium Amethyst Purple", border: "#a855f7" },
         { nameRo: "Triasic Inferior", nameEn: "Lower Triassic", rankRo: "Serie / Epocă", rankEn: "Series / Epoch", ageInterval: "247.2 – 251.9 Ma", hex: "#983f9d", rgb: "RGB(152, 63, 157)", colorRo: "Purpuriu-prună închis", colorEn: "Dark Plum Purple", border: "#7e22ce" },
 
+        // ETAJE / VÂRSTE (STAGES)
         { nameRo: "Meghalayan", nameEn: "Meghalayan", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "0.00 – 0.0042 Ma", hex: "#fff7eb", rgb: "RGB(255, 247, 235)", colorRo: "Alb-pânză de in", colorEn: "Pale Linen White", border: "#facc15" },
         { nameRo: "Northgrippian", nameEn: "Northgrippian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "0.0042 – 0.0082 Ma", hex: "#fff2df", rgb: "RGB(255, 242, 223)", colorRo: "Galben-alabastru cald", colorEn: "Warm Alabaster Yellow", border: "#facc15" },
         { nameRo: "Greenlandian", nameEn: "Greenlandian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "0.0082 – 0.0117 Ma", hex: "#ffeed3", rgb: "RGB(255, 238, 211)", colorRo: "Crem-porumb pal", colorEn: "Pale Cream Corn", border: "#facc15" },
@@ -132,7 +135,7 @@
         { nameRo: "Thanetian", nameEn: "Thanetian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "56.00 – 59.24 Ma", hex: "#fdb869", rgb: "RGB(253, 184, 105)", colorRo: "Portocaliu-tigru deschis", colorEn: "Light Tiger Orange", border: "#9a3412" },
         { nameRo: "Selandian", nameEn: "Selandian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "59.24 – 61.66 Ma", hex: "#fdae57", rgb: "RGB(253, 174, 87)", colorRo: "Portocaliu-morcov cald", colorEn: "Warm Carrot Orange", border: "#9a3412" },
         { nameRo: "Danian", nameEn: "Danian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "61.66 – 66.00 Ma", hex: "#fda445", rgb: "RGB(253, 164, 69)", colorRo: "Portocaliu-dovleac profund", colorEn: "Deep Pumpkin Orange", border: "#9a3412" },
-        { nameRo: "Maastrichtian", nameEn: "Maastrichtian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "66.00 – 72.2 Ma", hex: "#f2fa8a", rgb: "RGB(252, 250, 138)", colorRo: "Verde-chartreuse pal", colorEn: "Pale Lime Chartreuse", border: "#65a30d" },
+        { nameRo: "Maastrichtian", nameEn: "Maastrichtian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "66.00 – 72.2 Ma", hex: "#f2fa8a", rgb: "RGB(242, 250, 138)", colorRo: "Verde-chartreuse pal", colorEn: "Pale Lime Chartreuse", border: "#65a30d" },
         { nameRo: "Campanian", nameEn: "Campanian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "72.2 – 83.6 Ma", hex: "#e6f578", rgb: "RGB(230, 245, 120)", colorRo: "Verde-pară deschis", colorEn: "Light Pear Green", border: "#65a30d" },
         { nameRo: "Santonian", nameEn: "Santonian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "83.6 – 85.7 Ma", hex: "#d9f066", rgb: "RGB(217, 240, 102)", colorRo: "Verde-primăvară viu", colorEn: "Bright Spring Green", border: "#65a30d" },
         { nameRo: "Coniacian", nameEn: "Coniacian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "85.7 – 89.8 Ma", hex: "#cceb54", rgb: "RGB(204, 235, 84)", colorRo: "Verde-măr intens", colorEn: "Vivid Granny Smith Green", border: "#65a30d" },
@@ -161,10 +164,47 @@
         { nameRo: "Ladinian", nameEn: "Ladinian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "237.0 – 241.5 Ma", hex: "#b071b9", rgb: "RGB(176, 113, 185)", colorRo: "Lavandă-magenta mediu", colorEn: "Medium Lavender Magenta", border: "#a855f7" },
         { nameRo: "Anisian", nameEn: "Anisian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "241.5 – 247.2 Ma", hex: "#9e55ae", rgb: "RGB(158, 85, 174)", colorRo: "Violet-orhidee bogat", colorEn: "Rich Orchid Violet", border: "#a855f7" },
         { nameRo: "Olenekian", nameEn: "Olenekian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "247.2 – 250.8 Ma", hex: "#a1479e", rgb: "RGB(161, 71, 158)", colorRo: "Purpuriu-dudă profund", colorEn: "Deep Mulberry Purple", border: "#7e22ce" },
-        { nameRo: "Induan", nameEn: "Induan", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "250.8 – 251.9 Ma", hex: "#983395", rgb: "RGB(152, 51, 149)", colorRo: "Violet-bizantin strălucitor", colorEn: "Vivid Byzantine Violet", border: "#7e22ce" }
+        { nameRo: "Induan", nameEn: "Induan", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "250.8 – 251.9 Ma", hex: "#983395", rgb: "RGB(152, 51, 149)", colorRo: "Violet-bizantin strălucitor", colorEn: "Vivid Byzantine Violet", border: "#7e22ce" },
+        { nameRo: "Changhsingian", nameEn: "Changhsingian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "251.9 – 254.1 Ma", hex: "#fbbbb0", rgb: "RGB(251, 187, 176)", colorRo: "Roz-somon pal", colorEn: "Pale Salmon Rose", border: "#f87171" },
+        { nameRo: "Wuchiapingian", nameEn: "Wuchiapingian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "254.1 – 259.5 Ma", hex: "#fba794", rgb: "RGB(251, 167, 148)", colorRo: "Teracotă-coral deschis", colorEn: "Light Coral Terracotta", border: "#f87171" },
+        { nameRo: "Capitanian", nameEn: "Capitanian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "259.5 – 264.3 Ma", hex: "#fb8e7b", rgb: "RGB(251, 142, 123)", colorRo: "Coral-mac mediu", colorEn: "Medium Poppy Coral", border: "#ef4444" },
+        { nameRo: "Wordian", nameEn: "Wordian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "264.3 – 266.9 Ma", hex: "#fb745c", rgb: "RGB(251, 116, 92)", colorRo: "Roșu-mușcată cald", colorEn: "Warm Geranium Red", border: "#ef4444" },
+        { nameRo: "Roadian", nameEn: "Roadian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "266.9 – 274.4 Ma", hex: "#fb5a3d", rgb: "RGB(251, 90, 61)", colorRo: "Roșu-flacără viu", colorEn: "Vivid Flame Orange-Red", border: "#ef4444" },
+        { nameRo: "Kungurian", nameEn: "Kungurian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "274.4 – 283.3 Ma", hex: "#f6745f", rgb: "RGB(246, 116, 95)", colorRo: "Coral-ruginiu cald", colorEn: "Warm Rust Coral", border: "#dc2626" },
+        { nameRo: "Artinskian", nameEn: "Artinskian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "283.3 – 290.1 Ma", hex: "#f5644d", rgb: "RGB(245, 100, 77)", colorRo: "Roșu-piper mediu", colorEn: "Medium Cayenne Red", border: "#dc2626" },
+        { nameRo: "Sakmarian", nameEn: "Sakmarian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "290.1 – 293.5 Ma", hex: "#ef533b", rgb: "RGB(239, 83, 59)", colorRo: "Vermilion-purpuriu viu", colorEn: "Vivid Crimson Vermilion", border: "#dc2626" },
+        { nameRo: "Asselian", nameEn: "Asselian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "293.5 – 298.9 Ma", hex: "#e5472e", rgb: "RGB(229, 71, 46)", colorRo: "Roșu-cardinal profund", colorEn: "Deep Cardinal Red", border: "#dc2626" },
+        { nameRo: "Gzhelian", nameEn: "Gzhelian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "298.9 – 303.7 Ma", hex: "#cce4d6", rgb: "RGB(204, 228, 214)", colorRo: "Mentă-pepene galben pal", colorEn: "Pale Honeydew Mint", border: "#14b8a6" },
+        { nameRo: "Kasimovian", nameEn: "Kasimovian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "303.7 – 307.0 Ma", hex: "#bfdcc8", rgb: "RGB(191, 220, 200)", colorRo: "Verde-celadon deschis", colorEn: "Soft Celadon Green", border: "#14b8a6" },
+        { nameRo: "Moscovian", nameEn: "Moscovian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "307.0 – 315.2 Ma", hex: "#b3d5bb", rgb: "RGB(179, 213, 187)", colorRo: "Verde-ceai deschis", colorEn: "Light Tea Green", border: "#14b8a6" },
+        { nameRo: "Bashkirian", nameEn: "Bashkirian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "315.2 – 323.2 Ma", hex: "#a6cdad", rgb: "RGB(166, 205, 173)", colorRo: "Salvie-deschis pal", colorEn: "Soft Pale Sage", border: "#14b8a6" },
+        { nameRo: "Serpukhovian", nameEn: "Serpukhovian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "323.2 – 330.9 Ma", hex: "#8cb5a3", rgb: "RGB(140, 181, 163)", colorRo: "Mușchi-ardezie mediu", colorEn: "Medium Moss Slate", border: "#0f766e" },
+        { nameRo: "Visean", nameEn: "Visean", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "330.9 – 346.7 Ma", hex: "#7fae98", rgb: "RGB(127, 174, 152)", colorRo: "Teal-ardezie pământos", colorEn: "Earthy Slate Teal", border: "#0f766e" },
+        { nameRo: "Tournaisian", nameEn: "Tournaisian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "346.7 – 358.9 Ma", hex: "#73a68d", rgb: "RGB(115, 166, 141)", colorRo: "Verde-pin stins", colorEn: "Muted Pine Green", border: "#0f766e" },
+        { nameRo: "Famennian", nameEn: "Famennian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "358.9 – 372.2 Ma", hex: "#f1d49e", rgb: "RGB(241, 212, 158)", colorRo: "Bej-biscuit pal", colorEn: "Pale Biscuit Tan", border: "#d97706" },
+        { nameRo: "Frasnian", nameEn: "Frasnian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "372.2 – 382.7 Ma", hex: "#f1c784", rgb: "RGB(241, 199, 132)", colorRo: "Auriu-caramel deschis", colorEn: "Soft Caramel Gold", border: "#d97706" },
+        { nameRo: "Givetian", nameEn: "Givetian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "382.7 – 387.7 Ma", hex: "#f1b364", rgb: "RGB(241, 179, 100)", colorRo: "Ocru-roșcat cald", colorEn: "Warm Tawny Ochre", border: "#d97706" },
+        { nameRo: "Eifelian", nameEn: "Eifelian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "387.7 – 393.3 Ma", hex: "#e5a450", rgb: "RGB(229, 164, 80)", colorRo: "Ocru-scorțișoară mediu", colorEn: "Medium Cinnamon Ochre", border: "#d97706" },
+        { nameRo: "Emsian", nameEn: "Emsian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "393.3 – 407.6 Ma", hex: "#e59438", rgb: "RGB(229, 148, 56)", colorRo: "Brun-caramel profund", colorEn: "Deep Butterscotch Brown", border: "#b45309" },
+        { nameRo: "Pragian", nameEn: "Pragian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "407.6 – 410.8 Ma", hex: "#e58525", rgb: "RGB(229, 133, 37)", colorRo: "Siena-naturală bogată", colorEn: "Rich Raw Sienna", border: "#b45309" },
+        { nameRo: "Lochkovian", nameEn: "Lochkovian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "410.8 – 419.6 Ma", hex: "#da7513", rgb: "RGB(218, 117, 19)", colorRo: "Portocaliu-ars cald", colorEn: "Warm Burnt Orange", border: "#b45309" },
+        { nameRo: "Pridoli", nameEn: "Pridoli", rankRo: "Serie / Epocă", rankEn: "Series / Epoch", ageInterval: "419.6 – 423.0 Ma", hex: "#e6f5e1", rgb: "RGB(230, 245, 225)", colorRo: "Alb-mentolat foarte pal", colorEn: "Very Pale Mint White", border: "#22c55e" },
+        { nameRo: "Ludlow", nameEn: "Ludlow", rankRo: "Serie / Epocă", rankEn: "Series / Epoch", ageInterval: "423.0 – 427.4 Ma", hex: "#bfe6cf", rgb: "RGB(191, 230, 207)", colorRo: "Verde-mentă pastel", colorEn: "Pastel Spearmint Green", border: "#22c55e" },
+        { nameRo: "Wenlock", nameEn: "Wenlock", rankRo: "Serie / Epocă", rankEn: "Series / Epoch", ageInterval: "427.4 – 433.4 Ma", hex: "#a6dcc3", rgb: "RGB(166, 220, 195)", colorRo: "Jad-deschis pal", colorEn: "Soft Pale Jade", border: "#22c55e" },
+        { nameRo: "Llandovery", nameEn: "Llandovery", rankRo: "Serie / Epocă", rankEn: "Series / Epoch", ageInterval: "433.4 – 443.1 Ma", hex: "#8cd2b8", rgb: "RGB(140, 210, 184)", colorRo: "Verde-opal proaspăt", colorEn: "Fresh Opal Green", border: "#22c55e" },
+        { nameRo: "Hirnantian", nameEn: "Hirnantian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "443.1 – 445.2 Ma", hex: "#a6d9c6", rgb: "RGB(166, 217, 198)", colorRo: "Verde-marin deschis", colorEn: "Light Sea Green", border: "#15803d" },
+        { nameRo: "Katian", nameEn: "Katian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "445.2 – 453.0 Ma", hex: "#99d3bc", rgb: "RGB(153, 211, 188)", colorRo: "Aqua-viridian deschis", colorEn: "Soft Viridian Aqua", border: "#15803d" },
+        { nameRo: "Sandbian", nameEn: "Sandbian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "453.0 – 458.4 Ma", hex: "#8cccb2", rgb: "RGB(140, 204, 178)", colorRo: "Teal-jad mediu", colorEn: "Medium Jade Teal", border: "#15803d" },
+        { nameRo: "Darriwilian", nameEn: "Darriwilian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "458.4 – 467.3 Ma", hex: "#73c2a5", rgb: "RGB(115, 194, 165)", colorRo: "Verde-malachit stins", colorEn: "Muted Malachite Green", border: "#15803d" },
+        { nameRo: "Dapingian", nameEn: "Dapingian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "467.3 – 470.0 Ma", hex: "#66bc9b", rgb: "RGB(102, 188, 155)", colorRo: "Teal-mentă mediu", colorEn: "Medium Mint Teal", border: "#15803d" },
+        { nameRo: "Floian", nameEn: "Floian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "470.0 – 477.7 Ma", hex: "#4db08e", rgb: "RGB(77, 176, 142)", colorRo: "Verde-persan bogat", colorEn: "Rich Persian Green", border: "#15803d" },
+        { nameRo: "Tremadocian", nameEn: "Tremadocian", rankRo: "Etaj / Vârstă", rankEn: "Stage / Age", ageInterval: "477.7 – 486.9 Ma", hex: "#33a582", rgb: "RGB(51, 165, 130)", colorRo: "Verde-jad profund", colorEn: "Deep Jade Green", border: "#15803d" },
+        { nameRo: "Furongian", nameEn: "Furongian", rankRo: "Serie / Epocă", rankEn: "Series / Epoch", ageInterval: "486.9 – 497.0 Ma", hex: "#b3c89b", rgb: "RGB(179, 200, 155)", colorRo: "Verde-salcie pal", colorEn: "Pale Willow Green", border: "#4d7c0f" },
+        { nameRo: "Miaolingian", nameEn: "Miaolingian", rankRo: "Serie / Epocă", rankEn: "Series / Epoch", ageInterval: "497.0 – 509.0 Ma", hex: "#a6be8c", rgb: "RGB(166, 190, 140)", colorRo: "Celadon-măsliniu deschis", colorEn: "Soft Olive Celadon", border: "#4d7c0f" },
+        { nameRo: "Terreneuvian", nameEn: "Terreneuvian", rankRo: "Serie / Epocă", rankEn: "Series / Epoch", ageInterval: "521.0 – 538.8 Ma", hex: "#8cb073", rgb: "RGB(140, 176, 115)", colorRo: "Verde-mușchi mediu", colorEn: "Medium Moss Green", border: "#4d7c0f" }
     ];
 
-    function filterStratigraphyList() {
+    window.filterStratigraphyList = function() {
         const searchInput = document.getElementById('stratigraphy-search-input');
         const rankFilter = document.getElementById('stratigraphy-rank-filter');
         const listContainer = document.getElementById('stratigraphy-results-list');
@@ -189,20 +229,20 @@
             return matchesQuery && matchesRank;
         });
 
-        const t = (typeof translations !== 'undefined' && typeof currentLang !== 'undefined') ? translations[currentLang] : { stratigraphyUnitsSuffix: 'unități' };
+        const isRo = (typeof currentLang === 'undefined' || currentLang === 'ro');
         if (countBadge) {
-            countBadge.innerText = `${results.length} / ${window.iugsChronodata.length} ${t.stratigraphyUnitsSuffix}`;
+            countBadge.innerText = `${results.length} / ${window.iugsChronodata.length} ${isRo ? 'unități' : 'units'}`;
         }
 
         if (results.length === 0) {
-            listContainer.innerHTML = `<div class="text-center py-8 text-slate-500 text-xs">${currentLang === 'ro' ? 'Nicio unitate găsită.' : 'No stratigraphic units found.'}</div>`;
+            listContainer.innerHTML = `<div class="text-center py-8 text-slate-500 text-xs">${isRo ? 'Nicio unitate găsită.' : 'No stratigraphic units found.'}</div>`;
             return;
         }
 
         results.forEach(item => {
-            const name = (typeof currentLang !== 'undefined' && currentLang === 'ro') ? item.nameRo : item.nameEn;
-            const rank = (typeof currentLang !== 'undefined' && currentLang === 'ro') ? item.rankRo : item.rankEn;
-            const colorDesc = (typeof currentLang !== 'undefined' && currentLang === 'ro') ? item.colorRo : item.colorEn;
+            const name = isRo ? item.nameRo : item.nameEn;
+            const rank = isRo ? item.rankRo : item.rankEn;
+            const colorDesc = isRo ? item.colorRo : item.colorEn;
 
             listContainer.innerHTML += `
                 <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex items-center justify-between hover:border-slate-700 transition-all">
@@ -232,7 +272,8 @@
                 </div>
             `;
         });
-    }
+    };
 
-    filterStratigraphyList();
+    // Apelare automată imediat ce fișierul este injectat
+    window.filterStratigraphyList();
 </script>
