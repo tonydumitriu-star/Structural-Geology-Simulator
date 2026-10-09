@@ -16,7 +16,6 @@
         }
         canvas { touch-action: none; }
 
-        /* Stiluri dedicate pentru Landscape pe mobil */
         @media (orientation: landscape) and (max-height: 550px) {
             body {
                 overflow: hidden !important;
@@ -58,7 +57,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
 
-    <!-- Header Compact cu Badge de Versiune v2.3.0 -->
+    <!-- Header Compact cu Badge de Versiune v2.4.0 -->
     <header class="bg-slate-900 border-b border-slate-800 px-3 sm:px-4 py-2 sm:py-2.5 flex justify-between items-center shadow-lg sticky top-0 z-50 landscape-compact-header">
         <div class="flex items-center space-x-2">
             <div class="bg-indigo-600 p-1.5 sm:p-2 rounded-lg text-white shadow-md">
@@ -67,9 +66,9 @@
             <div>
                 <div class="flex items-center space-x-1.5 sm:space-x-2">
                     <h1 class="text-xs sm:text-base font-bold tracking-wide text-white leading-tight">TECTONO-LAB</h1>
-                    <span id="app-version-badge" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v2.3.0</span>
+                    <span id="app-version-badge" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v2.4.0</span>
                 </div>
-                <p class="hidden sm:block text-[10px] text-slate-400">Simulator Tectonic & Relief</p>
+                <p class="hidden sm:block text-[10px] text-slate-400">Simulator Tectonic & Relief (Auto-Scale)</p>
             </div>
         </div>
         <div class="flex items-center space-x-2">
@@ -97,11 +96,11 @@
                     <span id="erosion-badge" class="bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold border border-cyan-500/30">Eroziune Activă</span>
                 </div>
                 <div class="text-[10px] text-slate-400">
-                    <span><i class="fa-solid fa-hand-pointer text-amber-400 mr-1"></i> Sapă pe ecran</span>
+                    <span><i class="fa-solid fa-expand text-emerald-400 mr-1"></i> Auto-centrare dinamică activă</span>
                 </div>
             </div>
 
-            <!-- Canvas Viewport adaptiv cu margini sigure -->
+            <!-- Canvas Viewport adaptiv cu Auto-Fit -->
             <div id="canvas-container" class="w-full bg-slate-950 rounded-lg sm:rounded-xl border border-slate-800 relative overflow-hidden flex items-center justify-center h-[260px] sm:h-[420px] lg:h-[540px]">
                 <canvas id="geologyCanvas" class="w-full h-full cursor-crosshair"></canvas>
             </div>
@@ -115,7 +114,7 @@
                 </div>
                 <div class="flex items-center space-x-2">
                     <div id="stat-dip-type" class="hidden sm:block text-slate-400 font-mono text-[10px]">Cădere spre Dreapta</div>
-                    <span class="text-[9px] font-mono text-slate-500 bg-slate-900 px-1 py-0.5 rounded border border-slate-800">v2.3.0</span>
+                    <span class="text-[9px] font-mono text-slate-500 bg-slate-900 px-1 py-0.5 rounded border border-slate-800">v2.4.0</span>
                 </div>
             </div>
         </div>
@@ -157,10 +156,10 @@
                     </div>
                     <div>
                         <div class="flex justify-between text-[11px] mb-0.5">
-                            <span class="text-slate-300">Slip:</span>
+                            <span class="text-slate-300">Slip (0 - 250m):</span>
                             <span id="val-slip" class="font-bold text-emerald-400">45 m</span>
                         </div>
-                        <input type="range" id="slider-slip" min="0" max="140" value="45" oninput="updateParameters()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                        <input type="range" id="slider-slip" min="0" max="250" value="45" oninput="updateParameters()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
                     </div>
                 </div>
 
@@ -221,7 +220,7 @@
 
     <!-- JavaScript Engine -->
     <script>
-        const APP_VERSION = "2.3.0";
+        const APP_VERSION = "2.4.0";
         console.log(`TECTONO-LAB inițializat la versiunea: ${APP_VERSION}`);
 
         const canvas = document.getElementById('geologyCanvas');
@@ -248,6 +247,7 @@
 
         let strata = JSON.parse(JSON.stringify(baseStrata));
         let isCarving = false;
+        let viewTransform = { scale: 1, offsetX: 0, offsetY: 0 };
 
         function resizeCanvas() {
             const container = document.getElementById('canvas-container');
@@ -261,7 +261,6 @@
             canvas.style.width = `${rect.width}px`;
             canvas.style.height = `${rect.height}px`;
 
-            // Scalare proporțională a grosimii stratelor când înălțimea este mică (mobil landscape)
             let scaleFactor = 1.0;
             if (rect.height < 320) {
                 scaleFactor = 0.72;
@@ -365,7 +364,7 @@
                 badge.className = "bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold border border-cyan-500/30";
                 badge.innerText = "Eroziune Activă";
             } else {
-                btn.className = "bg-slate-800 text-slate-400 border border-slate-700 px-2 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all";
+                btn.className = "bg-slate-800 text-slate-400 border border-slate-700 px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all";
                 badge.className = "bg-slate-700/30 text-slate-400 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold border border-slate-700";
                 badge.innerText = "Eroziune Oprită";
             }
@@ -413,11 +412,21 @@
             drawSimulation();
         }
 
+        function getSimCoords(clientX, clientY) {
+            const rect = canvas.getBoundingClientRect();
+            const canvasX = clientX - rect.left;
+            const canvasY = clientY - rect.top;
+
+            const simX = (canvasX - viewTransform.offsetX) / viewTransform.scale;
+            const simY = (canvasY - viewTransform.offsetY) / viewTransform.scale;
+            return { x: simX, y: simY };
+        }
+
         function carveAtPoint(clientX, clientY) {
             if (!simState.erosionActive) return;
-            const rect = canvas.getBoundingClientRect();
-            const mouseX = Math.round(clientX - rect.left);
-            const mouseY = clientY - rect.top;
+            const coords = getSimCoords(clientX, clientY);
+            const mouseX = Math.round(coords.x);
+            const mouseY = coords.y;
             const radius = 30;
             const W = Math.round(parseFloat(canvas.style.width) || 700);
 
@@ -499,8 +508,17 @@
             const H = parseFloat(canvas.style.height) || 420;
             ctx.clearRect(0, 0, W, H);
 
-            // Margini de siguranță (padding) pentru ca modelul să fie vizibil complet
-            const boxPaddingX = Math.max(24, W * 0.04);
+            // Grid discret de fundal în spațiul ecranului
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < W; x += 45) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+            }
+            for (let y = 0; y < H; y += 45) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+            }
+
+            const boxPaddingX = Math.max(28, W * 0.05);
             const modelLeftX = boxPaddingX;
             const modelRightX = W - boxPaddingX;
 
@@ -525,16 +543,6 @@
             document.getElementById('stat-heave').innerText = Math.abs(dx).toFixed(1) + 'm';
             document.getElementById('stat-net-slip').innerText = s.toFixed(1) + 'm';
 
-            // Grid discret
-            ctx.strokeStyle = '#1e293b';
-            ctx.lineWidth = 1;
-            for (let x = 0; x < W; x += 45) {
-                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-            }
-            for (let y = 0; y < H; y += 45) {
-                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-            }
-
             const totalThickness = strata.reduce((acc, l) => acc + l.thickness, 0);
             const baseY = anchorY + (totalThickness * 0.44);
 
@@ -547,7 +555,49 @@
                 currY = yTop;
             }
 
-            // 1. FOOTWALL (Stânga - ancorat în zona de siguranță modelLeftX)
+            const topOriginalY = layerBounds[strata.length - 1].yTop;
+            const topTranslatedY = topOriginalY + dy;
+            const botTranslatedY = baseY + dy;
+
+            // Determinare limite extreme pe verticală pentru Auto-Scaling
+            let minY = Math.min(topOriginalY, topTranslatedY);
+            let maxY = Math.max(baseY, botTranslatedY);
+
+            if (simState.erosionActive && simState.topoProfile.length > 0) {
+                const intLeft = Math.max(0, Math.min(simState.topoProfile.length - 1, Math.round(modelLeftX)));
+                const intRight = Math.max(0, Math.min(simState.topoProfile.length - 1, Math.round(modelRightX)));
+                for (let x = intLeft; x <= intRight; x++) {
+                    if (simState.topoProfile[x] !== undefined) {
+                        minY = Math.min(minY, simState.topoProfile[x]);
+                    }
+                }
+            }
+
+            // Calcul scalare dinamică și centrare automată
+            const marginY = 32;
+            const targetMinY = marginY;
+            const targetMaxY = H - marginY;
+            const targetHeight = targetMaxY - targetMinY;
+
+            const contentHeight = Math.max(10, maxY - minY);
+            let scaleY = 1.0;
+            if (contentHeight > targetHeight) {
+                scaleY = targetHeight / contentHeight;
+            }
+
+            const scale = Math.min(1.0, scaleY);
+            const contentCenterY = (minY + maxY) / 2;
+            const canvasCenterY = H / 2;
+            const offsetY = canvasCenterY - contentCenterY * scale;
+            const offsetX = (W * (1 - scale)) / 2;
+
+            viewTransform = { scale, offsetX, offsetY };
+
+            ctx.save();
+            ctx.translate(offsetX, offsetY);
+            ctx.scale(scale, scale);
+
+            // 1. FOOTWALL (Bloc Stânga)
             layerBounds.forEach(({ layer, yTop, yBot }) => {
                 const xTopFault = getFaultX(yTop);
                 const xBotFault = getFaultX(yBot);
@@ -566,7 +616,7 @@
                 ctx.stroke();
             });
 
-            // 2. HANGING WALL (Dreapta - ancorat în zona de siguranță modelRightX)
+            // 2. HANGING WALL (Bloc Dreapta)
             layerBounds.forEach(({ layer, yTop, yBot }) => {
                 const yTopTrans = yTop + dy;
                 const yBotTrans = yBot + dy;
@@ -588,8 +638,8 @@
             });
 
             // 3. Plan de Falie (Linie roșie)
-            const faultY1 = Math.min(layerBounds[strata.length - 1].yTop, layerBounds[strata.length - 1].yTop + dy) - 40;
-            const faultY2 = Math.max(baseY, baseY + dy) + 40;
+            const faultY1 = Math.min(topOriginalY, topTranslatedY) - 50;
+            const faultY2 = Math.max(baseY, botTranslatedY) + 50;
             const faultX1 = getFaultX(faultY1);
             const faultX2 = getFaultX(faultY2);
 
@@ -605,10 +655,11 @@
             // 4. Mască de Eroziune & Relief
             const intW = Math.round(W);
             if (simState.erosionActive && simState.topoProfile.length >= intW) {
+                const skyTopY = Math.min(-300, minY - 100);
                 ctx.fillStyle = '#020617';
                 ctx.beginPath();
-                ctx.moveTo(0, 0);
-                ctx.lineTo(W, 0);
+                ctx.moveTo(0, skyTopY);
+                ctx.lineTo(W, skyTopY);
                 ctx.lineTo(W, simState.topoProfile[intW - 1]);
 
                 for (let x = intW - 1; x >= 0; x--) {
@@ -617,7 +668,6 @@
                 ctx.closePath();
                 ctx.fill();
 
-                // Linie de relief (pe zona activă a modelului)
                 ctx.strokeStyle = '#38bdf8';
                 ctx.lineWidth = 2.5;
                 ctx.beginPath();
@@ -628,24 +678,26 @@
                 ctx.stroke();
             }
 
-            // Margini laterale de contur ale blocului secțiunii
+            // Margini laterale de contur
             ctx.strokeStyle = '#334155';
             ctx.lineWidth = 1.5;
             ctx.beginPath();
-            ctx.moveTo(modelLeftX, layerBounds[strata.length - 1].yTop);
+            ctx.moveTo(modelLeftX, topOriginalY);
             ctx.lineTo(modelLeftX, baseY);
-            ctx.moveTo(modelRightX, layerBounds[strata.length - 1].yTop + dy);
-            ctx.lineTo(modelRightX, baseY + dy);
+            ctx.moveTo(modelRightX, topTranslatedY);
+            ctx.lineTo(modelRightX, botTranslatedY);
             ctx.stroke();
 
-            // 5. Etichete compacte plasate în interiorul zonei de siguranță
+            // 5. Etichete
             ctx.font = 'bold 10px Inter, sans-serif';
             ctx.fillStyle = '#94a3b8';
-            ctx.fillText("FOOTWALL", modelLeftX + 10, baseY - totalThickness - 10);
+            ctx.fillText("FOOTWALL", modelLeftX + 10, topOriginalY - 10);
 
             ctx.fillStyle = '#cbd5e1';
-            let hwLabelY = baseY - totalThickness - 10 + dy;
-            ctx.fillText("HANGING WALL", modelRightX - 85, Math.max(30, hwLabelY));
+            let hwLabelY = topTranslatedY - 10;
+            ctx.fillText("HANGING WALL", modelRightX - 85, hwLabelY);
+
+            ctx.restore();
         }
 
         window.onload = () => {
