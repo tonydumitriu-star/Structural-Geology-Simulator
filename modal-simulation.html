@@ -10,7 +10,7 @@
                 </div>
                 <div class="flex items-center space-x-2">
                     <h3 id="sim-window-title" class="font-bold text-white text-xs sm:text-sm">Laborator Tectonic - Simulare Secțiune în Timp Real</h3>
-                    <span id="simulation-modal-version" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v3.0.0</span>
+                    <span id="simulation-modal-version" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v3.1.0</span>
                 </div>
             </div>
 
@@ -203,9 +203,26 @@
 </div>
 
 <script>
-    const SIMULATION_MODAL_VERSION = "3.0.0";
+    const SIMULATION_MODAL_VERSION = "3.1.0";
 
-    // Date și Stare Locală a Simulatorului
+    // Dicționar de unități cronostratigrafice standard (disponibil direct în simulator fără dependențe externe)
+    window.simChronodata = [
+        { nameRo: "Cuaternar", nameEn: "Quaternary", hex: "#f9f97f", border: "#eab308" },
+        { nameRo: "Neogen", nameEn: "Neogene", hex: "#ffe619", border: "#ca8a04" },
+        { nameRo: "Paleogen", nameEn: "Paleogene", hex: "#fd9a52", border: "#ea580c" },
+        { nameRo: "Cretacic", nameEn: "Cretaceous", hex: "#7fc64e", border: "#65a30d" },
+        { nameRo: "Jurasic", nameEn: "Jurassic", hex: "#34b2c9", border: "#0891b2" },
+        { nameRo: "Triasic", nameEn: "Triassic", hex: "#812b92", border: "#7e22ce" },
+        { nameRo: "Permian", nameEn: "Permian", hex: "#f04028", border: "#dc2626" },
+        { nameRo: "Carbonifer", nameEn: "Carboniferous", hex: "#67a599", border: "#0d9488" },
+        { nameRo: "Devonian", nameEn: "Devonian", hex: "#cb8c37", border: "#d97706" },
+        { nameRo: "Silurian", nameEn: "Silurian", hex: "#b3e1b6", border: "#22c55e" },
+        { nameRo: "Ordovician", nameEn: "Ordovician", hex: "#009270", border: "#15803d" },
+        { nameRo: "Cambrian", nameEn: "Cambrian", hex: "#7fa056", border: "#4d7c0f" },
+        { nameRo: "Precambrian", nameEn: "Precambrian", hex: "#f74370", border: "#be123c" }
+    ];
+
+    // Stratele geologice active
     window.simStrata = [
         { name: "Fundament Cristalin", age: "Precambrian", thickness: 110 },
         { name: "Calcare Recifale", age: "Jurassic", thickness: 75 },
@@ -231,7 +248,28 @@
     let simCtx = null;
     let isSimCarving = false;
 
-    // Inițializare Mediu de Simulare la Deschidere
+    // Returnează lista completă de unități (IUGS globală dacă există, altfel dicționarul integrat)
+    function getActiveChronodata() {
+        if (window.iugsChronodata && Array.isArray(window.iugsChronodata) && window.iugsChronodata.length > 0) {
+            return window.iugsChronodata;
+        }
+        return window.simChronodata;
+    }
+
+    function getStratumColor(age) {
+        const list = getActiveChronodata();
+        const k = (age || '').toLowerCase();
+        const found = list.find(i => (i.nameEn && i.nameEn.toLowerCase() === k) || (i.nameRo && i.nameRo.toLowerCase() === k));
+        return found ? found.hex : "#718096";
+    }
+
+    function getStratumBorder(age) {
+        const list = getActiveChronodata();
+        const k = (age || '').toLowerCase();
+        const found = list.find(i => (i.nameEn && i.nameEn.toLowerCase() === k) || (i.nameRo && i.nameRo.toLowerCase() === k));
+        return found ? found.border : "#4a5568";
+    }
+
     window.initSimulationEnvironment = function() {
         simCanvas = document.getElementById('geologyCanvas');
         if (!simCanvas) return;
@@ -242,7 +280,6 @@
         syncControlsToState();
         renderSimStrataEditor();
 
-        // Asigurăm dimensiunile inițiale 1:1
         requestAnimationFrame(() => {
             resizeSimCanvasToContainer();
             window.drawSimCanvas();
@@ -504,7 +541,7 @@
     }
 
     // ========================================================
-    // RANDARE GRAFICĂ TECTONICĂ 1:1 PE CANVAS-UL DIN MODAL
+    // RANDARE GRAFICĂ TECTONICĂ 1:1 PE CANVAS
     // ========================================================
     window.drawSimCanvas = function() {
         if (!simCanvas || !simCtx) return;
@@ -514,7 +551,7 @@
 
         simCtx.clearRect(0, 0, W, H);
 
-        // Grid discret
+        // Grid
         simCtx.strokeStyle = '#1e293b';
         simCtx.lineWidth = 1;
         for (let x = 0; x < W; x += 45) {
@@ -565,7 +602,7 @@
         const lambda = Math.max(60, window.simState.foldWavelength || 220);
         const k = (2 * Math.PI) / lambda;
 
-        // Estompare riguroasă la planul de falie pentru tăietură plană impecabilă
+        // Estompare riguroasă pentru tăietură plană impecabilă
         const getFoldAt = (x, yRef) => {
             if (foldAmp === 0) return 0;
             const faultEdgeX = getFaultX(yRef);
@@ -574,27 +611,13 @@
             return foldAmp * Math.sin((x - anchorX) * k) * blend;
         };
 
-        function getLayerColor(age) {
-            if (!window.iugsChronodata) return "#64748b";
-            const k = (age || '').toLowerCase();
-            const item = window.iugsChronodata.find(i => i.nameEn.toLowerCase() === k || i.nameRo.toLowerCase() === k);
-            return item ? item.hex : "#64748b";
-        }
-
-        function getLayerBorder(age) {
-            if (!window.iugsChronodata) return "#334155";
-            const k = (age || '').toLowerCase();
-            const item = window.iugsChronodata.find(i => i.nameEn.toLowerCase() === k || i.nameRo.toLowerCase() === k);
-            return item ? item.border : "#334155";
-        }
-
         // 1. FOOTWALL (Stânga)
         layerBounds.forEach(({ layer, yTop, yBot }) => {
             const xTopFault = getFaultX(yTop);
             const xBotFault = getFaultX(yBot);
 
-            simCtx.fillStyle = getLayerColor(layer.age);
-            simCtx.strokeStyle = getLayerBorder(layer.age);
+            simCtx.fillStyle = getStratumColor(layer.age);
+            simCtx.strokeStyle = getStratumBorder(layer.age);
             simCtx.lineWidth = 1.5;
 
             simCtx.beginPath();
@@ -623,8 +646,8 @@
             const xTopFaultTrans = getFaultX(yTop) + dx;
             const xBotFaultTrans = getFaultX(yBot) + dx;
 
-            simCtx.fillStyle = getLayerColor(layer.age);
-            simCtx.strokeStyle = getLayerBorder(layer.age);
+            simCtx.fillStyle = getStratumColor(layer.age);
+            simCtx.strokeStyle = getStratumBorder(layer.age);
             simCtx.lineWidth = 1.5;
 
             simCtx.beginPath();
@@ -647,7 +670,7 @@
             simCtx.stroke();
         });
 
-        // 3. Plan de Falie (Linie dreaptă roșie)
+        // 3. Plan de Falie (Linie dreaptă)
         const topOriginalY = layerBounds[window.simStrata.length - 1].yTop;
         const topTranslatedY = topOriginalY + dy;
         const botTranslatedY = baseY + dy;
@@ -713,18 +736,20 @@
         simCtx.fillText(isRo ? "HANGING WALL" : "HANGING WALL", modelRightX - 85, hwLabelY);
     };
 
-    // Editor Coloană Stratigrafică
+    // ========================================================
+    // GESTIUNE COLOANĂ STRATIGRAFICĂ (EDITOR STRATE)
+    // ========================================================
     function renderSimStrataEditor() {
         const list = document.getElementById('sim-strata-list');
-        if (!list || !window.simStrata || !window.iugsChronodata) return;
+        if (!list || !window.simStrata) return;
 
+        const chronodata = getActiveChronodata();
         list.innerHTML = '';
+
         window.simStrata.slice().reverse().forEach((layer, origIdxReversed) => {
             const actualIdx = window.simStrata.length - 1 - origIdxReversed;
-            const k = (layer.age || '').toLowerCase();
-            const item = window.iugsChronodata.find(i => i.nameEn.toLowerCase() === k || i.nameRo.toLowerCase() === k);
-            const color = item ? item.hex : '#718096';
-            const border = item ? item.border : '#4a5568';
+            const color = getStratumColor(layer.age);
+            const border = getStratumBorder(layer.age);
 
             list.innerHTML += `
                 <div class="flex items-center space-x-1.5 bg-slate-950 p-1.5 rounded-lg border border-slate-800">
@@ -732,11 +757,12 @@
                     
                     <input type="text" value="${layer.name}" onchange="window.simStrata[${actualIdx}].name = this.value; window.drawSimCanvas();" class="flex-1 min-w-0 bg-slate-900 border border-slate-700 px-1.5 py-0.5 rounded text-[11px] text-white focus:outline-none focus:border-indigo-500">
 
-                    <select onchange="window.simStrata[${actualIdx}].age = this.value; renderSimStrataEditor(); window.drawSimCanvas();" class="w-28 bg-slate-900 border border-slate-700 px-1 py-0.5 rounded text-[10px] text-indigo-300 focus:outline-none focus:border-indigo-500">
-                        ${window.iugsChronodata.map(it => {
+                    <select onchange="window.simStrata[${actualIdx}].age = this.value; renderSimStrataEditor(); window.drawSimCanvas();" class="w-32 bg-slate-900 border border-slate-700 px-1 py-0.5 rounded text-[10px] text-indigo-300 focus:outline-none focus:border-indigo-500">
+                        ${chronodata.map(it => {
                             const isRo = window.currentLang === 'ro';
-                            const optName = isRo ? it.nameRo : it.nameEn;
-                            const isSelected = layer.age.toLowerCase() === it.nameEn.toLowerCase() || layer.age.toLowerCase() === it.nameRo.toLowerCase();
+                            const optName = isRo ? (it.nameRo || it.nameEn) : (it.nameEn || it.nameRo);
+                            const isSelected = (layer.age && it.nameEn && layer.age.toLowerCase() === it.nameEn.toLowerCase()) || 
+                                               (layer.age && it.nameRo && layer.age.toLowerCase() === it.nameRo.toLowerCase());
                             return `<option value="${it.nameEn}" ${isSelected ? 'selected' : ''}>${optName}</option>`;
                         }).join('')}
                     </select>
@@ -771,4 +797,9 @@
         renderSimStrataEditor();
         window.drawSimCanvas();
     };
+
+    // Inițializare automată la injectare dacă modalul este deja vizibil
+    if (document.getElementById('simulation-modal') && !document.getElementById('simulation-modal').classList.contains('hidden')) {
+        window.initSimulationEnvironment();
+    }
 </script>
