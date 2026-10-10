@@ -1,203 +1,170 @@
-<!-- Modal: Consola de Control Simulare (Deformare, Relief & Strate) -->
-<div id="simulation-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
-        
-        <!-- Header Consola cu Badge de Versiune v2.0.0 -->
-        <div class="px-4 py-3 border-b border-slate-800 flex justify-between items-center bg-slate-900/90">
+<!-- Panou Lateral Glisant: Consola de Simulare în Timp Real -->
+<div id="simulation-modal" class="hidden fixed top-[49px] bottom-0 left-0 w-full sm:w-[420px] bg-slate-900/95 backdrop-blur-xl border-r border-slate-800 shadow-2xl z-30 flex flex-col transition-all duration-300">
+    
+    <!-- Header Panou -->
+    <div class="px-3.5 py-2.5 border-b border-slate-800 flex justify-between items-center bg-slate-950/80 flex-shrink-0">
+        <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-sliders text-indigo-400 text-sm"></i>
             <div class="flex items-center space-x-2">
-                <i class="fa-solid fa-sliders text-indigo-400"></i>
-                <div class="flex items-center space-x-2">
-                    <h3 id="sim-modal-header-title" class="font-bold text-white text-sm sm:text-base">Consolă de Simulare Tectonică</h3>
-                    <span id="simulation-modal-version" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v2.0.0</span>
-                </div>
+                <h3 id="sim-modal-header-title" class="font-bold text-white text-xs sm:text-sm">Consolă Simulare în Timp Real</h3>
+                <span id="simulation-modal-version" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v2.1.0</span>
             </div>
-            <button onclick="closeSimulationModal()" class="text-slate-400 hover:text-white p-1">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
         </div>
+        <button onclick="closeSimulationModal()" class="text-slate-400 hover:text-white p-1 text-sm" title="Ascunde Panoul">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+    </div>
 
-        <!-- Bara de Tab-uri de Navigare -->
-        <div class="flex border-b border-slate-800 bg-slate-950 px-3 pt-2 space-x-1 text-xs">
-            <button onclick="switchSimTab('deform')" id="tab-btn-deform" class="px-3 py-1.5 rounded-t-lg font-semibold bg-slate-900 text-indigo-300 border-t border-x border-slate-800 flex items-center space-x-1.5">
-                <i class="fa-solid fa-gears text-indigo-400"></i>
-                <span id="tab-lbl-deform">1. Deformare</span>
-            </button>
-            <button onclick="switchSimTab('relief')" id="tab-btn-relief" class="px-3 py-1.5 rounded-t-lg font-semibold text-slate-400 hover:text-slate-200 flex items-center space-x-1.5">
-                <i class="fa-solid fa-wind text-cyan-400"></i>
-                <span id="tab-lbl-relief">2. Relief</span>
-            </button>
-            <button onclick="switchSimTab('strata')" id="tab-btn-strata" class="px-3 py-1.5 rounded-t-lg font-semibold text-slate-400 hover:text-slate-200 flex items-center space-x-1.5">
-                <i class="fa-solid fa-layer-group text-amber-400"></i>
-                <span id="tab-lbl-strata">3. Strate Secțiune</span>
-            </button>
-        </div>
-
-        <!-- Conținut Tab-uri (Scrollable) -->
-        <div class="p-3 sm:p-4 overflow-y-auto space-y-3 flex-1">
-            
-            <!-- TAB 1: DEFORMARE TECTONICĂ (FALII & CUTE) -->
-            <div id="sim-tab-content-deform" class="space-y-3">
-                <!-- Falii -->
-                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2.5">
-                    <div class="flex justify-between items-center">
-                        <span id="sim-lbl-brittle" class="text-xs font-bold uppercase text-indigo-300 flex items-center">
-                            <i class="fa-solid fa-bolt text-indigo-400 mr-1.5"></i> Faliere (Fragil)
-                        </span>
-                        <span id="modal-val-dip-badge" class="text-[10px] font-mono text-indigo-300 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">60°</span>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-2">
-                        <button onclick="setModalProcess('normal')" id="modal-btn-normal" class="p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-14">
-                            <span class="flex items-center justify-between w-full">
-                                <span id="modal-txt-normal">Falie Normală</span>
-                                <i class="fa-solid fa-circle-check text-[10px]"></i>
-                            </span>
-                            <span id="modal-sub-normal" class="text-[9px] text-indigo-200">Extensie</span>
-                        </button>
-                        <button onclick="setModalProcess('reverse')" id="modal-btn-reverse" class="p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-14">
-                            <span class="flex items-center justify-between w-full">
-                                <span id="modal-txt-reverse">Falie Inversă</span>
-                                <i class="fa-solid fa-circle text-[10px] opacity-0"></i>
-                            </span>
-                            <span id="modal-sub-reverse" class="text-[9px] text-slate-400">Compresiune</span>
-                        </button>
-                    </div>
-
-                    <div class="space-y-2 pt-1">
-                        <div>
-                            <div class="flex justify-between text-[11px] mb-1">
-                                <span id="modal-lbl-dip" class="text-slate-300">Unghi înclinare falie (&theta;):</span>
-                                <span id="modal-val-dip" class="font-bold text-indigo-400">60°</span>
-                            </div>
-                            <input type="range" id="modal-slider-dip" min="-90" max="90" value="60" oninput="updateModalDeformParams()" class="w-full accent-indigo-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-[11px] mb-1">
-                                <span id="modal-lbl-slip" class="text-slate-300">Deplasare pe falie:</span>
-                                <span id="modal-val-slip" class="font-bold text-emerald-400">45 m</span>
-                            </div>
-                            <input type="range" id="modal-slider-slip" min="0" max="250" value="45" oninput="updateModalDeformParams()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                        </div>
-                    </div>
-
-                    <button onclick="triggerFaultAnimation()" class="w-full bg-indigo-600/30 hover:bg-indigo-600 border border-indigo-500/50 text-indigo-200 hover:text-white font-medium py-1.5 rounded-lg text-xs transition-all flex items-center justify-center space-x-1.5 mt-1">
-                        <i class="fa-solid fa-play text-[9px]"></i>
-                        <span id="modal-btn-anim">Animează Deplasarea Faliei</span>
-                    </button>
-                </div>
-
-                <!-- Cute -->
-                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2.5">
-                    <div class="flex justify-between items-center">
-                        <span id="sim-lbl-ductile" class="text-xs font-bold uppercase text-purple-300 flex items-center">
-                            <i class="fa-solid fa-water text-purple-400 mr-1.5"></i> Cutare Tectonică (Ductil)
-                        </span>
-                        <span id="modal-val-fold-badge" class="text-[10px] font-mono text-purple-300 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">0%</span>
-                    </div>
-
-                    <div class="space-y-2 pt-1">
-                        <div>
-                            <div class="flex justify-between text-[11px] mb-1">
-                                <span id="modal-lbl-shortening" class="text-slate-300">Scurtare orizontală:</span>
-                                <span id="modal-val-shortening" class="font-bold text-purple-400">0%</span>
-                            </div>
-                            <input type="range" id="modal-slider-shortening" min="0" max="60" value="0" oninput="updateModalDeformParams()" class="w-full accent-purple-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-[11px] mb-1">
-                                <span id="modal-lbl-wavelength" class="text-slate-300">Lungime de undă (&lambda;):</span>
-                                <span id="modal-val-wavelength" class="font-bold text-pink-400">220 m</span>
-                            </div>
-                            <input type="range" id="modal-slider-wavelength" min="80" max="450" value="220" oninput="updateModalDeformParams()" class="w-full accent-pink-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                        </div>
-                    </div>
-                </div>
+    <!-- Conținut Derulabil cu Toate Secțiunile Deschise Simultan -->
+    <div class="p-3 overflow-y-auto space-y-3 flex-1 text-xs">
+        
+        <!-- 1. DEFORMARE FRAGILĂ (FALII) -->
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 space-y-2">
+            <div class="flex justify-between items-center">
+                <span class="text-[11px] font-bold uppercase text-indigo-300 flex items-center">
+                    <i class="fa-solid fa-bolt text-indigo-400 mr-1.5"></i> 1. Faliere (Deformare Fragilă)
+                </span>
+                <span id="modal-val-dip-badge" class="text-[9px] font-mono text-indigo-300 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">60°</span>
             </div>
 
-            <!-- TAB 2: RELIEF & NIVELARE -->
-            <div id="sim-tab-content-relief" class="space-y-3 hidden">
-                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2.5">
-                    <span id="sim-lbl-planation" class="text-xs font-bold uppercase text-cyan-300 flex items-center">
-                        <i class="fa-solid fa-arrows-up-down text-cyan-400 mr-1.5"></i> Nivelare Topografie (Sus / Jos)
+            <div class="grid grid-cols-2 gap-1.5">
+                <button onclick="setModalProcess('normal')" id="modal-btn-normal" class="p-1.5 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-12">
+                    <span class="flex items-center justify-between w-full">
+                        <span>Falie Normală</span>
+                        <i class="fa-solid fa-circle-check text-[10px]"></i>
                     </span>
-                    <div class="flex justify-between text-[11px]">
-                        <span id="modal-lbl-offset" class="text-slate-400">Decupaj orizontal:</span>
-                        <span id="modal-val-offset" class="font-bold text-emerald-400">0 m</span>
-                    </div>
-                    <input type="range" id="modal-slider-offset" min="-200" max="200" value="0" oninput="updateModalReliefParams()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                    
-                    <div class="grid grid-cols-2 gap-2 pt-1">
-                        <button onclick="shiftProfileModal(-25)" class="bg-slate-900 hover:bg-slate-800 text-slate-200 py-1.5 rounded-lg text-xs border border-slate-700 flex items-center justify-center space-x-1">
-                            <i class="fa-solid fa-arrow-up text-[10px]"></i>
-                            <span id="modal-btn-up">Sus 25m</span>
-                        </button>
-                        <button onclick="shiftProfileModal(25)" class="bg-slate-900 hover:bg-slate-800 text-slate-200 py-1.5 rounded-lg text-xs border border-slate-700 flex items-center justify-center space-x-1">
-                            <i class="fa-solid fa-arrow-down text-[10px]"></i>
-                            <span id="modal-btn-down">Jos 25m</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2.5">
-                    <span id="sim-lbl-valleys" class="text-xs font-bold uppercase text-cyan-300 flex items-center">
-                        <i class="fa-solid fa-shuffle text-cyan-400 mr-1.5"></i> Profil Văi Eroziune
+                    <span class="text-[9px] text-indigo-200 font-normal">Extensie</span>
+                </button>
+                <button onclick="setModalProcess('reverse')" id="modal-btn-reverse" class="p-1.5 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-12">
+                    <span class="flex items-center justify-between w-full">
+                        <span>Falie Inversă</span>
+                        <i class="fa-solid fa-circle text-[10px] opacity-0"></i>
                     </span>
-                    <div class="flex justify-between text-[11px]">
-                        <span id="modal-lbl-valley-amp" class="text-slate-400">Amplitudine Văi:</span>
-                        <span id="modal-val-valley-amp" class="font-bold text-cyan-400">45 m</span>
-                    </div>
-                    <input type="range" id="modal-slider-valleys" min="10" max="150" value="45" oninput="document.getElementById('modal-val-valley-amp').innerText = this.value + ' m'" class="w-full accent-cyan-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                    <button onclick="generateRandomValleysModal()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-1.5 rounded-lg text-xs transition-all flex items-center justify-center space-x-1.5">
-                        <i class="fa-solid fa-shuffle text-[10px]"></i>
-                        <span id="modal-btn-gen-valleys">Generează Văi Aleatoare</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- TAB 3: STRATE SECȚIUNE -->
-            <div id="sim-tab-content-strata" class="space-y-3 hidden">
-                <div class="flex justify-between items-center px-1 text-slate-400 text-xs font-bold uppercase tracking-wider">
-                    <span id="modal-lbl-strata-order">Coloană Stratigrafică (Fundament &rarr; Suprafață)</span>
-                    <span>Grosime (m)</span>
-                </div>
-                <div class="space-y-2" id="strata-edit-list"></div>
-                <button onclick="addNewStratumModal()" class="w-full bg-slate-950 hover:bg-slate-800 text-indigo-300 border border-slate-800 py-2 rounded-xl text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all">
-                    <i class="fa-solid fa-plus text-xs"></i>
-                    <span id="modal-btn-add-layer">Adaugă Strat Nou</span>
+                    <span class="text-[9px] text-slate-400 font-normal">Compresiune</span>
                 </button>
             </div>
 
+            <div class="space-y-1.5 pt-0.5">
+                <div>
+                    <div class="flex justify-between text-[11px] mb-0.5">
+                        <span class="text-slate-300">Înclinare falie (&theta;):</span>
+                        <span id="modal-val-dip" class="font-bold text-indigo-400">60°</span>
+                    </div>
+                    <input type="range" id="modal-slider-dip" min="-90" max="90" value="60" oninput="updateModalDeformParams()" class="w-full accent-indigo-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                </div>
+                <div>
+                    <div class="flex justify-between text-[11px] mb-0.5">
+                        <span class="text-slate-300">Deplasare pe falie:</span>
+                        <span id="modal-val-slip" class="font-bold text-emerald-400">45 m</span>
+                    </div>
+                    <input type="range" id="modal-slider-slip" min="0" max="250" value="45" oninput="updateModalDeformParams()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                </div>
+            </div>
+
+            <button onclick="triggerFaultAnimation()" class="w-full bg-indigo-600/30 hover:bg-indigo-600 border border-indigo-500/50 text-indigo-200 hover:text-white font-medium py-1 rounded-lg text-xs transition-all flex items-center justify-center space-x-1.5 mt-1">
+                <i class="fa-solid fa-play text-[9px]"></i>
+                <span>Animează Falie</span>
+            </button>
         </div>
 
-        <!-- Footer Modal -->
-        <div class="p-3 border-t border-slate-800 bg-slate-900/90 flex justify-between items-center">
-            <button onclick="window.resetAll()" class="text-slate-400 hover:text-white text-xs underline flex items-center space-x-1">
-                <i class="fa-solid fa-rotate-right text-[10px]"></i>
-                <span id="modal-btn-reset-all">Reset Toate Valorile</span>
-            </button>
-            <div class="flex space-x-2">
-                <button onclick="closeSimulationModal()" id="modal-btn-close-console" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded-xl text-xs font-semibold shadow-md transition-all">Închide & Păstrează</button>
+        <!-- 2. DEFORMARE DUCTILĂ (CUTE) -->
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 space-y-2">
+            <div class="flex justify-between items-center">
+                <span class="text-[11px] font-bold uppercase text-purple-300 flex items-center">
+                    <i class="fa-solid fa-water text-purple-400 mr-1.5"></i> 2. Cutare (Deformare Ductilă)
+                </span>
+                <span id="modal-val-fold-badge" class="text-[9px] font-mono text-purple-300 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">0%</span>
+            </div>
+
+            <div class="space-y-1.5">
+                <div>
+                    <div class="flex justify-between text-[11px] mb-0.5">
+                        <span class="text-slate-300">Scurtare orizontală:</span>
+                        <span id="modal-val-shortening" class="font-bold text-purple-400">0%</span>
+                    </div>
+                    <input type="range" id="modal-slider-shortening" min="0" max="60" value="0" oninput="updateModalDeformParams()" class="w-full accent-purple-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                </div>
+                <div>
+                    <div class="flex justify-between text-[11px] mb-0.5">
+                        <span class="text-slate-300">Lungime de undă (&lambda;):</span>
+                        <span id="modal-val-wavelength" class="font-bold text-pink-400">220 m</span>
+                    </div>
+                    <input type="range" id="modal-slider-wavelength" min="80" max="450" value="220" oninput="updateModalDeformParams()" class="w-full accent-pink-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                </div>
             </div>
         </div>
+
+        <!-- 3. RELIEF & NIVELARE -->
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 space-y-2">
+            <span class="text-[11px] font-bold uppercase text-cyan-300 flex items-center">
+                <i class="fa-solid fa-wind text-cyan-400 mr-1.5"></i> 3. Relief & Topografie
+            </span>
+
+            <div class="space-y-1">
+                <div class="flex justify-between text-[11px]">
+                    <span class="text-slate-400">Nivelare decupaj:</span>
+                    <span id="modal-val-offset" class="font-bold text-emerald-400">0 m</span>
+                </div>
+                <input type="range" id="modal-slider-offset" min="-200" max="200" value="0" oninput="updateModalReliefParams()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                
+                <div class="grid grid-cols-2 gap-1.5 pt-0.5">
+                    <button onclick="shiftProfileModal(-25)" class="bg-slate-900 hover:bg-slate-800 text-slate-200 py-1 rounded-lg text-xs border border-slate-700 flex items-center justify-center space-x-1">
+                        <i class="fa-solid fa-arrow-up text-[9px]"></i>
+                        <span>Sus 25m</span>
+                    </button>
+                    <button onclick="shiftProfileModal(25)" class="bg-slate-900 hover:bg-slate-800 text-slate-200 py-1 rounded-lg text-xs border border-slate-700 flex items-center justify-center space-x-1">
+                        <i class="fa-solid fa-arrow-down text-[9px]"></i>
+                        <span>Jos 25m</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="pt-1 border-t border-slate-800/80 space-y-1">
+                <div class="flex justify-between text-[11px]">
+                    <span class="text-slate-400">Amplitudine văi:</span>
+                    <span id="modal-val-valley-amp" class="font-bold text-cyan-400">45 m</span>
+                </div>
+                <input type="range" id="modal-slider-valleys" min="10" max="150" value="45" oninput="document.getElementById('modal-val-valley-amp').innerText = this.value + ' m'" class="w-full accent-cyan-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                <button onclick="generateRandomValleysModal()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-1 rounded-lg text-xs transition-all flex items-center justify-center space-x-1.5">
+                    <i class="fa-solid fa-shuffle text-[10px]"></i>
+                    <span>Generează Văi Aleatoare</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 4. COLOANĂ STRATIGRAFICĂ (EDITOR STRATE) -->
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 space-y-2">
+            <div class="flex justify-between items-center text-slate-400 text-[11px] font-bold uppercase tracking-wider">
+                <span class="flex items-center text-amber-300">
+                    <i class="fa-solid fa-layer-group text-amber-400 mr-1.5"></i> 4. Strate Secțiune
+                </span>
+                <span class="text-[9px] text-slate-500">Grosime (m)</span>
+            </div>
+            
+            <div class="space-y-1.5" id="strata-edit-list"></div>
+
+            <button onclick="addNewStratumModal()" class="w-full bg-slate-900 hover:bg-slate-800 text-indigo-300 border border-slate-800 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all">
+                <i class="fa-solid fa-plus text-[10px]"></i>
+                <span>Adaugă Strat Nou</span>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Footer Panou -->
+    <div class="p-2.5 border-t border-slate-800 bg-slate-950 flex justify-between items-center flex-shrink-0">
+        <button onclick="window.resetAll()" class="text-slate-400 hover:text-white text-xs underline flex items-center space-x-1">
+            <i class="fa-solid fa-rotate-right text-[10px]"></i>
+            <span>Reset Valori</span>
+        </button>
+        <button onclick="closeSimulationModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded-lg text-xs font-semibold transition-all">
+            Ascunde Panou
+        </button>
     </div>
 </div>
 
 <script>
-    const SIMULATION_MODAL_VERSION = "2.0.0";
-
-    function switchSimTab(tabKey) {
-        ['deform', 'relief', 'strata'].forEach(k => {
-            const btn = document.getElementById(`tab-btn-${k}`);
-            const content = document.getElementById(`sim-tab-content-${k}`);
-            if (k === tabKey) {
-                btn.className = "px-3 py-1.5 rounded-t-lg font-semibold bg-slate-900 text-indigo-300 border-t border-x border-slate-800 flex items-center space-x-1.5";
-                content.classList.remove('hidden');
-            } else {
-                btn.className = "px-3 py-1.5 rounded-t-lg font-semibold text-slate-400 hover:text-slate-200 flex items-center space-x-1.5";
-                content.classList.add('hidden');
-            }
-        });
-    }
+    const SIMULATION_MODAL_VERSION = "2.1.0";
 
     window.openSimulationConsole = function() {
         syncSimulationModalValues();
@@ -207,19 +174,16 @@
     window.syncSimulationModalValues = function() {
         if (!window.simState) return;
 
-        // Falii
         const sDip = document.getElementById('modal-slider-dip');
         const sSlip = document.getElementById('modal-slider-slip');
         if (sDip) sDip.value = window.simState.dip;
         if (sSlip) sSlip.value = window.simState.slip;
 
-        // Cute
         const sShort = document.getElementById('modal-slider-shortening');
         const sWave = document.getElementById('modal-slider-wavelength');
         if (sShort) sShort.value = window.simState.foldShortening;
         if (sWave) sWave.value = window.simState.foldWavelength;
 
-        // Relief
         const sOffset = document.getElementById('modal-slider-offset');
         if (sOffset) sOffset.value = window.simState.baseCutOffset;
 
@@ -244,14 +208,14 @@
         const btnR = document.getElementById('modal-btn-reverse');
 
         if (type === 'normal') {
-            btnN.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-14";
+            btnN.className = "p-1.5 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-12";
             btnN.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
-            btnR.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-14";
+            btnR.className = "p-1.5 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-12";
             btnR.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
         } else {
-            btnR.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-14";
+            btnR.className = "p-1.5 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-12";
             btnR.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
-            btnN.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-14";
+            btnN.className = "p-1.5 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-12";
             btnN.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
         }
         if (updateState && typeof window.drawSimulation === 'function') {
@@ -351,7 +315,6 @@
         requestAnimationFrame(step);
     }
 
-    // Gestiune Strate
     function renderSimulationStrataList() {
         const list = document.getElementById('strata-edit-list');
         if (!list || !window.strata || !window.iugsChronodata) return;
@@ -363,31 +326,23 @@
             const border = typeof window.getStratumBorder === 'function' ? window.getStratumBorder(layer.age) : '#4a5568';
 
             list.innerHTML += `
-                <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-                    <div class="w-6 h-6 rounded-lg flex-shrink-0 border" style="background-color: ${color}; border-color: ${border}"></div>
+                <div class="flex items-center space-x-1.5 bg-slate-900/90 p-1.5 rounded-lg border border-slate-800">
+                    <div class="w-4 h-4 rounded flex-shrink-0 border" style="background-color: ${color}; border-color: ${border}"></div>
                     
-                    <div class="flex-1 w-full sm:w-auto">
-                        <input type="text" value="${layer.name}" onchange="window.strata[${actualIdx}].name = this.value; window.drawSimulation();" class="w-full bg-slate-900 border border-slate-700 px-2 py-1 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500">
-                    </div>
+                    <input type="text" value="${layer.name}" onchange="window.strata[${actualIdx}].name = this.value; window.drawSimulation();" class="flex-1 min-w-0 bg-slate-950 border border-slate-700 px-1.5 py-0.5 rounded text-[11px] text-white focus:outline-none focus:border-indigo-500">
 
-                    <div class="w-full sm:w-52 flex-shrink-0">
-                        <select onchange="window.strata[${actualIdx}].age = this.value; renderSimulationStrataList(); window.drawSimulation();" class="w-full bg-slate-900 border border-slate-700 px-2 py-1 rounded-lg text-xs text-indigo-300 focus:outline-none focus:border-indigo-500">
-                            ${window.iugsChronodata.map(item => {
-                                const isRo = (typeof window.currentLang !== 'undefined' && window.currentLang === 'ro');
-                                const optName = isRo ? item.nameRo : item.nameEn;
-                                const optRank = isRo ? item.rankRo : item.rankEn;
-                                const isSelected = layer.age.toLowerCase() === item.nameEn.toLowerCase() || layer.age.toLowerCase() === item.nameRo.toLowerCase();
-                                return `<option value="${item.nameEn}" ${isSelected ? 'selected' : ''}>${optName} (${optRank})</option>`;
-                            }).join('')}
-                        </select>
-                    </div>
+                    <select onchange="window.strata[${actualIdx}].age = this.value; renderSimulationStrataList(); window.drawSimulation();" class="w-28 bg-slate-950 border border-slate-700 px-1 py-0.5 rounded text-[10px] text-indigo-300 focus:outline-none focus:border-indigo-500">
+                        ${window.iugsChronodata.map(item => {
+                            const isRo = (typeof window.currentLang !== 'undefined' && window.currentLang === 'ro');
+                            const optName = isRo ? item.nameRo : item.nameEn;
+                            const isSelected = layer.age.toLowerCase() === item.nameEn.toLowerCase() || layer.age.toLowerCase() === item.nameRo.toLowerCase();
+                            return `<option value="${item.nameEn}" ${isSelected ? 'selected' : ''}>${optName}</option>`;
+                        }).join('')}
+                    </select>
 
-                    <div class="flex items-center space-x-1.5 w-full sm:w-28 flex-shrink-0">
-                        <input type="number" min="10" max="250" value="${layer.thickness}" onchange="window.strata[${actualIdx}].thickness = parseInt(this.value) || 30; window.drawSimulation();" class="w-full bg-slate-900 border border-slate-700 px-2 py-1 rounded-lg text-xs text-white text-center focus:outline-none focus:border-indigo-500">
-                        <span class="text-[10px] text-slate-400">m</span>
-                    </div>
+                    <input type="number" min="10" max="250" value="${layer.thickness}" onchange="window.strata[${actualIdx}].thickness = parseInt(this.value) || 30; window.drawSimulation();" class="w-12 bg-slate-950 border border-slate-700 px-1 py-0.5 rounded text-[11px] text-white text-center focus:outline-none focus:border-indigo-500">
 
-                    <button onclick="removeStratumModal(${actualIdx})" class="text-rose-400 hover:text-rose-300 p-1 px-2 text-xs rounded bg-slate-900 border border-slate-800" title="Delete">
+                    <button onclick="removeStratumModal(${actualIdx})" class="text-rose-400 hover:text-rose-300 p-1 text-xs rounded hover:bg-slate-800" title="Șterge">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>
                 </div>
@@ -416,6 +371,5 @@
         if (typeof window.drawSimulation === 'function') window.drawSimulation();
     }
 
-    // Sincronizare la injectare
     syncSimulationModalValues();
 </script>
