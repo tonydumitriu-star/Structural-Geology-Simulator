@@ -1,16 +1,16 @@
-<!-- Modal 3D: Laborator Geologic Solid cu Cinematică Riguroasă și Sculptare DEM (v4.9.0-3D) -->
+<!-- Modal 3D: Laborator Geologic Structural Masiv (v5.0.0-3D) -->
 <div id="simulation-modal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-1 sm:p-3">
     <div class="bg-slate-900 border border-slate-800 w-full max-w-[1850px] h-[96vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
         
         <!-- Header Fereastră -->
         <div class="px-4 py-2.5 border-b border-slate-800 flex justify-between items-center bg-slate-950/90 flex-shrink-0">
             <div class="flex items-center space-x-2.5">
-                <div class="bg-indigo-600 p-1.5 rounded-lg text-white">
+                <div class="bg-indigo-600 p-1.5 rounded-lg text-white shadow-md">
                     <i class="fa-solid fa-cube text-xs"></i>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <h3 id="sim3d-title" class="font-bold text-white text-xs sm:text-sm">Laborator Tectonic 3D - Solid DEM & Sculptare</h3>
-                    <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v4.9.0-3D</span>
+                    <h3 id="sim3d-title" class="font-bold text-white text-xs sm:text-sm">Laborator Tectonic 3D - Bloc Masiv & Sculptare DEM</h3>
+                    <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v5.0.0-3D</span>
                 </div>
             </div>
 
@@ -18,7 +18,7 @@
             <div class="flex items-center space-x-1.5 sm:space-x-2">
                 <div class="bg-slate-900 border border-slate-800 p-0.5 rounded-lg flex text-[10px] font-semibold">
                     <button onclick="setSim3DCamera('iso')" id="cam-btn-iso" class="px-2 py-1 rounded bg-indigo-600 text-white transition-all">3D Izometric</button>
-                    <button onclick="setSim3DCamera('top')" id="cam-btn-top" class="px-2 py-1 rounded text-slate-400 hover:text-white transition-all">Hartă Geologică</button>
+                    <button onclick="setSim3DCamera('top')" id="cam-btn-top" class="px-2 py-1 rounded text-slate-400 hover:text-white transition-all">Hartă (Sus)</button>
                     <button onclick="setSim3DCamera('front')" id="cam-btn-front" class="px-2 py-1 rounded text-slate-400 hover:text-white transition-all">Secțiune (Față)</button>
                 </div>
 
@@ -41,8 +41,8 @@
                     <div class="flex items-center space-x-1.5">
                         <span id="sim3d-badge-process" class="bg-slate-900/80 backdrop-blur-md text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full font-semibold shadow">Falie Normală</span>
                     </div>
-                    <div class="bg-slate-900/80 backdrop-blur-md text-amber-400 border border-slate-800 px-2.5 py-0.5 rounded-full hidden sm:block shadow-lg">
-                        <i class="fa-solid fa-hand-pointer mr-1"></i> Trage cu mouse-ul pe suprafață pentru a SCULPTA! | Orbitare: Clic Dreapta
+                    <div class="bg-slate-900/80 backdrop-blur-md text-amber-300 border border-slate-800 px-2.5 py-0.5 rounded-full hidden sm:block shadow-lg">
+                        <i class="fa-solid fa-hand-pointer mr-1"></i> Clic Stânga: Sapă văi pe suprafață | Clic Dreapta: Rotește camera
                     </div>
                 </div>
 
@@ -54,38 +54,39 @@
                         <div><span class="text-slate-400">Decalaj Orizontal:</span> <span id="sim3d-heave" class="font-bold text-amber-400">0.0m</span></div>
                         <div><span class="text-slate-400">Deplasare Falie:</span> <span id="sim3d-slip" class="font-bold text-emerald-400">0.0m</span></div>
                     </div>
+                    <div class="text-slate-500 font-mono text-[10px]">Bloc: 600m &times; 360m &times; 400m</div>
                 </div>
             </div>
 
             <!-- 2. PANOU DE SETĂRI -->
-            <div class="w-full lg:w-[410px] bg-slate-950 rounded-xl border border-slate-800 p-3 overflow-y-auto space-y-3 flex-shrink-0 text-xs">
+            <div class="w-full lg:w-[420px] bg-slate-950 rounded-xl border border-slate-800 p-3 overflow-y-auto space-y-3 flex-shrink-0 text-xs">
                 
-                <!-- Secțiunea 1: Plane de Secționare -->
+                <!-- Secțiunea 1: Plane de Secționare (Curse complete) -->
                 <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-2">
-                    <span class="text-[11px] font-bold uppercase text-cyan-300 flex items-center">
-                        <i class="fa-solid fa-scissors text-cyan-400 mr-1.5"></i> 1. Plane de Tăiere (Clipping)
+                    <span class="text-[11px] font-bold uppercase text-orange-300 flex items-center">
+                        <i class="fa-solid fa-scissors text-orange-400 mr-1.5"></i> 1. Plane de Secționare
                     </span>
                     <div>
                         <div class="flex justify-between text-[11px] mb-0.5">
-                            <span class="text-slate-300">Felie Transversală (Axa X):</span>
-                            <span id="val-clip-x" class="font-bold text-emerald-400">Max</span>
+                            <span class="text-slate-300">Secțiune Transversală (Axa X):</span>
+                            <span id="val-clip-x" class="font-bold text-orange-400">Complet (600m)</span>
                         </div>
-                        <input type="range" id="slider-clip-x" min="-280" max="300" value="300" oninput="update3DModelParams()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                        <input type="range" id="slider-clip-x" min="-280" max="300" value="300" oninput="update3DModelParams()" class="w-full accent-orange-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
                     </div>
                     <div>
                         <div class="flex justify-between text-[11px] mb-0.5">
-                            <span class="text-slate-300">Felie Longitudinală (Axa Z):</span>
-                            <span id="val-clip-z" class="font-bold text-amber-400">Max</span>
+                            <span class="text-slate-300">Secțiune Longitudinală (Axa Z):</span>
+                            <span id="val-clip-z" class="font-bold text-orange-400">Complet (400m)</span>
                         </div>
-                        <input type="range" id="slider-clip-z" min="-180" max="200" value="200" oninput="update3DModelParams()" class="w-full accent-amber-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                        <input type="range" id="slider-clip-z" min="-180" max="200" value="200" oninput="update3DModelParams()" class="w-full accent-orange-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
                     </div>
                 </div>
 
-                <!-- Secțiunea 2: Faliere 3D (Fragil) -->
+                <!-- Secțiunea 2: Faliere Tectonică (Orientare, Înclinare & Translație 3D) -->
                 <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-2">
                     <div class="flex justify-between items-center">
                         <span class="text-[11px] font-bold uppercase text-indigo-300 flex items-center">
-                            <i class="fa-solid fa-bolt text-indigo-400 mr-1.5"></i> 2. Faliere (Fragil)
+                            <i class="fa-solid fa-bolt text-indigo-400 mr-1.5"></i> 2. Faliere Tectonică 3D
                         </span>
                         <span id="val-dip-badge" class="text-[10px] font-mono text-indigo-300 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">60°</span>
                     </div>
@@ -96,37 +97,62 @@
                                 <span>Falie Normală</span>
                                 <i class="fa-solid fa-circle-check text-[10px]"></i>
                             </span>
+                            <span class="text-[9px] text-indigo-200">Extensie</span>
                         </button>
                         <button onclick="setSim3DFaultProcess('reverse')" id="btn-3d-reverse" class="p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-12">
                             <span class="flex items-center justify-between w-full">
                                 <span>Falie Inversă</span>
                                 <i class="fa-solid fa-circle text-[10px] opacity-0"></i>
                             </span>
+                            <span class="text-[9px] text-slate-400">Compresiune</span>
                         </button>
                     </div>
 
                     <div class="space-y-1.5 pt-0.5">
                         <div>
                             <div class="flex justify-between text-[11px] mb-0.5">
-                                <span class="text-slate-300">Înclinare falie (&theta;):</span>
+                                <span class="text-slate-300">Înclinare falie (Dip &theta;):</span>
                                 <span id="val-3d-dip" class="font-bold text-indigo-400">60°</span>
                             </div>
-                            <input type="range" id="slider-3d-dip" min="-85" max="85" value="60" oninput="update3DModelParams()" class="w-full accent-indigo-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                            <input type="range" id="slider-3d-dip" min="15" max="85" value="60" oninput="update3DModelParams()" class="w-full accent-indigo-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
                         </div>
                         <div>
                             <div class="flex justify-between text-[11px] mb-0.5">
-                                <span class="text-slate-300">Deplasare pe falie:</span>
+                                <span class="text-slate-300">Deplasare pe falie (Slip):</span>
                                 <span id="val-3d-slip" class="font-bold text-emerald-400">45 m</span>
                             </div>
                             <input type="range" id="slider-3d-slip" min="0" max="250" value="45" oninput="update3DModelParams()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
                         </div>
+                        <div>
+                            <div class="flex justify-between text-[11px] mb-0.5">
+                                <span class="text-slate-300">Direcție / Azimut Falie (Strike &alpha;):</span>
+                                <span id="val-3d-strike" class="font-bold text-indigo-300">0°</span>
+                            </div>
+                            <input type="range" id="slider-3d-strike" min="-60" max="60" value="0" oninput="update3DModelParams()" class="w-full accent-indigo-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <div class="flex justify-between text-[10px] mb-0.5">
+                                    <span class="text-slate-400">Poziție E-V:</span>
+                                    <span id="val-3d-posx" class="font-bold text-indigo-300">0m</span>
+                                </div>
+                                <input type="range" id="slider-3d-posx" min="-140" max="140" value="0" oninput="update3DModelParams()" class="w-full accent-indigo-500 bg-slate-800 rounded-lg h-1.5 cursor-pointer">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] mb-0.5">
+                                    <span class="text-slate-400">Poziție N-S:</span>
+                                    <span id="val-3d-posz" class="font-bold text-indigo-300">0m</span>
+                                </div>
+                                <input type="range" id="slider-3d-posz" min="-100" max="100" value="0" oninput="update3DModelParams()" class="w-full accent-indigo-500 bg-slate-800 rounded-lg h-1.5 cursor-pointer">
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Secțiunea 3: Cutare 3D (Ductil) -->
+                <!-- Secțiunea 3: Cutare Tectonică -->
                 <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-2">
                     <span class="text-[11px] font-bold uppercase text-purple-300 flex items-center">
-                        <i class="fa-solid fa-water text-purple-400 mr-1.5"></i> 3. Cutare (Ductil)
+                        <i class="fa-solid fa-water text-purple-400 mr-1.5"></i> 3. Cutare Cilindrică (Ductil)
                     </span>
                     <div class="space-y-1.5">
                         <div>
@@ -146,41 +172,33 @@
                     </div>
                 </div>
 
-                <!-- Secțiunea 4: Morfologie DEM & Peneplanizare -->
+                <!-- Secțiunea 4: Morfologie Topografică DEM & Peneplanizare -->
                 <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-2">
                     <span class="text-[11px] font-bold uppercase text-cyan-300 flex items-center">
-                        <i class="fa-solid fa-mountain-sun text-cyan-400 mr-1.5"></i> 4. Topografie, Peneplanizare & Văi
+                        <i class="fa-solid fa-mountain-sun text-cyan-400 mr-1.5"></i> 4. Topografie, Peneplanizare & DEM
                     </span>
 
                     <div>
                         <div class="flex justify-between text-[11px] mb-0.5">
-                            <span class="text-slate-300">Peneplanizare / Nivelare (Y-Top):</span>
-                            <span id="val-clip-top" class="font-bold text-cyan-400">240 m</span>
+                            <span class="text-slate-300">Peneplanizare (Rade de sus în jos):</span>
+                            <span id="val-clip-top" class="font-bold text-cyan-400">Fără tăiere</span>
                         </div>
-                        <input type="range" id="slider-clip-top" min="-120" max="240" value="240" oninput="update3DModelParams()" class="w-full accent-cyan-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                        <input type="range" id="slider-clip-top" min="-80" max="240" value="240" oninput="update3DModelParams()" class="w-full accent-cyan-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
                     </div>
                     
                     <div class="grid grid-cols-2 gap-1.5 pt-1">
                         <button onclick="generateRandomRelief3D()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-1.5 rounded-lg text-xs transition-all flex items-center justify-center space-x-1">
                             <i class="fa-solid fa-shuffle text-[10px]"></i>
-                            <span>Văi Aleatoare</span>
+                            <span>Relief 2D Văi</span>
                         </button>
                         <button onclick="flattenTopography()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-1.5 rounded-lg text-xs transition-all flex items-center justify-center space-x-1">
                             <i class="fa-solid fa-ruler-horizontal text-[10px]"></i>
                             <span>Nivelează Plat</span>
                         </button>
                     </div>
-
-                    <div class="pt-1">
-                        <div class="flex justify-between text-[11px] mb-0.5">
-                            <span class="text-slate-300">Ajustare Cotă DEM (Sus/Jos):</span>
-                            <span id="val-topo-offset" class="font-bold text-emerald-400">0 m</span>
-                        </div>
-                        <input type="range" id="slider-topo-offset" min="-150" max="150" value="0" oninput="shiftTopography()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                    </div>
                 </div>
 
-                <!-- Secțiunea 5: Strate Geologice -->
+                <!-- Secțiunea 5: Coloană Stratigrafică -->
                 <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-2">
                     <div class="flex justify-between items-center text-slate-400 text-[11px] font-bold uppercase tracking-wider">
                         <span class="flex items-center text-amber-300">
@@ -230,26 +248,30 @@
         process: 'normal',
         dip: 60,
         slip: 45,
+        strike: 0,
+        faultPosX: 0,
+        faultPosZ: 0,
         foldShortening: 0,
         foldWavelength: 220,
-        clipTopY: 240,
+        peneplainY: 240,
         clipX: 300,
         clipZ: 200,
-        topoOffset: 0,
-        topoProfile: new Float32Array(1001) 
+        // Grid Topografic DEM 2D (61 coloane pe X, 41 rânduri pe Z)
+        demNX: 61,
+        demNZ: 41,
+        demGrid: null
     };
 
     let scene3D, camera3D, renderer3D, controls3D;
     let modelMainGroup;
-    let clippingPlanes = [];
     let raycaster, mouse;
     let isCarving3D = false;
     let isThreeInitialized = false;
 
     const HALF_W = 300;
-    const EXTRA_W = 800; // Asigură margini infinite pentru decupare
-    const DEPTH_Z = 400;
-    const BASE_TOPO_Y = 180;
+    const HALF_D = 200;
+    const BASE_ELEV_Y = -130;
+    const DEFAULT_TOPO_Y = 175;
 
     function ensureThreeScripts(callback) {
         if (window.THREE && window.THREE.OrbitControls) { callback(); return; }
@@ -268,8 +290,8 @@
     window.initSimulationEnvironment = function() {
         ensureThreeScripts(() => {
             if (!isThreeInitialized) {
+                initDEMGrid();
                 setupThreeJSScene();
-                window.flattenTopography(false);
                 attachRaycasterErosion();
                 isThreeInitialized = true;
             }
@@ -280,49 +302,50 @@
         });
     };
 
+    function initDEMGrid() {
+        const nx = window.sim3DState.demNX;
+        const nz = window.sim3DState.demNZ;
+        window.sim3DState.demGrid = new Float32Array(nx * nz);
+        window.sim3DState.demGrid.fill(DEFAULT_TOPO_Y);
+    }
+
     function setupThreeJSScene() {
         const container = document.getElementById('threejs-container');
         scene3D = new THREE.Scene();
         scene3D.background = new THREE.Color(0x020617);
 
-        camera3D = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 1, 5000);
-        camera3D.position.set(480, 430, 530);
+        camera3D = new THREE.PerspectiveCamera(38, container.clientWidth / container.clientHeight, 1, 5000);
+        camera3D.position.set(490, 440, 540);
 
         renderer3D = new THREE.WebGLRenderer({ antialias: true, alpha: true, logarithmicDepthBuffer: true });
         renderer3D.setSize(container.clientWidth, container.clientHeight);
         renderer3D.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-        renderer3D.localClippingEnabled = true;
         container.innerHTML = '';
         container.appendChild(renderer3D.domElement);
 
         controls3D = new THREE.OrbitControls(camera3D, renderer3D.domElement);
         controls3D.enableDamping = true;
         controls3D.dampingFactor = 0.05;
-        // Extragem sculptarea din Click Stânga, mutăm rotirea pe Dreapta
+        // Click Dreapta = Orbitare, eliberând Click Stânga pentru sculptare
         controls3D.mouseButtons = { LEFT: null, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE };
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.88);
         scene3D.add(ambientLight);
 
-        const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
-        dirLight1.position.set(400, 650, 450);
+        const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.75);
+        dirLight1.position.set(400, 700, 450);
         scene3D.add(dirLight1);
 
-        const dirLight2 = new THREE.DirectionalLight(0x94a3b8, 0.4);
-        dirLight2.position.set(-400, 300, -350);
+        const dirLight2 = new THREE.DirectionalLight(0x94a3b8, 0.45);
+        dirLight2.position.set(-450, 350, -350);
         scene3D.add(dirLight2);
 
-        const gridHelper = new THREE.GridHelper(800, 16, 0x334155, 0x1e293b);
-        gridHelper.position.y = -155;
+        const gridHelper = new THREE.GridHelper(850, 17, 0x334155, 0x1e293b);
+        gridHelper.position.y = BASE_ELEV_Y - 2;
         scene3D.add(gridHelper);
 
         modelMainGroup = new THREE.Group();
         scene3D.add(modelMainGroup);
-
-        clippingPlanes = [
-            new THREE.Plane(new THREE.Vector3(-1, 0, 0), 300), 
-            new THREE.Plane(new THREE.Vector3(0, 0, -1), 200)
-        ];
 
         raycaster = new THREE.Raycaster();
         mouse = new THREE.Vector2();
@@ -346,21 +369,50 @@
     }
 
     // ==========================================
-    // EROZIUNE DEM & SCULPTARE
+    // TOPOGRAFIE 2D (DEM) & SCULPTARE MANUALĂ
     // ==========================================
+    function getDEMElevation(worldX, worldZ) {
+        const nx = window.sim3DState.demNX;
+        const nz = window.sim3DState.demNZ;
+        const grid = window.sim3DState.demGrid;
+
+        // Mapăm worldX [-300, 300] la [0, nx-1]
+        const gx = ((worldX + HALF_W) / (2 * HALF_W)) * (nx - 1);
+        const gz = ((worldZ + HALF_D) / (2 * HALF_D)) * (nz - 1);
+
+        const x0 = Math.max(0, Math.min(nx - 1, Math.floor(gx)));
+        const x1 = Math.max(0, Math.min(nx - 1, Math.ceil(gx)));
+        const z0 = Math.max(0, Math.min(nz - 1, Math.floor(gz)));
+        const z1 = Math.max(0, Math.min(nz - 1, Math.ceil(gz)));
+
+        const tx = gx - x0;
+        const tz = gz - z0;
+
+        const h00 = grid[z0 * nx + x0];
+        const h10 = grid[z0 * nx + x1];
+        const h01 = grid[z1 * nx + x0];
+        const h11 = grid[z1 * nx + x1];
+
+        const hTop = h00 * (1 - tx) + h10 * tx;
+        const hBot = h01 * (1 - tx) + h11 * tx;
+        const rawH = hTop * (1 - tz) + hBot * tz;
+
+        // Retezăm la cota de peneplanizare dacă este coborâtă
+        return Math.min(rawH, window.sim3DState.peneplainY);
+    }
+
     function attachRaycasterErosion() {
         const container = document.getElementById('threejs-container');
-        
         container.addEventListener('mousedown', (e) => {
-            if (e.button === 0) { isCarving3D = true; carveTopography(e); }
+            if (e.button === 0) { isCarving3D = true; carveTopographyAtMouse(e); }
         });
         container.addEventListener('mousemove', (e) => {
-            if (isCarving3D) carveTopography(e);
+            if (isCarving3D) carveTopographyAtMouse(e);
         });
         window.addEventListener('mouseup', () => { isCarving3D = false; });
     }
 
-    function carveTopography(e) {
+    function carveTopographyAtMouse(e) {
         const container = document.getElementById('threejs-container');
         const rect = container.getBoundingClientRect();
         mouse.x = ((e.clientX - rect.left) / container.clientWidth) * 2 - 1;
@@ -370,58 +422,50 @@
         const intersects = raycaster.intersectObjects(modelMainGroup.children, true);
 
         if (intersects.length > 0) {
-            const worldX = intersects[0].point.x;
-            const radius = 45;
-            const force = 6.0;
+            const hitPoint = intersects[0].point;
+            const radius = 55;
+            const force = 4.5;
+            const nx = window.sim3DState.demNX;
+            const nz = window.sim3DState.demNZ;
+            const grid = window.sim3DState.demGrid;
 
-            for (let i = 0; i <= 1000; i++) {
-                let actualX = i - 500; 
-                let dist = Math.abs(actualX - worldX);
-                if (dist < radius) {
-                    let factor = Math.cos((dist / radius) * (Math.PI / 2));
-                    window.sim3DState.topoProfile[i] -= force * factor;
+            for (let iz = 0; iz < nz; iz++) {
+                const wz = -HALF_D + (iz / (nz - 1)) * (2 * HALF_D);
+                for (let ix = 0; ix < nx; ix++) {
+                    const wx = -HALF_W + (ix / (nx - 1)) * (2 * HALF_W);
+                    const dist = Math.hypot(wx - hitPoint.x, wz - hitPoint.z);
+                    if (dist < radius) {
+                        const factor = Math.cos((dist / radius) * (Math.PI / 2));
+                        grid[iz * nx + ix] = Math.max(BASE_ELEV_Y + 15, grid[iz * nx + ix] - force * factor);
+                    }
                 }
             }
             rebuildGeological3DModel();
         }
     }
 
-    function getTopoElevation(worldX) {
-        let idx = Math.round(worldX + 500);
-        idx = Math.max(0, Math.min(1000, idx));
-        let demY = window.sim3DState.topoProfile[idx] + window.sim3DState.topoOffset;
-        return Math.min(demY, window.sim3DState.clipTopY);
-    }
-
-    window.flattenTopography = function(rebuild = true) {
-        window.sim3DState.topoProfile.fill(BASE_TOPO_Y);
-        const s = document.getElementById('slider-topo-offset');
-        if (s) s.value = 0;
-        window.sim3DState.topoOffset = 0;
-        const val = document.getElementById('val-topo-offset');
-        if (val) val.innerText = "0 m";
-        if (rebuild) rebuildGeological3DModel();
-    };
-
-    window.generateRandomRelief3D = function() {
-        const f1 = 0.005 + Math.random() * 0.005;
-        const f2 = 0.015 + Math.random() * 0.01;
-        const p1 = Math.random() * 10;
-        const p2 = Math.random() * 10;
-        
-        for (let i = 0; i <= 1000; i++) {
-            let x = i - 500;
-            let wave = Math.sin(x * f1 + p1) * 35 + Math.sin(x * f2 + p2) * 20;
-            window.sim3DState.topoProfile[i] = BASE_TOPO_Y - 25 + wave;
-        }
+    window.flattenTopography = function() {
+        initDEMGrid();
         rebuildGeological3DModel();
     };
 
-    window.shiftTopography = function() {
-        const s = document.getElementById('slider-topo-offset');
-        if (!s) return;
-        window.sim3DState.topoOffset = parseInt(s.value);
-        document.getElementById('val-topo-offset').innerText = (window.sim3DState.topoOffset > 0 ? `+${window.sim3DState.topoOffset}` : window.sim3DState.topoOffset) + ' m';
+    window.generateRandomRelief3D = function() {
+        const nx = window.sim3DState.demNX;
+        const nz = window.sim3DState.demNZ;
+        const grid = window.sim3DState.demGrid;
+        const p1 = Math.random() * 10;
+        const p2 = Math.random() * 10;
+
+        for (let iz = 0; iz < nz; iz++) {
+            const z = -HALF_D + (iz / (nz - 1)) * (2 * HALF_D);
+            for (let ix = 0; ix < nx; ix++) {
+                const x = -HALF_W + (ix / (nx - 1)) * (2 * HALF_W);
+                // Văi fluviale 2D orientate oblic
+                const river1 = Math.cos(x * 0.012 + z * 0.008 + p1) * 25;
+                const hills2 = Math.sin(z * 0.015 - x * 0.007 + p2) * 15;
+                grid[iz * nx + ix] = DEFAULT_TOPO_Y - 20 + river1 + hills2;
+            }
+        }
         rebuildGeological3DModel();
     };
 
@@ -433,95 +477,15 @@
     }
 
     // ==========================================
-    // ALGORITM TĂIERE SUTHERLAND-HODGMAN v2 (Solid)
+    // RECONSTRUCȚIE GEOLOGICĂ SOLIDĂ 100%
     // ==========================================
-    function getLocalTopo(x, isHW, dx, dy) {
-        let worldX = isHW ? x + dx : x;
-        return getTopoElevation(worldX) - (isHW ? dy : 0);
-    }
-
-    function clipPolygonByTopo(points, isHW, dx, dy) {
-        const output = [];
-        for (let i = 0; i < points.length; i++) {
-            const cur = points[i];
-            const prv = points[(i + points.length - 1) % points.length];
-            
-            const curIn = cur.y <= getLocalTopo(cur.x, isHW, dx, dy);
-            const prvIn = prv.y <= getLocalTopo(prv.x, isHW, dx, dy);
-            
-            if (curIn) {
-                if (!prvIn) output.push(findIntersectDEM(prv, cur, isHW, dx, dy));
-                output.push(cur);
-            } else if (prvIn) {
-                output.push(findIntersectDEM(prv, cur, isHW, dx, dy));
+    function getLayerIndexAtY(yUndeformed, strataOffsets) {
+        for (let i = 0; i < strataOffsets.length; i++) {
+            if (yUndeformed >= strataOffsets[i].bot && yUndeformed < strataOffsets[i].top) {
+                return i;
             }
         }
-        return output;
-    }
-
-    function findIntersectDEM(p1, p2, isHW, dx, dy) {
-        let pIn = (p1.y <= getLocalTopo(p1.x, isHW, dx, dy)) ? p1 : p2;
-        let pOut = (pIn === p1) ? p2 : p1;
-        
-        let low = 0, high = 1;
-        for(let i=0; i<12; i++) {
-            let t = (low + high) / 2;
-            let mx = pIn.x + t * (pOut.x - pIn.x);
-            let my = pIn.y + t * (pOut.y - pIn.y);
-            if (my <= getLocalTopo(mx, isHW, dx, dy)) low = t;
-            else high = t;
-        }
-        let t = (low + high) / 2;
-        return new THREE.Vector2(pIn.x + t * (pOut.x - pIn.x), pIn.y + t * (pOut.y - pIn.y));
-    }
-
-    function createSolidPolygon(yBot, yTop, foldAmp, k, cotDip, isHW, dx, dy) {
-        const points = [];
-        const X_fault_bot = yBot * cotDip;
-        const X_fault_top = yTop * cotDip;
-        
-        const getFoldedY = (x, yBase) => yBase + foldAmp * Math.sin(x * k);
-
-        if (!isHW) {
-            const startX = -EXTRA_W;
-            for (let x = startX; x <= X_fault_bot; x += 15) points.push(new THREE.Vector2(x, getFoldedY(x, yBot)));
-            points.push(new THREE.Vector2(X_fault_bot, yBot));
-            
-            // Densificăm falia pentru decupaj fin la suprafață
-            const faultSteps = Math.max(2, Math.ceil((yTop - yBot) / 10));
-            for (let i = 1; i <= faultSteps; i++) {
-                let t = i / faultSteps;
-                let cY = yBot + t * (yTop - yBot);
-                points.push(new THREE.Vector2(cY * cotDip, cY));
-            }
-            
-            for (let x = X_fault_top; x >= startX; x -= 15) points.push(new THREE.Vector2(x, getFoldedY(x, yTop)));
-        } else {
-            const rightLimit = EXTRA_W;
-            points.push(new THREE.Vector2(X_fault_bot, yBot));
-            for (let x = X_fault_bot; x <= rightLimit; x += 15) points.push(new THREE.Vector2(x, getFoldedY(x, yBot)));
-            points.push(new THREE.Vector2(rightLimit, getFoldedY(rightLimit, yBot)));
-            points.push(new THREE.Vector2(rightLimit, getFoldedY(rightLimit, yTop)));
-            for (let x = rightLimit; x >= X_fault_top; x -= 15) points.push(new THREE.Vector2(x, getFoldedY(x, yTop)));
-            
-            const faultSteps = Math.max(2, Math.ceil((yTop - yBot) / 10));
-            for (let i = faultSteps - 1; i >= 0; i--) {
-                let t = i / faultSteps;
-                let cY = yBot + t * (yTop - yBot);
-                points.push(new THREE.Vector2(cY * cotDip, cY));
-            }
-        }
-        
-        const clippedPoints = clipPolygonByTopo(points, isHW, dx, dy);
-        if (clippedPoints.length < 3) return null;
-        
-        const cleanPoints = [];
-        for(let i=0; i<clippedPoints.length; i++) {
-            if (i===0 || clippedPoints[i].distanceTo(clippedPoints[i-1]) > 0.1) {
-                cleanPoints.push(clippedPoints[i]);
-            }
-        }
-        return cleanPoints;
+        return -1;
     }
 
     window.rebuildGeological3DModel = function() {
@@ -531,128 +495,271 @@
             modelMainGroup.remove(modelMainGroup.children[0]);
         }
 
-        let dipDeg = window.sim3DState.dip;
-        if (Math.abs(dipDeg) < 5) dipDeg = 5 * Math.sign(dipDeg || 1); 
-        
+        // 1. Parametri Falie & Cinematică Tangențială Riguroasă
+        const dipDeg = window.sim3DState.dip;
         const dipRad = (dipDeg * Math.PI) / 180;
+        const strikeDeg = window.sim3DState.strike;
+        const strikeRad = (strikeDeg * Math.PI) / 180;
         const slip = window.sim3DState.slip;
+        const xF = window.sim3DState.faultPosX;
+        const zF = window.sim3DState.faultPosZ;
 
-        const cotDip = 1.0 / Math.tan(dipRad);
+        // Vectorul unitar de-a lungul pantei faliei în spațiu
+        const cosA = Math.cos(strikeRad);
+        const sinA = Math.sin(strikeRad);
+        const cosD = Math.cos(dipRad);
+        const sinD = Math.sin(dipRad);
 
-        const signDip = Math.sign(dipDeg);
-        let dxMag = slip * Math.cos(Math.abs(dipRad));
-        let dyMag = slip * Math.sin(Math.abs(dipRad));
+        // Deplasare tangentă exactă (Normală: coboară pe falie, Inversă: urcă pe falie)
+        const signProc = (window.sim3DState.process === 'normal') ? 1 : -1;
+        const dx = signProc * slip * cosD * cosA;
+        const dy = signProc * -slip * sinD;
+        const dz = signProc * slip * cosD * sinA;
 
-        let dx = 0, dy = 0;
-        if (window.sim3DState.process === 'normal') {
-            dy = -dyMag; 
-            dx = signDip * dxMag;
-        } else {
-            dy = dyMag;  
-            dx = -signDip * dxMag;
-        }
+        document.getElementById('sim3d-throw').innerText = Math.abs(dy).toFixed(1) + 'm';
+        document.getElementById('sim3d-heave').innerText = Math.hypot(dx, dz).toFixed(1) + 'm';
+        document.getElementById('sim3d-slip').innerText = slip.toFixed(1) + 'm';
 
-        const eThrow = document.getElementById('sim3d-throw');
-        const eHeave = document.getElementById('sim3d-heave');
-        const eSlip = document.getElementById('sim3d-slip');
-        if(eThrow) eThrow.innerText = Math.abs(dy).toFixed(1) + 'm';
-        if(eHeave) eHeave.innerText = Math.abs(dx).toFixed(1) + 'm';
-        if(eSlip) eSlip.innerText = slip.toFixed(1) + 'm';
-
+        // 2. Praguri Strate și Cutare
         const foldAmp = (window.sim3DState.foldShortening / 100) * 45;
         const lambda = Math.max(60, window.sim3DState.foldWavelength);
-        const k = (2 * Math.PI) / lambda;
+        const kFold = (2 * Math.PI) / lambda;
+        const getFold = (x) => foldAmp * Math.sin(x * kFold);
 
-        let currY = -140;
-
-        const fwGroup = new THREE.Group();
-        const hwGroup = new THREE.Group();
-        modelMainGroup.add(fwGroup);
-        modelMainGroup.add(hwGroup);
-
-        window.sim3DStrata.forEach((stratum) => {
-            const h = stratum.thickness;
-            const colorHex = get3DColor(stratum.age);
-
-            const fwPoly = createSolidPolygon(currY, currY + h, foldAmp, k, cotDip, false, 0, 0);
-            if (fwPoly) {
-                const geom = new THREE.ExtrudeGeometry(new THREE.Shape(fwPoly), { depth: DEPTH_Z, bevelEnabled: false, steps: 1 });
-                geom.computeVertexNormals();
-                const mesh = new THREE.Mesh(geom, new THREE.MeshStandardMaterial({
-                    color: colorHex, roughness: 0.65, metalness: 0.05, side: THREE.DoubleSide, clippingPlanes: clippingPlanes
-                }));
-                mesh.position.z = -DEPTH_Z / 2;
-                mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geom, 25), new THREE.LineBasicMaterial({ color: 0x0f172a, clippingPlanes: clippingPlanes })));
-                fwGroup.add(mesh);
-            }
-
-            const hwPoly = createSolidPolygon(currY, currY + h, foldAmp, k, cotDip, true, dx, dy);
-            if (hwPoly) {
-                const geom = new THREE.ExtrudeGeometry(new THREE.Shape(hwPoly), { depth: DEPTH_Z, bevelEnabled: false, steps: 1 });
-                geom.computeVertexNormals();
-                const mesh = new THREE.Mesh(geom, new THREE.MeshStandardMaterial({
-                    color: colorHex, roughness: 0.65, metalness: 0.05, side: THREE.DoubleSide, clippingPlanes: clippingPlanes
-                }));
-                mesh.position.z = -DEPTH_Z / 2;
-                mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geom, 25), new THREE.LineBasicMaterial({ color: 0x0f172a, clippingPlanes: clippingPlanes })));
-                hwGroup.add(mesh);
-            }
-
-            currY += h;
+        let curY = BASE_ELEV_Y;
+        const strataOffsets = window.sim3DStrata.map(s => {
+            const bot = curY;
+            const top = curY + s.thickness;
+            curY = top;
+            return { bot, top, color: get3DColor(s.age) };
         });
 
-        hwGroup.position.set(dx, dy, 0);
+        // 3. Funcție de evaluare a faliei: F(x, y, z) <= 0 => Footwall, > 0 => Hanging Wall
+        const evaluateFault = (x, y, z) => {
+            const u = (x - xF) * cosA + (z - zF) * sinA;
+            return u - (y / Math.tan(dipRad));
+        };
+
+        // Limite active de secționare
+        const activeMaxX = window.sim3DState.clipX;
+        const activeMaxZ = window.sim3DState.clipZ;
+
+        // 4. GENERARE SUPRAFAȚĂ TOPOGRAFICĂ SOLIDĂ (Harta Geologică la zi)
+        const topoGeom = new THREE.BufferGeometry();
+        const topoPositions = [];
+        const topoColors = [];
+        const stepGrid = 10;
+
+        for (let wz = -HALF_D; wz < activeMaxZ; wz += stepGrid) {
+            for (let wx = -HALF_W; wx < activeMaxX; wx += stepGrid) {
+                const x0 = wx, x1 = Math.min(activeMaxX, wx + stepGrid);
+                const z0 = wz, z1 = Math.min(activeMaxZ, wz + stepGrid);
+
+                const pts = [
+                    new THREE.Vector3(x0, getDEMElevation(x0, z0), z0),
+                    new THREE.Vector3(x1, getDEMElevation(x1, z0), z0),
+                    new THREE.Vector3(x1, getDEMElevation(x1, z1), z1),
+                    new THREE.Vector3(x0, getDEMElevation(x0, z1), z1)
+                ];
+
+                const addTri = (pA, pB, pC) => {
+                    [pA, pB, pC].forEach(p => {
+                        topoPositions.push(p.x, p.y, p.z);
+                        // Determinăm stratul geologic outcropping
+                        const isHW = evaluateFault(p.x, p.y, p.z) > 0;
+                        const origX = isHW ? p.x - dx : p.x;
+                        const origY = isHW ? p.y - dy : p.y;
+                        const uY = origY - getFold(origX);
+                        const lIdx = getLayerIndexAtY(uY, strataOffsets);
+                        const col = lIdx >= 0 ? new THREE.Color(strataOffsets[lIdx].color) : new THREE.Color(0x334155);
+                        topoColors.push(col.r, col.g, col.b);
+                    });
+                };
+
+                addTri(pts[0], pts[1], pts[2]);
+                addTri(pts[0], pts[2], pts[3]);
+            }
+        }
+
+        topoGeom.setAttribute('position', new THREE.Float32BufferAttribute(topoPositions, 3));
+        topoGeom.setAttribute('color', new THREE.Float32BufferAttribute(topoColors, 3));
+        topoGeom.computeVertexNormals();
+
+        const topoMesh = new THREE.Mesh(topoGeom, new THREE.MeshStandardMaterial({
+            vertexColors: true, roughness: 0.65, metalness: 0.05, side: THREE.DoubleSide
+        }));
+        modelMainGroup.add(topoMesh);
+
+        // 5. GENERARE PEREȚI SOLIZI (Față Z_cut, Spate -200, Stânga -300, Dreapta X_cut)
+        function buildSectionWall(isConstantZ, constCoord, startU, endU, isFacingOut) {
+            const wallGeom = new THREE.BufferGeometry();
+            const wPos = [];
+            const wCol = [];
+            const stepU = 6;
+
+            for (let u = startU; u < endU; u += stepU) {
+                const u0 = u;
+                const u1 = Math.min(endU, u + stepU);
+
+                const getPt = (currU) => {
+                    const wx = isConstantZ ? currU : constCoord;
+                    const wz = isConstantZ ? constCoord : currU;
+                    const topY = getDEMElevation(wx, wz);
+                    return { wx, wz, topY };
+                };
+
+                const p0 = getPt(u0);
+                const p1 = getPt(u1);
+
+                // Discretizăm pe verticală pentru a desena fiecare strat
+                strataOffsets.forEach(st => {
+                    const addQuad = (b0, t0, b1, t1, colHex) => {
+                        const col = new THREE.Color(colHex);
+                        const v1 = [p0.wx, b0, p0.wz];
+                        const v2 = [p1.wx, b1, p1.wz];
+                        const v3 = [p1.wx, t1, p1.wz];
+                        const v4 = [p0.wx, t0, p0.wz];
+
+                        const pushTri = (a, b, c) => {
+                            [a, b, c].forEach(v => {
+                                wPos.push(v[0], v[1], v[2]);
+                                wCol.push(col.r, col.g, col.b);
+                            });
+                        };
+
+                        if (isFacingOut) {
+                            pushTri(v1, v2, v3);
+                            pushTri(v1, v3, v4);
+                        } else {
+                            pushTri(v1, v3, v2);
+                            pushTri(v1, v4, v3);
+                        }
+                    };
+
+                    const evalLayerY = (wx, wz, targetY) => {
+                        const isHW = evaluateFault(wx, targetY, wz) > 0;
+                        const origX = isHW ? wx - dx : wx;
+                        const shiftY = isHW ? dy : 0;
+                        return targetY + getFold(origX) + shiftY;
+                    };
+
+                    const bY0 = Math.max(BASE_ELEV_Y, Math.min(p0.topY, evalLayerY(p0.wx, p0.wz, st.bot)));
+                    const tY0 = Math.max(BASE_ELEV_Y, Math.min(p0.topY, evalLayerY(p0.wx, p0.wz, st.top)));
+                    const bY1 = Math.max(BASE_ELEV_Y, Math.min(p1.topY, evalLayerY(p1.wx, p1.wz, st.bot)));
+                    const tY1 = Math.max(BASE_ELEV_Y, Math.min(p1.topY, evalLayerY(p1.wx, p1.wz, st.top)));
+
+                    if (tY0 > bY0 || tY1 > bY1) {
+                        addQuad(bY0, tY0, bY1, tY1, st.color);
+                    }
+                });
+            }
+
+            wallGeom.setAttribute('position', new THREE.Float32BufferAttribute(wPos, 3));
+            wallGeom.setAttribute('color', new THREE.Float32BufferAttribute(wCol, 3));
+            wallGeom.computeVertexNormals();
+
+            const wMesh = new THREE.Mesh(wallGeom, new THREE.MeshStandardMaterial({
+                vertexColors: true, roughness: 0.65, metalness: 0.05, side: THREE.DoubleSide
+            }));
+            modelMainGroup.add(wMesh);
+        }
+
+        // Peretele Frontal activ (Secțiune pe Z)
+        buildSectionWall(true, activeMaxZ, -HALF_W, activeMaxX, true);
+        // Peretele Posterior (-200)
+        buildSectionWall(true, -HALF_D, -HALF_W, activeMaxX, false);
+        // Peretele Stâng (-300)
+        buildSectionWall(false, -HALF_W, -HALF_D, activeMaxZ, false);
+        // Peretele Drept activ (Secțiune pe X)
+        buildSectionWall(false, activeMaxX, -HALF_D, activeMaxZ, true);
+
+        // 6. FAȚETA PLANULUI DE FALIE (Complet închisă și continuă)
+        const faultGeom = new THREE.BufferGeometry();
+        const fPos = [];
+        const fCol = [];
+        const stepsZ = 30;
+
+        for (let iz = 0; iz < stepsZ; iz++) {
+            const z0 = -HALF_D + (iz / stepsZ) * (activeMaxZ - -HALF_D);
+            const z1 = -HALF_D + ((iz + 1) / stepsZ) * (activeMaxZ - -HALF_D);
+
+            strataOffsets.forEach(st => {
+                const getFaultCoords = (refY, currZ) => {
+                    const uVal = refY / Math.tan(dipRad);
+                    const fx = xF + uVal * cosA - (currZ - zF) * (sinA / cosA);
+                    return fx;
+                };
+
+                const fX0_bot = getFaultCoords(st.bot, z0);
+                const fX0_top = getFaultCoords(st.top, z0);
+                const fX1_bot = getFaultCoords(st.bot, z1);
+                const fX1_top = getFaultCoords(st.top, z1);
+
+                const topLimit0 = getDEMElevation(fX0_top, z0);
+                const topLimit1 = getDEMElevation(fX1_top, z1);
+
+                const y0_b = Math.max(BASE_ELEV_Y, Math.min(topLimit0, st.bot));
+                const y0_t = Math.max(BASE_ELEV_Y, Math.min(topLimit0, st.top));
+                const y1_b = Math.max(BASE_ELEV_Y, Math.min(topLimit1, st.bot));
+                const y1_t = Math.max(BASE_ELEV_Y, Math.min(topLimit1, st.top));
+
+                if (y0_t > y0_b || y1_t > y1_b) {
+                    const col = new THREE.Color(st.color);
+                    const v1 = [fX0_bot, y0_b, z0];
+                    const v2 = [fX1_bot, y1_b, z1];
+                    const v3 = [fX1_top, y1_t, z1];
+                    const v4 = [fX0_top, y0_t, z0];
+
+                    [v1, v2, v3, v1, v3, v4].forEach(v => {
+                        fPos.push(v[0], v[1], v[2]);
+                        fCol.push(col.r, col.g, col.b);
+                    });
+                }
+            });
+        }
+
+        faultGeom.setAttribute('position', new THREE.Float32BufferAttribute(fPos, 3));
+        faultGeom.setAttribute('color', new THREE.Float32BufferAttribute(fCol, 3));
+        faultGeom.computeVertexNormals();
+
+        const faultMesh = new THREE.Mesh(faultGeom, new THREE.MeshStandardMaterial({
+            vertexColors: true, roughness: 0.6, metalness: 0.05, side: THREE.DoubleSide
+        }));
+        modelMainGroup.add(faultMesh);
+
+        // 7. Baza inferioară (Planul de fundament -130m)
+        const baseGeom = new THREE.PlaneGeometry(activeMaxX - -HALF_W, activeMaxZ - -HALF_D);
+        const baseMesh = new THREE.Mesh(baseGeom, new THREE.MeshBasicMaterial({ color: 0x0f172a, side: THREE.DoubleSide }));
+        baseMesh.rotation.x = Math.PI / 2;
+        baseMesh.position.set((-HALF_W + activeMaxX) / 2, BASE_ELEV_Y, (-HALF_D + activeMaxZ) / 2);
+        modelMainGroup.add(baseMesh);
     };
 
     window.update3DModelParams = function() {
-        const dDip = document.getElementById('slider-3d-dip');
-        if(dDip) window.sim3DState.dip = parseInt(dDip.value);
-        
-        const dSlip = document.getElementById('slider-3d-slip');
-        if(dSlip) window.sim3DState.slip = parseInt(dSlip.value);
-        
-        const dShort = document.getElementById('slider-3d-fold-short');
-        if(dShort) window.sim3DState.foldShortening = parseInt(dShort.value);
-        
-        const dWave = document.getElementById('slider-3d-fold-wave');
-        if(dWave) window.sim3DState.foldWavelength = parseInt(dWave.value);
-        
-        const dClipTop = document.getElementById('slider-clip-top');
-        if(dClipTop) window.sim3DState.clipTopY = parseInt(dClipTop.value);
-        
-        const dClipX = document.getElementById('slider-clip-x');
-        if(dClipX) window.sim3DState.clipX = parseInt(dClipX.value);
-        
-        const dClipZ = document.getElementById('slider-clip-z');
-        if(dClipZ) window.sim3DState.clipZ = parseInt(dClipZ.value);
+        window.sim3DState.dip = parseInt(document.getElementById('slider-3d-dip').value);
+        window.sim3DState.slip = parseInt(document.getElementById('slider-3d-slip').value);
+        window.sim3DState.strike = parseInt(document.getElementById('slider-3d-strike').value);
+        window.sim3DState.faultPosX = parseInt(document.getElementById('slider-3d-posx').value);
+        window.sim3DState.faultPosZ = parseInt(document.getElementById('slider-3d-posz').value);
 
-        if(clippingPlanes.length >= 2) {
-            clippingPlanes[0].constant = window.sim3DState.clipX;
-            clippingPlanes[1].constant = window.sim3DState.clipZ;
-        }
+        window.sim3DState.foldShortening = parseInt(document.getElementById('slider-3d-fold-short').value);
+        window.sim3DState.foldWavelength = parseInt(document.getElementById('slider-3d-fold-wave').value);
+        window.sim3DState.peneplainY = parseInt(document.getElementById('slider-clip-top').value);
+        window.sim3DState.clipX = parseInt(document.getElementById('slider-clip-x').value);
+        window.sim3DState.clipZ = parseInt(document.getElementById('slider-clip-z').value);
 
-        const tDip = document.getElementById('val-3d-dip');
-        if(tDip) tDip.innerText = window.sim3DState.dip + '°';
-        const bDip = document.getElementById('val-dip-badge');
-        if(bDip) bDip.innerText = window.sim3DState.dip + '°';
-        
-        const tSlip = document.getElementById('val-3d-slip');
-        if(tSlip) tSlip.innerText = window.sim3DState.slip + ' m';
-        
-        const tShort = document.getElementById('val-3d-fold-short');
-        if(tShort) tShort.innerText = window.sim3DState.foldShortening + '%';
-        
-        const tWave = document.getElementById('val-3d-fold-wave');
-        if(tWave) tWave.innerText = window.sim3DState.foldWavelength + ' m';
-        
-        const tClipTop = document.getElementById('val-clip-top');
-        if(tClipTop) tClipTop.innerText = window.sim3DState.clipTopY >= 235 ? 'Oprit' : `${window.sim3DState.clipTopY} m`;
-        
-        const tClipX = document.getElementById('val-clip-x');
-        if(tClipX) tClipX.innerText = window.sim3DState.clipX >= 295 ? 'Max' : `${window.sim3DState.clipX + 300} m`;
-        
-        const tClipZ = document.getElementById('val-clip-z');
-        if(tClipZ) tClipZ.innerText = window.sim3DState.clipZ >= 195 ? 'Max' : `${window.sim3DState.clipZ + 200} m`;
+        document.getElementById('val-3d-dip').innerText = window.sim3DState.dip + '°';
+        document.getElementById('val-dip-badge').innerText = window.sim3DState.dip + '°';
+        document.getElementById('val-3d-slip').innerText = window.sim3DState.slip + ' m';
+        document.getElementById('val-3d-strike').innerText = window.sim3DState.strike + '°';
+        document.getElementById('val-3d-posx').innerText = window.sim3DState.faultPosX + ' m';
+        document.getElementById('val-3d-posz').innerText = window.sim3DState.faultPosZ + ' m';
+
+        document.getElementById('val-3d-fold-short').innerText = window.sim3DState.foldShortening + '%';
+        document.getElementById('val-3d-fold-wave').innerText = window.sim3DState.foldWavelength + ' m';
+        document.getElementById('val-clip-top').innerText = window.sim3DState.peneplainY >= 235 ? 'Fără tăiere' : `${window.sim3DState.peneplainY} m`;
+        document.getElementById('val-clip-x').innerText = window.sim3DState.clipX >= 295 ? 'Complet (600m)' : `${window.sim3DState.clipX + 300} m`;
+        document.getElementById('val-clip-z').innerText = window.sim3DState.clipZ >= 195 ? 'Complet (400m)' : `${window.sim3DState.clipZ + 200} m`;
 
         rebuildGeological3DModel();
     };
@@ -663,19 +770,17 @@
         const btnR = document.getElementById('btn-3d-reverse');
 
         if (type === 'normal') {
-            if(btnN) btnN.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-12";
-            if(btnN) btnN.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
-            if(btnR) btnR.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-12";
-            if(btnR) btnR.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
-            const b = document.getElementById('sim3d-badge-process');
-            if(b) b.innerText = "Falie Normală";
+            btnN.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-12";
+            btnN.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
+            btnR.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-12";
+            btnR.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
+            document.getElementById('sim3d-badge-process').innerText = "Falie Normală";
         } else {
-            if(btnR) btnR.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-12";
-            if(btnR) btnR.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
-            if(btnN) btnN.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-12";
-            if(btnN) btnN.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
-            const b = document.getElementById('sim3d-badge-process');
-            if(b) b.innerText = "Falie Inversă";
+            btnR.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-12";
+            btnR.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
+            btnN.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-12";
+            btnN.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
+            document.getElementById('sim3d-badge-process').innerText = "Falie Inversă";
         }
         rebuildGeological3DModel();
     };
@@ -683,11 +788,10 @@
     window.setSim3DCamera = function(view) {
         if (!camera3D || !controls3D) return;
         ['iso', 'top', 'front'].forEach(v => {
-            const el = document.getElementById(`cam-btn-${v}`);
-            if(el) el.className = (v === view) ? "px-2 py-1 rounded bg-indigo-600 text-white transition-all" : "px-2 py-1 rounded text-slate-400 hover:text-white transition-all";
+            document.getElementById(`cam-btn-${v}`).className = (v === view) ? "px-2 py-1 rounded bg-indigo-600 text-white transition-all" : "px-2 py-1 rounded text-slate-400 hover:text-white transition-all";
         });
-        if (view === 'iso') camera3D.position.set(480, 430, 530);
-        else if (view === 'top') camera3D.position.set(0, 900, 1);
+        if (view === 'iso') camera3D.position.set(490, 440, 540);
+        else if (view === 'top') camera3D.position.set(0, 950, 1);
         else if (view === 'front') camera3D.position.set(0, 0, 850);
         controls3D.target.set(0, 0, 0);
         controls3D.update();
@@ -696,29 +800,39 @@
     window.resetSim3DParams = function() {
         window.sim3DState.slip = 0;
         window.sim3DState.foldShortening = 0;
-        window.sim3DState.clipTopY = 240;
+        window.sim3DState.strike = 0;
+        window.sim3DState.faultPosX = 0;
+        window.sim3DState.faultPosZ = 0;
+        window.sim3DState.peneplainY = 240;
         window.sim3DState.clipX = 300;
         window.sim3DState.clipZ = 200;
-        
-        const sd = document.getElementById('slider-3d-slip'); if(sd) sd.value = 0;
-        const sf = document.getElementById('slider-3d-fold-short'); if(sf) sf.value = 0;
-        const sct = document.getElementById('slider-clip-top'); if(sct) sct.value = 240;
-        const scx = document.getElementById('slider-clip-x'); if(scx) scx.value = 300;
-        const scz = document.getElementById('slider-clip-z'); if(scz) scz.value = 200;
-        
-        window.flattenTopography();
+
+        document.getElementById('slider-3d-slip').value = 0;
+        document.getElementById('slider-3d-fold-short').value = 0;
+        document.getElementById('slider-3d-strike').value = 0;
+        document.getElementById('slider-3d-posx').value = 0;
+        document.getElementById('slider-3d-posz').value = 0;
+        document.getElementById('slider-clip-top').value = 240;
+        document.getElementById('slider-clip-x').value = 300;
+        document.getElementById('slider-clip-z').value = 200;
+
+        initDEMGrid();
         update3DModelParams();
         setSim3DCamera('iso');
     };
 
     function sync3DControls() {
-        const sd = document.getElementById('slider-3d-dip'); if(sd) sd.value = window.sim3DState.dip;
-        const ss = document.getElementById('slider-3d-slip'); if(ss) ss.value = window.sim3DState.slip;
-        const sfs = document.getElementById('slider-3d-fold-short'); if(sfs) sfs.value = window.sim3DState.foldShortening;
-        const sfw = document.getElementById('slider-3d-fold-wave'); if(sfw) sfw.value = window.sim3DState.foldWavelength;
-        const sct = document.getElementById('slider-clip-top'); if(sct) sct.value = window.sim3DState.clipTopY;
-        const scx = document.getElementById('slider-clip-x'); if(scx) scx.value = window.sim3DState.clipX;
-        const scz = document.getElementById('slider-clip-z'); if(scz) scz.value = window.sim3DState.clipZ;
+        document.getElementById('slider-3d-dip').value = window.sim3DState.dip;
+        document.getElementById('slider-3d-slip').value = window.sim3DState.slip;
+        document.getElementById('slider-3d-strike').value = window.sim3DState.strike;
+        document.getElementById('slider-3d-posx').value = window.sim3DState.faultPosX;
+        document.getElementById('slider-3d-posz').value = window.sim3DState.faultPosZ;
+
+        document.getElementById('slider-3d-fold-short').value = window.sim3DState.foldShortening;
+        document.getElementById('slider-3d-fold-wave').value = window.sim3DState.foldWavelength;
+        document.getElementById('slider-clip-top').value = window.sim3DState.peneplainY;
+        document.getElementById('slider-clip-x').value = window.sim3DState.clipX;
+        document.getElementById('slider-clip-z').value = window.sim3DState.clipZ;
         update3DModelParams();
     }
 
