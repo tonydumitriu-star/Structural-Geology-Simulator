@@ -1,14 +1,14 @@
-<!-- Modal: Editor Stratigrafie Secțiune -->
+<!-- Modal: Consola de Control Simulare (Deformare, Relief & Strate) -->
 <div id="simulation-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
         
-        <!-- Header Modal -->
+        <!-- Header Consola cu Badge de Versiune v2.0.0 -->
         <div class="px-4 py-3 border-b border-slate-800 flex justify-between items-center bg-slate-900/90">
             <div class="flex items-center space-x-2">
-                <i class="fa-solid fa-layer-group text-indigo-400"></i>
+                <i class="fa-solid fa-sliders text-indigo-400"></i>
                 <div class="flex items-center space-x-2">
-                    <h3 id="simulation-modal-title" class="font-bold text-white text-sm sm:text-base">Editor Stratigrafie Secțiune</h3>
-                    <span id="simulation-modal-version" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v1.2.0</span>
+                    <h3 id="sim-modal-header-title" class="font-bold text-white text-sm sm:text-base">Consolă de Simulare Tectonică</h3>
+                    <span id="simulation-modal-version" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v2.0.0</span>
                 </div>
             </div>
             <button onclick="closeSimulationModal()" class="text-slate-400 hover:text-white p-1">
@@ -16,56 +16,364 @@
             </button>
         </div>
 
-        <!-- Listă Strate Editabile -->
+        <!-- Bara de Tab-uri de Navigare -->
+        <div class="flex border-b border-slate-800 bg-slate-950 px-3 pt-2 space-x-1 text-xs">
+            <button onclick="switchSimTab('deform')" id="tab-btn-deform" class="px-3 py-1.5 rounded-t-lg font-semibold bg-slate-900 text-indigo-300 border-t border-x border-slate-800 flex items-center space-x-1.5">
+                <i class="fa-solid fa-gears text-indigo-400"></i>
+                <span id="tab-lbl-deform">1. Deformare</span>
+            </button>
+            <button onclick="switchSimTab('relief')" id="tab-btn-relief" class="px-3 py-1.5 rounded-t-lg font-semibold text-slate-400 hover:text-slate-200 flex items-center space-x-1.5">
+                <i class="fa-solid fa-wind text-cyan-400"></i>
+                <span id="tab-lbl-relief">2. Relief</span>
+            </button>
+            <button onclick="switchSimTab('strata')" id="tab-btn-strata" class="px-3 py-1.5 rounded-t-lg font-semibold text-slate-400 hover:text-slate-200 flex items-center space-x-1.5">
+                <i class="fa-solid fa-layer-group text-amber-400"></i>
+                <span id="tab-lbl-strata">3. Strate Secțiune</span>
+            </button>
+        </div>
+
+        <!-- Conținut Tab-uri (Scrollable) -->
         <div class="p-3 sm:p-4 overflow-y-auto space-y-3 flex-1">
-            <div class="flex justify-between items-center px-1 text-slate-400 text-xs font-bold uppercase tracking-wider">
-                <span>Strate Geologice (Fundament &rarr; Suprafață)</span>
-                <span>Grosime (m)</span>
+            
+            <!-- TAB 1: DEFORMARE TECTONICĂ (FALII & CUTE) -->
+            <div id="sim-tab-content-deform" class="space-y-3">
+                <!-- Falii -->
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2.5">
+                    <div class="flex justify-between items-center">
+                        <span id="sim-lbl-brittle" class="text-xs font-bold uppercase text-indigo-300 flex items-center">
+                            <i class="fa-solid fa-bolt text-indigo-400 mr-1.5"></i> Faliere (Fragil)
+                        </span>
+                        <span id="modal-val-dip-badge" class="text-[10px] font-mono text-indigo-300 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">60°</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="setModalProcess('normal')" id="modal-btn-normal" class="p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-14">
+                            <span class="flex items-center justify-between w-full">
+                                <span id="modal-txt-normal">Falie Normală</span>
+                                <i class="fa-solid fa-circle-check text-[10px]"></i>
+                            </span>
+                            <span id="modal-sub-normal" class="text-[9px] text-indigo-200">Extensie</span>
+                        </button>
+                        <button onclick="setModalProcess('reverse')" id="modal-btn-reverse" class="p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-14">
+                            <span class="flex items-center justify-between w-full">
+                                <span id="modal-txt-reverse">Falie Inversă</span>
+                                <i class="fa-solid fa-circle text-[10px] opacity-0"></i>
+                            </span>
+                            <span id="modal-sub-reverse" class="text-[9px] text-slate-400">Compresiune</span>
+                        </button>
+                    </div>
+
+                    <div class="space-y-2 pt-1">
+                        <div>
+                            <div class="flex justify-between text-[11px] mb-1">
+                                <span id="modal-lbl-dip" class="text-slate-300">Unghi înclinare falie (&theta;):</span>
+                                <span id="modal-val-dip" class="font-bold text-indigo-400">60°</span>
+                            </div>
+                            <input type="range" id="modal-slider-dip" min="-90" max="90" value="60" oninput="updateModalDeformParams()" class="w-full accent-indigo-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-[11px] mb-1">
+                                <span id="modal-lbl-slip" class="text-slate-300">Deplasare pe falie:</span>
+                                <span id="modal-val-slip" class="font-bold text-emerald-400">45 m</span>
+                            </div>
+                            <input type="range" id="modal-slider-slip" min="0" max="250" value="45" oninput="updateModalDeformParams()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                        </div>
+                    </div>
+
+                    <button onclick="triggerFaultAnimation()" class="w-full bg-indigo-600/30 hover:bg-indigo-600 border border-indigo-500/50 text-indigo-200 hover:text-white font-medium py-1.5 rounded-lg text-xs transition-all flex items-center justify-center space-x-1.5 mt-1">
+                        <i class="fa-solid fa-play text-[9px]"></i>
+                        <span id="modal-btn-anim">Animează Deplasarea Faliei</span>
+                    </button>
+                </div>
+
+                <!-- Cute -->
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2.5">
+                    <div class="flex justify-between items-center">
+                        <span id="sim-lbl-ductile" class="text-xs font-bold uppercase text-purple-300 flex items-center">
+                            <i class="fa-solid fa-water text-purple-400 mr-1.5"></i> Cutare Tectonică (Ductil)
+                        </span>
+                        <span id="modal-val-fold-badge" class="text-[10px] font-mono text-purple-300 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">0%</span>
+                    </div>
+
+                    <div class="space-y-2 pt-1">
+                        <div>
+                            <div class="flex justify-between text-[11px] mb-1">
+                                <span id="modal-lbl-shortening" class="text-slate-300">Scurtare orizontală:</span>
+                                <span id="modal-val-shortening" class="font-bold text-purple-400">0%</span>
+                            </div>
+                            <input type="range" id="modal-slider-shortening" min="0" max="60" value="0" oninput="updateModalDeformParams()" class="w-full accent-purple-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-[11px] mb-1">
+                                <span id="modal-lbl-wavelength" class="text-slate-300">Lungime de undă (&lambda;):</span>
+                                <span id="modal-val-wavelength" class="font-bold text-pink-400">220 m</span>
+                            </div>
+                            <input type="range" id="modal-slider-wavelength" min="80" max="450" value="220" oninput="updateModalDeformParams()" class="w-full accent-pink-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="space-y-2" id="strata-edit-list"></div>
+
+            <!-- TAB 2: RELIEF & NIVELARE -->
+            <div id="sim-tab-content-relief" class="space-y-3 hidden">
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2.5">
+                    <span id="sim-lbl-planation" class="text-xs font-bold uppercase text-cyan-300 flex items-center">
+                        <i class="fa-solid fa-arrows-up-down text-cyan-400 mr-1.5"></i> Nivelare Topografie (Sus / Jos)
+                    </span>
+                    <div class="flex justify-between text-[11px]">
+                        <span id="modal-lbl-offset" class="text-slate-400">Decupaj orizontal:</span>
+                        <span id="modal-val-offset" class="font-bold text-emerald-400">0 m</span>
+                    </div>
+                    <input type="range" id="modal-slider-offset" min="-200" max="200" value="0" oninput="updateModalReliefParams()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                    
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <button onclick="shiftProfileModal(-25)" class="bg-slate-900 hover:bg-slate-800 text-slate-200 py-1.5 rounded-lg text-xs border border-slate-700 flex items-center justify-center space-x-1">
+                            <i class="fa-solid fa-arrow-up text-[10px]"></i>
+                            <span id="modal-btn-up">Sus 25m</span>
+                        </button>
+                        <button onclick="shiftProfileModal(25)" class="bg-slate-900 hover:bg-slate-800 text-slate-200 py-1.5 rounded-lg text-xs border border-slate-700 flex items-center justify-center space-x-1">
+                            <i class="fa-solid fa-arrow-down text-[10px]"></i>
+                            <span id="modal-btn-down">Jos 25m</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2.5">
+                    <span id="sim-lbl-valleys" class="text-xs font-bold uppercase text-cyan-300 flex items-center">
+                        <i class="fa-solid fa-shuffle text-cyan-400 mr-1.5"></i> Profil Văi Eroziune
+                    </span>
+                    <div class="flex justify-between text-[11px]">
+                        <span id="modal-lbl-valley-amp" class="text-slate-400">Amplitudine Văi:</span>
+                        <span id="modal-val-valley-amp" class="font-bold text-cyan-400">45 m</span>
+                    </div>
+                    <input type="range" id="modal-slider-valleys" min="10" max="150" value="45" oninput="document.getElementById('modal-val-valley-amp').innerText = this.value + ' m'" class="w-full accent-cyan-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                    <button onclick="generateRandomValleysModal()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-1.5 rounded-lg text-xs transition-all flex items-center justify-center space-x-1.5">
+                        <i class="fa-solid fa-shuffle text-[10px]"></i>
+                        <span id="modal-btn-gen-valleys">Generează Văi Aleatoare</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB 3: STRATE SECȚIUNE -->
+            <div id="sim-tab-content-strata" class="space-y-3 hidden">
+                <div class="flex justify-between items-center px-1 text-slate-400 text-xs font-bold uppercase tracking-wider">
+                    <span id="modal-lbl-strata-order">Coloană Stratigrafică (Fundament &rarr; Suprafață)</span>
+                    <span>Grosime (m)</span>
+                </div>
+                <div class="space-y-2" id="strata-edit-list"></div>
+                <button onclick="addNewStratumModal()" class="w-full bg-slate-950 hover:bg-slate-800 text-indigo-300 border border-slate-800 py-2 rounded-xl text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                    <span id="modal-btn-add-layer">Adaugă Strat Nou</span>
+                </button>
+            </div>
+
         </div>
 
         <!-- Footer Modal -->
         <div class="p-3 border-t border-slate-800 bg-slate-900/90 flex justify-between items-center">
-            <button onclick="addNewStratum()" class="bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all">
-                <i class="fa-solid fa-plus"></i>
-                <span id="btn-add-stratum">Adaugă Strat Nou</span>
+            <button onclick="window.resetAll()" class="text-slate-400 hover:text-white text-xs underline flex items-center space-x-1">
+                <i class="fa-solid fa-rotate-right text-[10px]"></i>
+                <span id="modal-btn-reset-all">Reset Toate Valorile</span>
             </button>
             <div class="flex space-x-2">
-                <button onclick="closeSimulationModal()" id="btn-cancel-simulation" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-1.5 rounded-xl text-xs font-semibold transition-all">Anulează</button>
-                <button onclick="saveSimulationStrataChanges()" id="btn-apply-simulation" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded-xl text-xs font-semibold shadow-md transition-all">Aplică pe Model</button>
+                <button onclick="closeSimulationModal()" id="modal-btn-close-console" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded-xl text-xs font-semibold shadow-md transition-all">Închide & Păstrează</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    const SIMULATION_MODAL_VERSION = "1.2.0";
+    const SIMULATION_MODAL_VERSION = "2.0.0";
 
-    function renderSimulationEditorList() {
+    function switchSimTab(tabKey) {
+        ['deform', 'relief', 'strata'].forEach(k => {
+            const btn = document.getElementById(`tab-btn-${k}`);
+            const content = document.getElementById(`sim-tab-content-${k}`);
+            if (k === tabKey) {
+                btn.className = "px-3 py-1.5 rounded-t-lg font-semibold bg-slate-900 text-indigo-300 border-t border-x border-slate-800 flex items-center space-x-1.5";
+                content.classList.remove('hidden');
+            } else {
+                btn.className = "px-3 py-1.5 rounded-t-lg font-semibold text-slate-400 hover:text-slate-200 flex items-center space-x-1.5";
+                content.classList.add('hidden');
+            }
+        });
+    }
+
+    window.openSimulationConsole = function() {
+        syncSimulationModalValues();
+        renderSimulationStrataList();
+    };
+
+    window.syncSimulationModalValues = function() {
+        if (!window.simState) return;
+
+        // Falii
+        const sDip = document.getElementById('modal-slider-dip');
+        const sSlip = document.getElementById('modal-slider-slip');
+        if (sDip) sDip.value = window.simState.dip;
+        if (sSlip) sSlip.value = window.simState.slip;
+
+        // Cute
+        const sShort = document.getElementById('modal-slider-shortening');
+        const sWave = document.getElementById('modal-slider-wavelength');
+        if (sShort) sShort.value = window.simState.foldShortening;
+        if (sWave) sWave.value = window.simState.foldWavelength;
+
+        // Relief
+        const sOffset = document.getElementById('modal-slider-offset');
+        if (sOffset) sOffset.value = window.simState.baseCutOffset;
+
+        setModalProcess(window.simState.process, false);
+        updateModalLabels();
+    };
+
+    function updateModalLabels() {
+        if (!window.simState) return;
+        document.getElementById('modal-val-dip').innerText = window.simState.dip + '°';
+        document.getElementById('modal-val-dip-badge').innerText = window.simState.dip + '°';
+        document.getElementById('modal-val-slip').innerText = window.simState.slip + ' m';
+        document.getElementById('modal-val-shortening').innerText = window.simState.foldShortening + '%';
+        document.getElementById('modal-val-fold-badge').innerText = window.simState.foldShortening + '%';
+        document.getElementById('modal-val-wavelength').innerText = window.simState.foldWavelength + ' m';
+        document.getElementById('modal-val-offset').innerText = (window.simState.baseCutOffset > 0 ? `+${window.simState.baseCutOffset}` : window.simState.baseCutOffset) + ' m';
+    }
+
+    function setModalProcess(type, updateState = true) {
+        if (updateState && window.simState) window.simState.process = type;
+        const btnN = document.getElementById('modal-btn-normal');
+        const btnR = document.getElementById('modal-btn-reverse');
+
+        if (type === 'normal') {
+            btnN.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-14";
+            btnN.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
+            btnR.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-14";
+            btnR.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
+        } else {
+            btnR.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-14";
+            btnR.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
+            btnN.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-14";
+            btnN.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
+        }
+        if (updateState && typeof window.drawSimulation === 'function') {
+            const badge = document.getElementById('process-title-badge');
+            if (badge) badge.innerText = type === 'normal' ? 'Falie Normală' : 'Falie Inversă';
+            window.drawSimulation();
+        }
+    }
+
+    function updateModalDeformParams() {
+        if (!window.simState) return;
+        window.simState.dip = parseInt(document.getElementById('modal-slider-dip').value);
+        window.simState.slip = parseInt(document.getElementById('modal-slider-slip').value);
+        window.simState.foldShortening = parseInt(document.getElementById('modal-slider-shortening').value);
+        window.simState.foldWavelength = parseInt(document.getElementById('modal-slider-wavelength').value);
+
+        updateModalLabels();
+
+        const foldBadge = document.getElementById('folding-badge');
+        if (foldBadge) {
+            if (window.simState.foldShortening > 0) {
+                foldBadge.classList.remove('hidden');
+                foldBadge.innerText = (window.currentLang === 'ro' ? 'Cutare: ' : 'Folding: ') + window.simState.foldShortening + '%';
+            } else {
+                foldBadge.classList.add('hidden');
+            }
+        }
+
+        if (typeof window.drawSimulation === 'function') window.drawSimulation();
+    }
+
+    function updateModalReliefParams() {
+        if (!window.simState) return;
+        window.simState.baseCutOffset = parseInt(document.getElementById('modal-slider-offset').value);
+        updateModalLabels();
+        if (typeof window.initTopoProfile === 'function') window.initTopoProfile();
+        if (typeof window.drawSimulation === 'function') window.drawSimulation();
+    }
+
+    function shiftProfileModal(amount) {
+        if (!window.simState) return;
+        window.simState.baseCutOffset = Math.max(-200, Math.min(200, window.simState.baseCutOffset + amount));
+        document.getElementById('modal-slider-offset').value = window.simState.baseCutOffset;
+        updateModalReliefParams();
+    }
+
+    function generateRandomValleysModal() {
+        const depth = parseInt(document.getElementById('modal-slider-valleys').value);
+        const W = window.canvas ? window.canvas.width : 800;
+        const f1 = 0.005;
+        const f2 = 0.012;
+        const phase1 = Math.random() * Math.PI * 2;
+        const phase2 = Math.random() * Math.PI * 2;
+
+        for (let x = 0; x < W; x++) {
+            let wave = Math.sin(x * f1 + phase1) * 0.65 + Math.sin(x * f2 + phase2) * 0.35;
+            window.simState.rawNoise[x] = ((wave + 1) / 2) * depth;
+        }
+
+        const H = window.canvas ? window.canvas.height : 500;
+        const totalThickness = window.strata.reduce((acc, l) => acc + l.thickness, 0);
+        const anchorY = H * 0.52;
+        const baseY = anchorY + (totalThickness * 0.44);
+        const groundY = baseY - totalThickness;
+
+        for (let x = 0; x < W; x++) {
+            window.simState.topoProfile[x] = groundY + window.simState.baseCutOffset + (window.simState.rawNoise[x] || 0);
+        }
+
+        if (typeof window.drawSimulation === 'function') window.drawSimulation();
+    }
+
+    function triggerFaultAnimation() {
+        if (window.simState.animating) return;
+        window.simState.animating = true;
+
+        const targetSlip = parseInt(document.getElementById('modal-slider-slip').value);
+        const startTime = performance.now();
+        const duration = 1000;
+
+        function step(time) {
+            const elapsed = time - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const ease = 1 - Math.pow(1 - progress, 3);
+            
+            window.simState.slip = targetSlip * ease;
+            if (typeof window.drawSimulation === 'function') window.drawSimulation();
+
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            } else {
+                window.simState.slip = targetSlip;
+                window.simState.animating = false;
+                if (typeof window.drawSimulation === 'function') window.drawSimulation();
+            }
+        }
+        requestAnimationFrame(step);
+    }
+
+    // Gestiune Strate
+    function renderSimulationStrataList() {
         const list = document.getElementById('strata-edit-list');
-        if (!list || typeof tempStrataEdit === 'undefined' || !window.iugsChronodata) return;
+        if (!list || !window.strata || !window.iugsChronodata) return;
         
         list.innerHTML = '';
-        const t = (typeof translations !== 'undefined' && typeof currentLang !== 'undefined') ? translations[currentLang] : { stratumPlaceholder: 'Nume Strat...' };
-
-        tempStrataEdit.slice().reverse().forEach((layer, origIdxReversed) => {
-            const actualIdx = tempStrataEdit.length - 1 - origIdxReversed;
-            const color = typeof getStratumColor === 'function' ? getStratumColor(layer.age) : '#718096';
-            const border = typeof getStratumBorder === 'function' ? getStratumBorder(layer.age) : '#4a5568';
+        window.strata.slice().reverse().forEach((layer, origIdxReversed) => {
+            const actualIdx = window.strata.length - 1 - origIdxReversed;
+            const color = typeof window.getStratumColor === 'function' ? window.getStratumColor(layer.age) : '#718096';
+            const border = typeof window.getStratumBorder === 'function' ? window.getStratumBorder(layer.age) : '#4a5568';
 
             list.innerHTML += `
                 <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
                     <div class="w-6 h-6 rounded-lg flex-shrink-0 border" style="background-color: ${color}; border-color: ${border}"></div>
                     
                     <div class="flex-1 w-full sm:w-auto">
-                        <input type="text" value="${layer.name}" onchange="tempStrataEdit[${actualIdx}].name = this.value" placeholder="${t.stratumPlaceholder}" class="w-full bg-slate-900 border border-slate-700 px-2 py-1 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500">
+                        <input type="text" value="${layer.name}" onchange="window.strata[${actualIdx}].name = this.value; window.drawSimulation();" class="w-full bg-slate-900 border border-slate-700 px-2 py-1 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500">
                     </div>
 
                     <div class="w-full sm:w-52 flex-shrink-0">
-                        <select onchange="tempStrataEdit[${actualIdx}].age = this.value; renderSimulationEditorList();" class="w-full bg-slate-900 border border-slate-700 px-2 py-1 rounded-lg text-xs text-indigo-300 focus:outline-none focus:border-indigo-500">
+                        <select onchange="window.strata[${actualIdx}].age = this.value; renderSimulationStrataList(); window.drawSimulation();" class="w-full bg-slate-900 border border-slate-700 px-2 py-1 rounded-lg text-xs text-indigo-300 focus:outline-none focus:border-indigo-500">
                             ${window.iugsChronodata.map(item => {
-                                const isRo = (typeof currentLang !== 'undefined' && currentLang === 'ro');
+                                const isRo = (typeof window.currentLang !== 'undefined' && window.currentLang === 'ro');
                                 const optName = isRo ? item.nameRo : item.nameEn;
                                 const optRank = isRo ? item.rankRo : item.rankEn;
                                 const isSelected = layer.age.toLowerCase() === item.nameEn.toLowerCase() || layer.age.toLowerCase() === item.nameRo.toLowerCase();
@@ -75,11 +383,11 @@
                     </div>
 
                     <div class="flex items-center space-x-1.5 w-full sm:w-28 flex-shrink-0">
-                        <input type="number" min="10" max="250" value="${layer.thickness}" onchange="tempStrataEdit[${actualIdx}].thickness = parseInt(this.value) || 30" class="w-full bg-slate-900 border border-slate-700 px-2 py-1 rounded-lg text-xs text-white text-center focus:outline-none focus:border-indigo-500">
+                        <input type="number" min="10" max="250" value="${layer.thickness}" onchange="window.strata[${actualIdx}].thickness = parseInt(this.value) || 30; window.drawSimulation();" class="w-full bg-slate-900 border border-slate-700 px-2 py-1 rounded-lg text-xs text-white text-center focus:outline-none focus:border-indigo-500">
                         <span class="text-[10px] text-slate-400">m</span>
                     </div>
 
-                    <button onclick="removeSimulationStratum(${actualIdx})" class="text-rose-400 hover:text-rose-300 p-1 px-2 text-xs rounded bg-slate-900 border border-slate-800" title="Delete">
+                    <button onclick="removeStratumModal(${actualIdx})" class="text-rose-400 hover:text-rose-300 p-1 px-2 text-xs rounded bg-slate-900 border border-slate-800" title="Delete">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>
                 </div>
@@ -87,39 +395,27 @@
         });
     }
 
-    function addNewStratum() {
-        if (typeof tempStrataEdit === 'undefined') return;
-        const isRo = (typeof currentLang !== 'undefined' && currentLang === 'ro');
-        tempStrataEdit.push({
+    function addNewStratumModal() {
+        const isRo = (typeof window.currentLang !== 'undefined' && window.currentLang === 'ro');
+        window.strata.push({
             name: isRo ? "Strat Nou" : "New Layer",
             age: "Cretaceous",
             thickness: 50
         });
-        renderSimulationEditorList();
+        renderSimulationStrataList();
+        if (typeof window.drawSimulation === 'function') window.drawSimulation();
     }
 
-    function removeSimulationStratum(index) {
-        if (typeof tempStrataEdit === 'undefined') return;
-        if (tempStrataEdit.length <= 1) {
-            const isRo = (typeof currentLang !== 'undefined' && currentLang === 'ro');
-            alert(isRo ? "Trebuie să existe cel puțin un strat în secțiune." : "At least one layer must remain in section.");
+    function removeStratumModal(index) {
+        if (window.strata.length <= 1) {
+            alert(window.currentLang === 'ro' ? "Trebuie să existe cel puțin un strat în secțiune." : "At least one layer must remain.");
             return;
         }
-        tempStrataEdit.splice(index, 1);
-        renderSimulationEditorList();
+        window.strata.splice(index, 1);
+        renderSimulationStrataList();
+        if (typeof window.drawSimulation === 'function') window.drawSimulation();
     }
 
-    function saveSimulationStrataChanges() {
-        if (typeof tempStrataEdit === 'undefined') return;
-        strata = JSON.parse(JSON.stringify(tempStrataEdit));
-        closeSimulationModal();
-        if (typeof initLegend === 'function') initLegend();
-        if (typeof initTopoProfile === 'function') initTopoProfile();
-        if (typeof drawSimulation === 'function') drawSimulation();
-    }
-
-    if (typeof tempStrataEdit === 'undefined' && typeof strata !== 'undefined') {
-        tempStrataEdit = JSON.parse(JSON.stringify(strata));
-    }
-    renderSimulationEditorList();
+    // Sincronizare la injectare
+    syncSimulationModalValues();
 </script>
