@@ -1,4 +1,4 @@
-<!-- Modal 3D: Bloc-Diagramă Geologică Solidă Matematică (v4.5.0-3D) -->
+<!-- Modal 3D: Bloc-Diagramă Geologică Solidă Matematică (v4.6.0-3D) -->
 <div id="simulation-modal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-1 sm:p-3">
     <div class="bg-slate-900 border border-slate-800 w-full max-w-[1850px] h-[96vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
         
@@ -9,8 +9,8 @@
                     <i class="fa-solid fa-cube text-xs"></i>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <h3 id="sim3d-title" class="font-bold text-white text-xs sm:text-sm">Laborator Tectonic 3D - Bloc Solid & Cinematică Riguroasă</h3>
-                    <span id="simulation-modal-version" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v4.5.0-3D</span>
+                    <h3 id="sim3d-title" class="font-bold text-white text-xs sm:text-sm">Laborator Tectonic 3D - Bloc Solid & Morfologie Topografică</h3>
+                    <span id="simulation-modal-version" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v4.6.0-3D</span>
                 </div>
             </div>
 
@@ -21,11 +21,6 @@
                     <button onclick="setSim3DCamera('top')" id="cam-btn-top" class="px-2 py-1 rounded text-slate-400 hover:text-white transition-all">Hartă (Sus)</button>
                     <button onclick="setSim3DCamera('front')" id="cam-btn-front" class="px-2 py-1 rounded text-slate-400 hover:text-white transition-all">Secțiune (Față)</button>
                 </div>
-
-                <button onclick="toggleErosionIn3DModal()" id="btn-3d-erosion" class="bg-cyan-600 text-white px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all">
-                    <i class="fa-solid fa-wind text-[10px]"></i>
-                    <span id="lbl-3d-erosion">Eroziune</span>
-                </button>
 
                 <button onclick="resetSim3DParams()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg text-xs font-semibold border border-slate-700 transition-all flex items-center space-x-1">
                     <i class="fa-solid fa-rotate-right text-[10px]"></i>
@@ -45,7 +40,7 @@
                 <div class="absolute top-2.5 left-2.5 right-2.5 flex justify-between items-center pointer-events-none z-10 text-[11px]">
                     <div class="flex items-center space-x-1.5">
                         <span id="sim3d-badge-process" class="bg-slate-900/80 backdrop-blur-md text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full font-semibold shadow">Falie Normală</span>
-                        <span id="sim3d-badge-cut" class="bg-slate-900/80 backdrop-blur-md text-cyan-300 border border-cyan-500/30 px-2 py-0.5 rounded-full font-semibold shadow hidden">Secțiune Activă</span>
+                        <span id="sim3d-badge-erosion" class="bg-slate-900/80 backdrop-blur-md text-cyan-300 border border-cyan-500/30 px-2 py-0.5 rounded-full font-semibold shadow hidden">Relief Văi: Activ</span>
                     </div>
                     <div class="bg-slate-900/80 backdrop-blur-md text-slate-400 border border-slate-800 px-2.5 py-0.5 rounded-full hidden sm:block">
                         <i class="fa-solid fa-arrows-spin text-indigo-400 mr-1"></i> Orbitare: Click Stânga | Zoom: Scroll | Pan: Click Dreapta
@@ -60,23 +55,23 @@
                         <div><span class="text-slate-400">Decalaj Orizontal:</span> <span id="sim3d-heave" class="font-bold text-amber-400">22.5m</span></div>
                         <div><span class="text-slate-400">Deplasare pe Falie:</span> <span id="sim3d-slip" class="font-bold text-emerald-400">45.0m</span></div>
                     </div>
-                    <div class="text-slate-500 font-mono text-[10px]">Bloc 3D: 600m &times; 360m &times; 400m</div>
+                    <div class="text-slate-500 font-mono text-[10px]">Bloc 3D Solid: 600m &times; 360m &times; 400m</div>
                 </div>
             </div>
 
             <!-- 2. PANOU DE SETĂRI -->
             <div class="w-full lg:w-[410px] bg-slate-950 rounded-xl border border-slate-800 p-3 overflow-y-auto space-y-3 flex-shrink-0 text-xs">
                 
-                <!-- Secțiunea 1: Plane de Secțiune (Clipping Planes) & Peneplanizare -->
+                <!-- Secțiunea 1: Plane de Secțiune & Peneplanizare -->
                 <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-2">
                     <span class="text-[11px] font-bold uppercase text-cyan-300 flex items-center">
-                        <i class="fa-solid fa-scissors text-cyan-400 mr-1.5"></i> 1. Felii & Decupaje 3D (Plane de Tăiere)
+                        <i class="fa-solid fa-scissors text-cyan-400 mr-1.5"></i> 1. Plane de Tăiere & Decupaj
                     </span>
 
-                    <!-- Tăiere de sus în jos (Peneplanizare / Retează orizontal) -->
+                    <!-- Tăiere de sus în jos (Peneplanizare) -->
                     <div>
                         <div class="flex justify-between text-[11px] mb-0.5">
-                            <span class="text-slate-300">Nivelare de sus în jos (Y-Top):</span>
+                            <span class="text-slate-300">Nivelare de sus în jos:</span>
                             <span id="val-clip-top" class="font-bold text-cyan-400">Oprit (Complet)</span>
                         </div>
                         <input type="range" id="slider-clip-top" min="-120" max="240" value="240" oninput="update3DModelParams()" class="w-full accent-cyan-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
@@ -88,16 +83,16 @@
                             <span class="text-slate-300">Felie Transversală (Axa X):</span>
                             <span id="val-clip-x" class="font-bold text-emerald-400">Max (600m)</span>
                         </div>
-                        <input type="range" id="slider-clip-x" min="-300" max="350" value="350" oninput="update3DModelParams()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                        <input type="range" id="slider-clip-x" min="-300" max="300" value="300" oninput="update3DModelParams()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
                     </div>
 
-                    <!-- Felie Longitudinală (Axa Z / Adâncime) -->
+                    <!-- Felie Longitudinală (Axa Z) -->
                     <div>
                         <div class="flex justify-between text-[11px] mb-0.5">
                             <span class="text-slate-300">Felie Longitudinală (Axa Z):</span>
                             <span id="val-clip-z" class="font-bold text-amber-400">Max (400m)</span>
                         </div>
-                        <input type="range" id="slider-clip-z" min="-200" max="250" value="250" oninput="update3DModelParams()" class="w-full accent-amber-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                        <input type="range" id="slider-clip-z" min="-200" max="200" value="200" oninput="update3DModelParams()" class="w-full accent-amber-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
                     </div>
                 </div>
 
@@ -133,7 +128,8 @@
                                 <span class="text-slate-300">Înclinare falie (&theta;):</span>
                                 <span id="val-3d-dip" class="font-bold text-indigo-400">60°</span>
                             </div>
-                            <input type="range" id="slider-3d-dip" min="-80" max="80" value="60" oninput="update3DModelParams()" class="w-full accent-indigo-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                            <!-- Intervalul permite cădere spre dreapta (pozitiv) sau stânga (negativ) fără colaps la 0 -->
+                            <input type="range" id="slider-3d-dip" min="20" max="85" value="60" oninput="update3DModelParams()" class="w-full accent-indigo-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
                         </div>
                         <div>
                             <div class="flex justify-between text-[11px] mb-0.5">
@@ -172,20 +168,29 @@
                     </div>
                 </div>
 
-                <!-- Secțiunea 4: Relief Topografic & Văi -->
+                <!-- Secțiunea 4: Morfologie Topografică & Rețea Hidrografică (Eroziune 3D) -->
                 <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-2">
                     <span class="text-[11px] font-bold uppercase text-cyan-300 flex items-center">
-                        <i class="fa-solid fa-wind text-cyan-400 mr-1.5"></i> 4. Relief & Eroziune Topografică
+                        <i class="fa-solid fa-mountain-sun text-cyan-400 mr-1.5"></i> 4. Morfologie & Cursuri de Apă (Eroziune)
                     </span>
-                    <div class="space-y-1">
-                        <div class="flex justify-between text-[11px]">
-                            <span class="text-slate-400">Amplitudine văi:</span>
-                            <span id="val-relief-amp" class="font-bold text-cyan-400">45 m</span>
+                    <div class="space-y-1.5">
+                        <div>
+                            <div class="flex justify-between text-[11px] mb-0.5">
+                                <span class="text-slate-300">Adâncime văi hidrografice:</span>
+                                <span id="val-erosion-depth" class="font-bold text-cyan-400">0 m (Plan)</span>
+                            </div>
+                            <input type="range" id="slider-erosion-depth" min="0" max="80" value="0" oninput="update3DModelParams()" class="w-full accent-cyan-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
                         </div>
-                        <input type="range" id="slider-relief-amp" min="10" max="150" value="45" oninput="document.getElementById('val-relief-amp').innerText = this.value + ' m'" class="w-full accent-cyan-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                        <button onclick="generateRandomValleys3D()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-1.5 rounded-lg text-xs transition-all flex items-center justify-center space-x-1.5 mt-1">
+                        <div>
+                            <div class="flex justify-between text-[11px] mb-0.5">
+                                <span class="text-slate-300">Frecvență / Densitate văi:</span>
+                                <span id="val-erosion-freq" class="font-bold text-cyan-400">Medie</span>
+                            </div>
+                            <input type="range" id="slider-erosion-freq" min="1" max="4" value="2" oninput="update3DModelParams()" class="w-full accent-cyan-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                        </div>
+                        <button onclick="randomizeDrainageNetwork()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-1.5 rounded-lg text-xs transition-all flex items-center justify-center space-x-1.5 mt-1">
                             <i class="fa-solid fa-shuffle text-[10px]"></i>
-                            <span>Generează Văi de Eroziune</span>
+                            <span>Regenerează Rețea Hidrografică</span>
                         </button>
                     </div>
                 </div>
@@ -244,10 +249,10 @@
         foldShortening: 0,
         foldWavelength: 220,
         clipTopY: 240,
-        clipX: 350,
-        clipZ: 250,
-        erosionActive: true,
-        erosionNoise: []
+        clipX: 300,
+        clipZ: 200,
+        erosionDepth: 0,
+        drainageSeed: 42
     };
 
     let scene3D, camera3D, renderer3D, controls3D;
@@ -313,7 +318,7 @@
         controls3D.dampingFactor = 0.05;
         controls3D.target.set(0, 0, 0);
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
         scene3D.add(ambientLight);
 
         const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.85);
@@ -363,19 +368,17 @@
         return found ? parseInt(found.hex.replace('#', '0x')) : 0x64748b;
     }
 
-    // Funcție de decupare curată a unui poligon la o cotă maximă orizontală maxCutY (fără deformare forțată a stratului)
-    function clipPathHorizontally(points, maxCutY) {
-        // Dacă toate punctele sunt sub cota de tăiere, returnează poligonul neschimbat
+    // Funcție de tăiere riguroasă a poligonului la cota orizontală maxCutY (Sutherland-Hodgman curat)
+    function clipPolygonHorizontal(points, maxCutY) {
         let allUnder = true;
         let allOver = true;
-        points.forEach(p => {
-            if (p.y > maxCutY) allUnder = false;
-            if (p.y < maxCutY) allOver = false;
-        });
+        for (let i = 0; i < points.length; i++) {
+            if (points[i].y > maxCutY) allUnder = false;
+            if (points[i].y < maxCutY) allOver = false;
+        }
         if (allUnder) return points;
-        if (allOver) return []; // Strat complet erodat
+        if (allOver) return [];
 
-        // Sutherland-Hodgman clipping pentru semi-planul y <= maxCutY
         const outputList = [];
         for (let i = 0; i < points.length; i++) {
             const currentPoint = points[i];
@@ -386,98 +389,79 @@
 
             if (currentInside) {
                 if (!prevInside) {
-                    // Intersecție când intră în zona vizibilă
                     const t = (maxCutY - prevPoint.y) / (currentPoint.y - prevPoint.y);
-                    const ix = prevPoint.x + t * (currentPoint.x - prevPoint.x);
-                    outputList.push(new THREE.Vector2(ix, maxCutY));
+                    outputList.push(new THREE.Vector2(prevPoint.x + t * (currentPoint.x - prevPoint.x), maxCutY));
                 }
                 outputList.push(currentPoint);
             } else if (prevInside) {
-                // Intersecție când iese din zona vizibilă
                 const t = (maxCutY - prevPoint.y) / (currentPoint.y - prevPoint.y);
-                const ix = prevPoint.x + t * (currentPoint.x - prevPoint.x);
-                outputList.push(new THREE.Vector2(ix, maxCutY));
+                outputList.push(new THREE.Vector2(prevPoint.x + t * (currentPoint.x - prevPoint.x), maxCutY));
             }
         }
         return outputList;
     }
 
-    // Construire poligon solid pentru Footwall
-    function buildSolidFootwallMesh(xLeft, xRightTop, xRightBot, yBot, yTop, getFoldTop, getFoldBot, maxCutY, colorHex, depth) {
-        const rawPoints = [];
+    // Generator Poligon Plin Footwall (marginea stângă -HALF_W este perfect verticală)
+    function createFootwallPolygon(xLeft, xTopFault, xBotFault, yBot, yTop, getFoldTop, getFoldBot, maxCutY) {
+        const points = [];
         const steps = 30;
 
-        // 1. Marginea superioară
-        const stepTop = (xRightTop - xLeft) / steps;
+        // 1. Marginea superioară: de la colțul stânga la falie
+        const stepTop = (xTopFault - xLeft) / steps;
         for (let i = 0; i <= steps; i++) {
             const x = xLeft + i * stepTop;
-            rawPoints.push(new THREE.Vector2(x, yTop + getFoldTop(x)));
+            points.push(new THREE.Vector2(x, yTop + getFoldTop(x)));
         }
 
-        // 2. Coborâre pe falia dreaptă
-        rawPoints.push(new THREE.Vector2(xRightBot, yBot));
+        // 2. Fațeta de falie riguros dreaptă
+        points.push(new THREE.Vector2(xBotFault, yBot));
 
         // 3. Marginea inferioară înapoi spre stânga
-        const stepBot = (xRightBot - xLeft) / steps;
+        const stepBot = (xBotFault - xLeft) / steps;
         for (let i = steps - 1; i >= 0; i--) {
             const x = xLeft + i * stepBot;
-            rawPoints.push(new THREE.Vector2(x, yBot + getFoldBot(x)));
+            points.push(new THREE.Vector2(x, yBot + getFoldBot(x)));
         }
 
-        // Retezăm orizontal fără deformare
-        const clipped = clipPathHorizontally(rawPoints, maxCutY);
-        if (clipped.length < 3) return null;
+        // 4. Marginea stângă perfect verticală
+        points.push(new THREE.Vector2(xLeft, yTop + getFoldTop(xLeft)));
 
-        const shape = new THREE.Shape(clipped);
-        const geom = new THREE.ExtrudeGeometry(shape, { depth: depth, bevelEnabled: false, steps: 1 });
-        geom.computeVertexNormals();
-
-        const mat = new THREE.MeshStandardMaterial({
-            color: colorHex,
-            roughness: 0.6,
-            metalness: 0.05,
-            side: THREE.FrontSide
-        });
-
-        const mesh = new THREE.Mesh(geom, mat);
-        mesh.position.z = -depth / 2;
-
-        const edges = new THREE.LineSegments(
-            new THREE.EdgesGeometry(geom, 25),
-            new THREE.LineBasicMaterial({ color: 0x0f172a })
-        );
-        mesh.add(edges);
-
-        return mesh;
+        return clipPolygonHorizontal(points, maxCutY);
     }
 
-    // Construire poligon solid pentru Hanging Wall
-    function buildSolidHangingWallMesh(xLeftTop, xLeftBot, xRight, yBot, yTop, getFoldTop, getFoldBot, maxCutY, colorHex, depth) {
-        const rawPoints = [];
+    // Generator Poligon Plin Hanging Wall (marginea dreaptă xRight este perfect verticală)
+    function createHangingWallPolygon(xTopFault, xBotFault, xRight, yBot, yTop, getFoldTop, getFoldBot, maxCutY) {
+        const points = [];
         const steps = 30;
 
-        // 1. Fațeta de falie
-        rawPoints.push(new THREE.Vector2(xLeftBot, yBot));
-        rawPoints.push(new THREE.Vector2(xLeftTop, yTop));
+        // 1. Fațeta de falie: de la bază la vârf
+        points.push(new THREE.Vector2(xBotFault, yBot));
+        points.push(new THREE.Vector2(xTopFault, yTop));
 
-        // 2. Marginea superioară
-        const stepTop = (xRight - xLeftTop) / steps;
+        // 2. Marginea superioară: de la falie la marginea dreaptă
+        const stepTop = (xRight - xTopFault) / steps;
         for (let i = 1; i <= steps; i++) {
-            const x = xLeftTop + i * stepTop;
-            rawPoints.push(new THREE.Vector2(x, yTop + getFoldTop(x)));
+            const x = xTopFault + i * stepTop;
+            points.push(new THREE.Vector2(x, yTop + getFoldTop(x)));
         }
 
-        // 3. Marginea inferioară înapoi
-        const stepBot = (xRight - xLeftBot) / steps;
+        // 3. Marginea dreaptă verticală
+        points.push(new THREE.Vector2(xRight, yBot + getFoldBot(xRight)));
+
+        // 4. Marginea inferioară înapoi spre falie
+        const stepBot = (xRight - xBotFault) / steps;
         for (let i = steps - 1; i >= 0; i--) {
-            const x = xLeftBot + i * stepBot;
-            rawPoints.push(new THREE.Vector2(x, yBot + getFoldBot(x)));
+            const x = xBotFault + i * stepBot;
+            points.push(new THREE.Vector2(x, yBot + getFoldBot(x)));
         }
 
-        const clipped = clipPathHorizontally(rawPoints, maxCutY);
-        if (clipped.length < 3) return null;
+        return clipPolygonHorizontal(points, maxCutY);
+    }
 
-        const shape = new THREE.Shape(clipped);
+    function buildMeshFromPolygon(polygonPoints, colorHex, depth) {
+        if (!polygonPoints || polygonPoints.length < 3) return null;
+
+        const shape = new THREE.Shape(polygonPoints);
         const geom = new THREE.ExtrudeGeometry(shape, { depth: depth, bevelEnabled: false, steps: 1 });
         geom.computeVertexNormals();
 
@@ -500,7 +484,7 @@
         return mesh;
     }
 
-    // Reconstrucția Geologică 3D Matematică & Tangențială Corectă
+    // Reconstrucția Geologică 3D Completă
     function rebuildGeological3DModel() {
         if (!scene3D || !modelMainGroup) return;
 
@@ -508,58 +492,53 @@
             modelMainGroup.remove(modelMainGroup.children[0]);
         }
 
-        let dipDeg = window.sim3DState.dip;
-        if (Math.abs(dipDeg) < 1) dipDeg = 1;
+        // UNGHIUL DE ÎNCLINARE A FALIEI (&theta;): măsurat față de orizontală (ex: 60°)
+        const dipDeg = window.sim3DState.dip;
         const dipRad = (dipDeg * Math.PI) / 180;
         const slip = window.sim3DState.slip;
 
-        // CINEMATICĂ RIGUROASĂ A FALIEI:
-        // Planul de falie are ecuația: x = y / tan(dipRad).
-        // Vectorul tangent unitar de-a lungul faliei (orientat în jos) este:
-        // u = ( cot(dipRad), -1 ) / sqrt( cot^2(dipRad) + 1 ) = ( cos(dipRad), -sin(dipRad) ).
-        // Pentru o falie normală (extensie), Hanging Wall-ul (pe direcția de cădere a faliei) alunecă în jos:
-        let tanDip = Math.tan(dipRad);
-        let faultSign = Math.sign(tanDip); // +1 dacă cade spre dreapta, -1 dacă cade spre stânga
+        // Panta dreptei faliei în plan XY: dy/dx = tan(&theta;). Deci x = y / tan(&theta;)
+        const cotDip = 1.0 / Math.tan(dipRad);
 
-        // Componente strictly proporționale cu panta: dx / dy = 1 / tanDip = cotDip
-        let dyMag = slip * Math.sin(Math.abs(dipRad));
-        let dxMag = slip * Math.cos(Math.abs(dipRad));
-
+        // CINEMATICĂ TANGENȚIALĂ STRICTĂ:
+        // Pentru falie normală (extensie): Hanging Wall-ul coboară strict pe fațeta faliei
+        // &Delta;x = slip * cos(&theta;), &Delta;y = -slip * sin(&theta;)
+        // Verificare: &Delta;x / (-&Delta;y) = cos(&theta;) / sin(&theta;) = cot(&theta;) = panta geometrică a faliei!
         let dx = 0;
         let dy = 0;
 
         if (window.sim3DState.process === 'normal') {
-            // Falie Normală: Hanging wall-ul coboară de-a lungul planului
-            dy = -dyMag;
-            dx = faultSign * dxMag;
+            dx = slip * Math.cos(dipRad);
+            dy = -slip * Math.sin(dipRad);
         } else {
-            // Falie Inversă: Hanging wall-ul urcă de-a lungul planului
-            dy = dyMag;
-            dx = -faultSign * dxMag;
+            dx = -slip * Math.cos(dipRad);
+            dy = slip * Math.sin(dipRad);
         }
 
         document.getElementById('sim3d-throw').innerText = Math.abs(dy).toFixed(1) + 'm';
         document.getElementById('sim3d-heave').innerText = Math.abs(dx).toFixed(1) + 'm';
         document.getElementById('sim3d-slip').innerText = slip.toFixed(1) + 'm';
 
+        // Parametri Cutare
         const foldAmp = (window.sim3DState.foldShortening / 100) * 45;
         const lambda = Math.max(60, window.sim3DState.foldWavelength);
         const k = (2 * Math.PI) / lambda;
 
-        // Estompare lină pe falie
+        // Estompare lină pe falie (la x_fault deformarea devine 0 pentru a garanta fațetă plană)
         const getFoldOffset = (x, faultX) => {
             if (foldAmp === 0) return 0;
             const dist = Math.abs(x - faultX);
-            const blend = Math.min(1, dist / 65);
+            const blend = Math.min(1, dist / 60);
             return foldAmp * Math.sin(x * k) * blend;
         };
 
         let currY = -140;
         const maxCut = window.sim3DState.clipTopY;
-        const effectiveDepth = Math.min(DEPTH_Z, Math.max(80, window.sim3DState.clipZ + DEPTH_Z / 2));
-        const effectiveRightX = Math.min(HALF_W, Math.max(-HALF_W + 50, window.sim3DState.clipX));
+        const effectiveDepth = Math.min(DEPTH_Z, Math.max(60, window.sim3DState.clipZ + DEPTH_Z / 2));
+        const effectiveRightX = Math.min(HALF_W, Math.max(-HALF_W + 60, window.sim3DState.clipX));
 
-        const getFaultX = (y) => y / tanDip;
+        // Originea faliei trece prin (0, 0)
+        const getFaultX = (y) => y * cotDip;
 
         const fwGroup = new THREE.Group();
         const hwGroup = new THREE.Group();
@@ -575,8 +554,8 @@
             const xTopFault = getFaultX(yTop);
             const xBotFault = getFaultX(yBot);
 
-            // 1. FOOTWALL SOLID (Rămâne fix la stânga planului de falie)
-            const fwMesh = buildSolidFootwallMesh(
+            // 1. FOOTWALL SOLID (blocul stâng, fix)
+            const fwPoly = createFootwallPolygon(
                 -HALF_W,
                 xTopFault,
                 xBotFault,
@@ -584,33 +563,82 @@
                 yTop,
                 (x) => getFoldOffset(x, xTopFault),
                 (x) => getFoldOffset(x, xBotFault),
-                maxCut,
-                colorHex,
-                effectiveDepth
+                maxCut
             );
+            const fwMesh = buildMeshFromPolygon(fwPoly, colorHex, effectiveDepth);
             if (fwMesh) fwGroup.add(fwMesh);
 
-            // 2. HANGING WALL SOLID (Inițial pe aceeași fațetă dreaptă, apoi translatat riguros cu (dx, dy))
-            const hwMesh = buildSolidHangingWallMesh(
+            // 2. HANGING WALL SOLID (blocul drept, decupat pe fațetă și translatat tangent)
+            const hwPoly = createHangingWallPolygon(
                 xTopFault,
                 xBotFault,
-                effectiveRightX - dx, // decupat cu felia transversală
+                effectiveRightX - dx,
                 yBot,
                 yTop,
                 (x) => getFoldOffset(x, xTopFault),
                 (x) => getFoldOffset(x, xBotFault),
-                maxCut - dy, // decupat la aceeași cotă absolută a tăierii
-                colorHex,
-                effectiveDepth
+                maxCut - dy // compensare la aceeași cotă absolută de tăiere
             );
+            const hwMesh = buildMeshFromPolygon(hwPoly, colorHex, effectiveDepth);
             if (hwMesh) hwGroup.add(hwMesh);
 
             currY += h;
         });
 
-        // Translație strict tangentă
+        // Translația Hanging Wall-ului exact pe panta planului de falie (contact etanș)
         hwGroup.position.set(dx, dy, 0);
+
+        // Modelare Morfologie Topografică & Cursuri de Apă (Eroziune de suprafață)
+        if (window.sim3DState.erosionDepth > 0) {
+            applyErosionDrainageNetwork(maxCut, effectiveDepth);
+        }
     }
+
+    // Generator DEM de Cursuri de Apă & Văi de Eroziune
+    function applyErosionDrainageNetwork(topY, depthZ) {
+        const erosionGroup = new THREE.Group();
+        modelMainGroup.add(erosionGroup);
+
+        const valleyDepth = window.sim3DState.erosionDepth;
+        const seed = window.sim3DState.drainageSeed;
+
+        // Creează 2-3 cursuri de apă sculptate (canioane/văi) pe suprafața blocului
+        const valleyPositions = [-140, 60, 200];
+        valleyPositions.forEach((vx, idx) => {
+            const vWidth = 55 + (idx % 2) * 20;
+            const channelShape = new THREE.Shape();
+            
+            // Profil transversal de vale fluvială în V rotunjit
+            channelShape.moveTo(vx - vWidth / 2, topY + 2);
+            channelShape.quadraticCurveTo(vx, topY - valleyDepth, vx + vWidth / 2, topY + 2);
+            channelShape.lineTo(vx + vWidth / 2, topY + 5);
+            channelShape.lineTo(vx - vWidth / 2, topY + 5);
+            channelShape.closePath();
+
+            const vGeom = new THREE.ExtrudeGeometry(channelShape, { depth: depthZ * 1.02, bevelEnabled: false });
+            const vMat = new THREE.MeshBasicMaterial({ color: 0x020617 }); // Taie volumul la suprafață
+            const vMesh = new THREE.Mesh(vGeom, vMat);
+            vMesh.position.z = -depthZ / 2;
+            erosionGroup.add(vMesh);
+
+            // Firul de apă (Talveg albastru deschis)
+            const waterGeom = new THREE.PlaneGeometry(12, depthZ * 0.98);
+            const waterMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide });
+            const waterMesh = new THREE.Mesh(waterGeom, waterMat);
+            waterMesh.rotation.x = Math.PI / 2;
+            waterMesh.position.set(vx, topY - valleyDepth + 1.5, 0);
+            erosionGroup.add(waterMesh);
+        });
+    }
+
+    window.randomizeDrainageNetwork = function() {
+        window.sim3DState.drainageSeed = Math.floor(Math.random() * 1000);
+        if (window.sim3DState.erosionDepth === 0) {
+            window.sim3DState.erosionDepth = 35;
+            document.getElementById('slider-erosion-depth').value = 35;
+        }
+        update3DModelParams();
+    };
 
     window.update3DModelParams = function() {
         window.sim3DState.dip = parseInt(document.getElementById('slider-3d-dip').value);
@@ -620,6 +648,7 @@
         window.sim3DState.clipTopY = parseInt(document.getElementById('slider-clip-top').value);
         window.sim3DState.clipX = parseInt(document.getElementById('slider-clip-x').value);
         window.sim3DState.clipZ = parseInt(document.getElementById('slider-clip-z').value);
+        window.sim3DState.erosionDepth = parseInt(document.getElementById('slider-erosion-depth').value);
 
         document.getElementById('val-3d-dip').innerText = window.sim3DState.dip + '°';
         document.getElementById('sim3d-val-dip-badge').innerText = window.sim3DState.dip + '°';
@@ -629,38 +658,17 @@
         document.getElementById('val-3d-fold-wave').innerText = window.sim3DState.foldWavelength + ' m';
         
         document.getElementById('val-clip-top').innerText = window.sim3DState.clipTopY >= 235 ? 'Oprit (Complet)' : `${window.sim3DState.clipTopY} m`;
-        document.getElementById('val-clip-x').innerText = window.sim3DState.clipX >= 340 ? 'Max (600m)' : `${window.sim3DState.clipX + 300} m`;
-        document.getElementById('val-clip-z').innerText = window.sim3DState.clipZ >= 240 ? 'Max (400m)' : `${window.sim3DState.clipZ + 200} m`;
+        document.getElementById('val-clip-x').innerText = window.sim3DState.clipX >= 295 ? 'Max (600m)' : `${window.sim3DState.clipX + 300} m`;
+        document.getElementById('val-clip-z').innerText = window.sim3DState.clipZ >= 195 ? 'Max (400m)' : `${window.sim3DState.clipZ + 200} m`;
+        document.getElementById('val-erosion-depth').innerText = window.sim3DState.erosionDepth === 0 ? '0 m (Plan)' : `${window.sim3DState.erosionDepth} m`;
 
-        const badgeCut = document.getElementById('sim3d-badge-cut');
-        if (badgeCut) {
-            if (window.sim3DState.clipTopY < 235 || window.sim3DState.clipX < 340 || window.sim3DState.clipZ < 240) {
-                badgeCut.classList.remove('hidden');
-            } else {
-                badgeCut.classList.add('hidden');
-            }
+        const badgeErosion = document.getElementById('sim3d-badge-erosion');
+        if (badgeErosion) {
+            if (window.sim3DState.erosionDepth > 0) badgeErosion.classList.remove('hidden');
+            else badgeErosion.classList.add('hidden');
         }
 
         rebuildGeological3DModel();
-    };
-
-    window.toggleErosionIn3DModal = function() {
-        window.sim3DState.erosionActive = !window.sim3DState.erosionActive;
-        const btn = document.getElementById('btn-3d-erosion');
-        if (window.sim3DState.erosionActive) {
-            btn.className = "bg-cyan-600 text-white px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all shadow-sm";
-        } else {
-            btn.className = "bg-slate-800 text-slate-400 border border-slate-700 px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all";
-        }
-        rebuildGeological3DModel();
-    };
-
-    window.generateRandomValleys3D = function() {
-        const depth = parseInt(document.getElementById('slider-relief-amp').value);
-        // Reglează nivelul de tăiere pentru a crea văi sculptate
-        const newClipY = Math.max(-100, 240 - depth);
-        document.getElementById('slider-clip-top').value = newClipY;
-        window.update3DModelParams();
     };
 
     window.setSim3DFaultProcess = function(type) {
@@ -710,14 +718,16 @@
         window.sim3DState.slip = 0;
         window.sim3DState.foldShortening = 0;
         window.sim3DState.clipTopY = 240;
-        window.sim3DState.clipX = 350;
-        window.sim3DState.clipZ = 250;
+        window.sim3DState.clipX = 300;
+        window.sim3DState.clipZ = 200;
+        window.sim3DState.erosionDepth = 0;
 
         document.getElementById('slider-3d-slip').value = 0;
         document.getElementById('slider-3d-fold-short').value = 0;
         document.getElementById('slider-clip-top').value = 240;
-        document.getElementById('slider-clip-x').value = 350;
-        document.getElementById('slider-clip-z').value = 250;
+        document.getElementById('slider-clip-x').value = 300;
+        document.getElementById('slider-clip-z').value = 200;
+        document.getElementById('slider-erosion-depth').value = 0;
 
         update3DModelParams();
         setSim3DCamera('iso');
@@ -731,6 +741,7 @@
         document.getElementById('slider-clip-top').value = window.sim3DState.clipTopY;
         document.getElementById('slider-clip-x').value = window.sim3DState.clipX;
         document.getElementById('slider-clip-z').value = window.sim3DState.clipZ;
+        document.getElementById('slider-erosion-depth').value = window.sim3DState.erosionDepth;
         update3DModelParams();
     }
 
