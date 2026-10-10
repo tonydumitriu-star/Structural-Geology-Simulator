@@ -1,298 +1,441 @@
-<!-- Panou Lateral Glisant: Consola de Simulare în Timp Real -->
-<div id="simulation-modal" class="hidden fixed top-[49px] bottom-0 left-0 w-full sm:w-[420px] bg-slate-900/95 backdrop-blur-xl border-r border-slate-800 shadow-2xl z-30 flex flex-col transition-all duration-300">
-    
-    <!-- Header Panou -->
-    <div class="px-3.5 py-2.5 border-b border-slate-800 flex justify-between items-center bg-slate-950/80 flex-shrink-0">
-        <div class="flex items-center space-x-2">
-            <i class="fa-solid fa-sliders text-indigo-400 text-sm"></i>
-            <div class="flex items-center space-x-2">
-                <h3 id="sim-modal-header-title" class="font-bold text-white text-xs sm:text-sm">Consolă Simulare în Timp Real</h3>
-                <span id="simulation-modal-version" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v2.1.0</span>
-            </div>
-        </div>
-        <button onclick="closeSimulationModal()" class="text-slate-400 hover:text-white p-1 text-sm" title="Ascunde Panoul">
-            <i class="fa-solid fa-chevron-left"></i>
-        </button>
-    </div>
-
-    <!-- Conținut Derulabil cu Toate Secțiunile Deschise Simultan -->
-    <div class="p-3 overflow-y-auto space-y-3 flex-1 text-xs">
+<!-- Modal Complet: Ecran de Simulare (Canvas) + Panou de Setări în Timp Real -->
+<div id="simulation-modal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-2 sm:p-4">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-[1750px] h-[94vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
         
-        <!-- 1. DEFORMARE FRAGILĂ (FALII) -->
-        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 space-y-2">
-            <div class="flex justify-between items-center">
-                <span class="text-[11px] font-bold uppercase text-indigo-300 flex items-center">
-                    <i class="fa-solid fa-bolt text-indigo-400 mr-1.5"></i> 1. Faliere (Deformare Fragilă)
-                </span>
-                <span id="modal-val-dip-badge" class="text-[9px] font-mono text-indigo-300 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">60°</span>
+        <!-- Header Fereastră Simulare -->
+        <div class="px-4 py-2.5 border-b border-slate-800 flex justify-between items-center bg-slate-950/90 flex-shrink-0">
+            <div class="flex items-center space-x-2.5">
+                <div class="bg-indigo-600 p-1.5 rounded-lg text-white">
+                    <i class="fa-solid fa-mountain text-xs"></i>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <h3 id="sim-window-title" class="font-bold text-white text-xs sm:text-sm">Laborator Tectonic - Simulare Secțiune în Timp Real</h3>
+                    <span id="simulation-modal-version" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v3.0.0</span>
+                </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-1.5">
-                <button onclick="setModalProcess('normal')" id="modal-btn-normal" class="p-1.5 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-12">
-                    <span class="flex items-center justify-between w-full">
-                        <span>Falie Normală</span>
-                        <i class="fa-solid fa-circle-check text-[10px]"></i>
-                    </span>
-                    <span class="text-[9px] text-indigo-200 font-normal">Extensie</span>
+            <div class="flex items-center space-x-2">
+                <button onclick="toggleErosionInModal()" id="btn-modal-erosion" class="bg-cyan-600 text-white px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all">
+                    <i class="fa-solid fa-wind text-[10px]"></i>
+                    <span id="lbl-modal-erosion">Eroziune</span>
                 </button>
-                <button onclick="setModalProcess('reverse')" id="modal-btn-reverse" class="p-1.5 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-12">
-                    <span class="flex items-center justify-between w-full">
-                        <span>Falie Inversă</span>
-                        <i class="fa-solid fa-circle text-[10px] opacity-0"></i>
-                    </span>
-                    <span class="text-[9px] text-slate-400 font-normal">Compresiune</span>
+                <button onclick="resetSimulationInModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg text-xs font-semibold border border-slate-700 transition-all flex items-center space-x-1">
+                    <i class="fa-solid fa-rotate-right text-[10px]"></i>
+                    <span id="lbl-modal-reset">Reset</span>
                 </button>
-            </div>
-
-            <div class="space-y-1.5 pt-0.5">
-                <div>
-                    <div class="flex justify-between text-[11px] mb-0.5">
-                        <span class="text-slate-300">Înclinare falie (&theta;):</span>
-                        <span id="modal-val-dip" class="font-bold text-indigo-400">60°</span>
-                    </div>
-                    <input type="range" id="modal-slider-dip" min="-90" max="90" value="60" oninput="updateModalDeformParams()" class="w-full accent-indigo-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                </div>
-                <div>
-                    <div class="flex justify-between text-[11px] mb-0.5">
-                        <span class="text-slate-300">Deplasare pe falie:</span>
-                        <span id="modal-val-slip" class="font-bold text-emerald-400">45 m</span>
-                    </div>
-                    <input type="range" id="modal-slider-slip" min="0" max="250" value="45" oninput="updateModalDeformParams()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                </div>
-            </div>
-
-            <button onclick="triggerFaultAnimation()" class="w-full bg-indigo-600/30 hover:bg-indigo-600 border border-indigo-500/50 text-indigo-200 hover:text-white font-medium py-1 rounded-lg text-xs transition-all flex items-center justify-center space-x-1.5 mt-1">
-                <i class="fa-solid fa-play text-[9px]"></i>
-                <span>Animează Falie</span>
-            </button>
-        </div>
-
-        <!-- 2. DEFORMARE DUCTILĂ (CUTE) -->
-        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 space-y-2">
-            <div class="flex justify-between items-center">
-                <span class="text-[11px] font-bold uppercase text-purple-300 flex items-center">
-                    <i class="fa-solid fa-water text-purple-400 mr-1.5"></i> 2. Cutare (Deformare Ductilă)
-                </span>
-                <span id="modal-val-fold-badge" class="text-[9px] font-mono text-purple-300 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">0%</span>
-            </div>
-
-            <div class="space-y-1.5">
-                <div>
-                    <div class="flex justify-between text-[11px] mb-0.5">
-                        <span class="text-slate-300">Scurtare orizontală:</span>
-                        <span id="modal-val-shortening" class="font-bold text-purple-400">0%</span>
-                    </div>
-                    <input type="range" id="modal-slider-shortening" min="0" max="60" value="0" oninput="updateModalDeformParams()" class="w-full accent-purple-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                </div>
-                <div>
-                    <div class="flex justify-between text-[11px] mb-0.5">
-                        <span class="text-slate-300">Lungime de undă (&lambda;):</span>
-                        <span id="modal-val-wavelength" class="font-bold text-pink-400">220 m</span>
-                    </div>
-                    <input type="range" id="modal-slider-wavelength" min="80" max="450" value="220" oninput="updateModalDeformParams()" class="w-full accent-pink-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. RELIEF & NIVELARE -->
-        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 space-y-2">
-            <span class="text-[11px] font-bold uppercase text-cyan-300 flex items-center">
-                <i class="fa-solid fa-wind text-cyan-400 mr-1.5"></i> 3. Relief & Topografie
-            </span>
-
-            <div class="space-y-1">
-                <div class="flex justify-between text-[11px]">
-                    <span class="text-slate-400">Nivelare decupaj:</span>
-                    <span id="modal-val-offset" class="font-bold text-emerald-400">0 m</span>
-                </div>
-                <input type="range" id="modal-slider-offset" min="-200" max="200" value="0" oninput="updateModalReliefParams()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                
-                <div class="grid grid-cols-2 gap-1.5 pt-0.5">
-                    <button onclick="shiftProfileModal(-25)" class="bg-slate-900 hover:bg-slate-800 text-slate-200 py-1 rounded-lg text-xs border border-slate-700 flex items-center justify-center space-x-1">
-                        <i class="fa-solid fa-arrow-up text-[9px]"></i>
-                        <span>Sus 25m</span>
-                    </button>
-                    <button onclick="shiftProfileModal(25)" class="bg-slate-900 hover:bg-slate-800 text-slate-200 py-1 rounded-lg text-xs border border-slate-700 flex items-center justify-center space-x-1">
-                        <i class="fa-solid fa-arrow-down text-[9px]"></i>
-                        <span>Jos 25m</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="pt-1 border-t border-slate-800/80 space-y-1">
-                <div class="flex justify-between text-[11px]">
-                    <span class="text-slate-400">Amplitudine văi:</span>
-                    <span id="modal-val-valley-amp" class="font-bold text-cyan-400">45 m</span>
-                </div>
-                <input type="range" id="modal-slider-valleys" min="10" max="150" value="45" oninput="document.getElementById('modal-val-valley-amp').innerText = this.value + ' m'" class="w-full accent-cyan-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                <button onclick="generateRandomValleysModal()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-1 rounded-lg text-xs transition-all flex items-center justify-center space-x-1.5">
-                    <i class="fa-solid fa-shuffle text-[10px]"></i>
-                    <span>Generează Văi Aleatoare</span>
+                <button onclick="closeSimulationModal()" class="text-slate-400 hover:text-white p-1 text-base ml-2" title="Închide">
+                    <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
         </div>
 
-        <!-- 4. COLOANĂ STRATIGRAFICĂ (EDITOR STRATE) -->
-        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 space-y-2">
-            <div class="flex justify-between items-center text-slate-400 text-[11px] font-bold uppercase tracking-wider">
-                <span class="flex items-center text-amber-300">
-                    <i class="fa-solid fa-layer-group text-amber-400 mr-1.5"></i> 4. Strate Secțiune
-                </span>
-                <span class="text-[9px] text-slate-500">Grosime (m)</span>
-            </div>
+        <!-- Conținut Principal Simulare: Ecran Canvas (Stânga) + Panou Setări (Dreapta) -->
+        <div class="flex-1 flex flex-col lg:flex-row overflow-hidden p-3 gap-3">
             
-            <div class="space-y-1.5" id="strata-edit-list"></div>
+            <!-- 1. ECRANUL CU SIMULAREA EFECTIVĂ (CANVAS 1:1) -->
+            <div class="flex-1 flex flex-col bg-slate-950 rounded-xl border border-slate-800 p-2 relative overflow-hidden">
+                
+                <!-- Status Badges Sus pe Canvas -->
+                <div class="flex justify-between items-center mb-1.5 px-1 text-xs">
+                    <div class="flex items-center space-x-1.5">
+                        <span id="sim-badge-process" class="bg-indigo-500/20 text-indigo-300 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border border-indigo-500/30">Falie Normală (Extensie)</span>
+                        <span id="sim-badge-folding" class="bg-purple-500/20 text-purple-300 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border border-purple-500/30 hidden">Cutare: 0%</span>
+                        <span id="sim-badge-erosion" class="bg-cyan-500/20 text-cyan-300 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border border-cyan-500/30">Eroziune Activă</span>
+                    </div>
+                    <div class="text-[11px] text-slate-400">
+                        <i class="fa-solid fa-hand-pointer text-amber-400 mr-1"></i> <span id="sim-hint-carve">Apasă & sapă pe ecran pentru relief</span>
+                    </div>
+                </div>
 
-            <button onclick="addNewStratumModal()" class="w-full bg-slate-900 hover:bg-slate-800 text-indigo-300 border border-slate-800 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all">
-                <i class="fa-solid fa-plus text-[10px]"></i>
-                <span>Adaugă Strat Nou</span>
-            </button>
+                <!-- Suprafața Canvas -->
+                <div id="sim-canvas-container" class="flex-1 w-full bg-slate-950 rounded-lg relative overflow-hidden flex items-center justify-center min-h-[280px]">
+                    <canvas id="geologyCanvas" class="cursor-crosshair w-full h-full"></canvas>
+                </div>
+
+                <!-- Bara de Date Tectonice Jos pe Canvas -->
+                <div class="mt-2 bg-slate-900/90 border border-slate-800 px-3 py-1.5 rounded-lg flex items-center justify-between text-xs flex-shrink-0">
+                    <div class="flex items-center space-x-4 sm:space-x-8">
+                        <div><span id="sim-stat-throw-lbl" class="text-slate-400">Rejet vertical:</span> <span id="sim-stat-throw" class="font-bold text-cyan-400">38.9m</span></div>
+                        <div><span id="sim-stat-heave-lbl" class="text-slate-400">Decalaj orizontal:</span> <span id="sim-stat-heave" class="font-bold text-amber-400">22.5m</span></div>
+                        <div><span id="sim-stat-slip-lbl" class="text-slate-400">Deplasare pe falie:</span> <span id="sim-stat-net-slip" class="font-bold text-emerald-400">45.0m</span></div>
+                    </div>
+                    <div id="sim-stat-dip-type" class="hidden sm:block text-slate-400 font-mono text-[11px]">Cădere spre Dreapta</div>
+                </div>
+            </div>
+
+            <!-- 2. PANOUL CU TOATE SETĂRILE SIMULĂRII (DREAPTA) -->
+            <div class="w-full lg:w-[410px] bg-slate-950 rounded-xl border border-slate-800 p-3 overflow-y-auto space-y-3 flex-shrink-0 text-xs">
+                
+                <!-- Secțiunea A: Faliere (Fragil) -->
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span id="sec-title-faults" class="text-[11px] font-bold uppercase text-indigo-300 flex items-center">
+                            <i class="fa-solid fa-bolt text-indigo-400 mr-1.5"></i> 1. Faliere (Deformare Fragilă)
+                        </span>
+                        <span id="val-dip-badge" class="text-[10px] font-mono text-indigo-300 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">60°</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <button onclick="setSimFaultProcess('normal')" id="btn-fault-normal" class="p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-13">
+                            <span class="flex items-center justify-between w-full">
+                                <span id="txt-fault-normal">Falie Normală</span>
+                                <i class="fa-solid fa-circle-check text-[10px]"></i>
+                            </span>
+                            <span id="sub-fault-normal" class="text-[9px] text-indigo-200 font-normal">Extensie</span>
+                        </button>
+                        <button onclick="setSimFaultProcess('reverse')" id="btn-fault-reverse" class="p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-13">
+                            <span class="flex items-center justify-between w-full">
+                                <span id="txt-fault-reverse">Falie Inversă</span>
+                                <i class="fa-solid fa-circle text-[10px] opacity-0"></i>
+                            </span>
+                            <span id="sub-fault-reverse" class="text-[9px] text-slate-400 font-normal">Compresiune</span>
+                        </button>
+                    </div>
+
+                    <div class="space-y-1.5 pt-0.5">
+                        <div>
+                            <div class="flex justify-between text-[11px] mb-0.5">
+                                <span id="lbl-fault-dip" class="text-slate-300">Înclinare falie (&theta;):</span>
+                                <span id="val-fault-dip" class="font-bold text-indigo-400">60°</span>
+                            </div>
+                            <input type="range" id="slider-fault-dip" min="-90" max="90" value="60" oninput="updateSimulationParams()" class="w-full accent-indigo-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-[11px] mb-0.5">
+                                <span id="lbl-fault-slip" class="text-slate-300">Deplasare pe falie:</span>
+                                <span id="val-fault-slip" class="font-bold text-emerald-400">45 m</span>
+                            </div>
+                            <input type="range" id="slider-fault-slip" min="0" max="250" value="45" oninput="updateSimulationParams()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                        </div>
+                    </div>
+
+                    <button onclick="animateFaultMovement()" class="w-full bg-indigo-600/30 hover:bg-indigo-600 border border-indigo-500/50 text-indigo-200 hover:text-white font-medium py-1.5 rounded-lg text-xs transition-all flex items-center justify-center space-x-1.5 mt-1">
+                        <i class="fa-solid fa-play text-[9px]"></i>
+                        <span id="btn-fault-anim">Animează Deplasarea Faliei</span>
+                    </button>
+                </div>
+
+                <!-- Secțiunea B: Cutare (Ductil) -->
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span id="sec-title-folding" class="text-[11px] font-bold uppercase text-purple-300 flex items-center">
+                            <i class="fa-solid fa-water text-purple-400 mr-1.5"></i> 2. Cutare (Deformare Ductilă)
+                        </span>
+                        <span id="val-folding-badge" class="text-[10px] font-mono text-purple-300 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">0%</span>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <div>
+                            <div class="flex justify-between text-[11px] mb-0.5">
+                                <span id="lbl-fold-short" class="text-slate-300">Scurtare orizontală:</span>
+                                <span id="val-fold-short" class="font-bold text-purple-400">0%</span>
+                            </div>
+                            <input type="range" id="slider-fold-short" min="0" max="60" value="0" oninput="updateSimulationParams()" class="w-full accent-purple-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-[11px] mb-0.5">
+                                <span id="lbl-fold-wave" class="text-slate-300">Lungime de undă (&lambda;):</span>
+                                <span id="val-fold-wave" class="font-bold text-pink-400">220 m</span>
+                            </div>
+                            <input type="range" id="slider-fold-wave" min="80" max="450" value="220" oninput="updateSimulationParams()" class="w-full accent-pink-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secțiunea C: Relief & Nivelare -->
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-2">
+                    <span id="sec-title-relief" class="text-[11px] font-bold uppercase text-cyan-300 flex items-center">
+                        <i class="fa-solid fa-wind text-cyan-400 mr-1.5"></i> 3. Relief & Topografie
+                    </span>
+
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-[11px]">
+                            <span id="lbl-relief-offset" class="text-slate-400">Nivelare decupaj:</span>
+                            <span id="val-relief-offset" class="font-bold text-emerald-400">0 m</span>
+                        </div>
+                        <input type="range" id="slider-relief-offset" min="-200" max="200" value="0" oninput="applyReliefShift()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                        
+                        <div class="grid grid-cols-2 gap-1.5 pt-0.5">
+                            <button onclick="shiftProfileStep(-25)" class="bg-slate-950 hover:bg-slate-800 text-slate-200 py-1 rounded-lg text-xs border border-slate-800 flex items-center justify-center space-x-1">
+                                <i class="fa-solid fa-arrow-up text-[9px]"></i>
+                                <span id="btn-relief-up">Sus 25m</span>
+                            </button>
+                            <button onclick="shiftProfileStep(25)" class="bg-slate-950 hover:bg-slate-800 text-slate-200 py-1 rounded-lg text-xs border border-slate-800 flex items-center justify-center space-x-1">
+                                <i class="fa-solid fa-arrow-down text-[9px]"></i>
+                                <span id="btn-relief-down">Jos 25m</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="pt-1.5 border-t border-slate-800/80 space-y-1">
+                        <div class="flex justify-between text-[11px]">
+                            <span id="lbl-relief-amp" class="text-slate-400">Amplitudine văi:</span>
+                            <span id="val-relief-amp" class="font-bold text-cyan-400">45 m</span>
+                        </div>
+                        <input type="range" id="slider-relief-amp" min="10" max="150" value="45" oninput="document.getElementById('val-relief-amp').innerText = this.value + ' m'" class="w-full accent-cyan-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                        <button onclick="generateRandomValleys()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-1.5 rounded-lg text-xs transition-all flex items-center justify-center space-x-1.5">
+                            <i class="fa-solid fa-shuffle text-[10px]"></i>
+                            <span id="btn-relief-gen">Generează Văi Aleatoare</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Secțiunea D: Coloană Stratigrafică (Editor Strate) -->
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-2">
+                    <div class="flex justify-between items-center text-slate-400 text-[11px] font-bold uppercase tracking-wider">
+                        <span id="sec-title-strata" class="flex items-center text-amber-300">
+                            <i class="fa-solid fa-layer-group text-amber-400 mr-1.5"></i> 4. Strate Secțiune
+                        </span>
+                        <span class="text-[9px] text-slate-500">Grosime (m)</span>
+                    </div>
+                    
+                    <div class="space-y-1.5" id="sim-strata-list"></div>
+
+                    <button onclick="addNewStratumLayer()" class="w-full bg-slate-950 hover:bg-slate-800 text-indigo-300 border border-slate-800 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all">
+                        <i class="fa-solid fa-plus text-[10px]"></i>
+                        <span id="btn-strata-add">Adaugă Strat Nou</span>
+                    </button>
+                </div>
+
+            </div>
         </div>
-
-    </div>
-
-    <!-- Footer Panou -->
-    <div class="p-2.5 border-t border-slate-800 bg-slate-950 flex justify-between items-center flex-shrink-0">
-        <button onclick="window.resetAll()" class="text-slate-400 hover:text-white text-xs underline flex items-center space-x-1">
-            <i class="fa-solid fa-rotate-right text-[10px]"></i>
-            <span>Reset Valori</span>
-        </button>
-        <button onclick="closeSimulationModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded-lg text-xs font-semibold transition-all">
-            Ascunde Panou
-        </button>
     </div>
 </div>
 
 <script>
-    const SIMULATION_MODAL_VERSION = "2.1.0";
+    const SIMULATION_MODAL_VERSION = "3.0.0";
 
-    window.openSimulationConsole = function() {
-        syncSimulationModalValues();
-        renderSimulationStrataList();
+    // Date și Stare Locală a Simulatorului
+    window.simStrata = [
+        { name: "Fundament Cristalin", age: "Precambrian", thickness: 110 },
+        { name: "Calcare Recifale", age: "Jurassic", thickness: 75 },
+        { name: "Gresii de Tarcău", age: "Cretaceous", thickness: 70 },
+        { name: "Marne cu Globigerine", age: "Paleogene", thickness: 60 },
+        { name: "Prundișuri Cuaternare", age: "Quaternary", thickness: 45 }
+    ];
+
+    window.simState = {
+        process: 'normal',
+        dip: 60,
+        slip: 45,
+        foldShortening: 0,
+        foldWavelength: 220,
+        animating: false,
+        erosionActive: true,
+        baseCutOffset: 0,
+        topoProfile: [],
+        rawNoise: []
     };
 
-    window.syncSimulationModalValues = function() {
-        if (!window.simState) return;
+    let simCanvas = null;
+    let simCtx = null;
+    let isSimCarving = false;
 
-        const sDip = document.getElementById('modal-slider-dip');
-        const sSlip = document.getElementById('modal-slider-slip');
-        if (sDip) sDip.value = window.simState.dip;
-        if (sSlip) sSlip.value = window.simState.slip;
+    // Inițializare Mediu de Simulare la Deschidere
+    window.initSimulationEnvironment = function() {
+        simCanvas = document.getElementById('geologyCanvas');
+        if (!simCanvas) return;
+        simCtx = simCanvas.getContext('2d');
 
-        const sShort = document.getElementById('modal-slider-shortening');
-        const sWave = document.getElementById('modal-slider-wavelength');
-        if (sShort) sShort.value = window.simState.foldShortening;
-        if (sWave) sWave.value = window.simState.foldWavelength;
+        setupSimCanvasResize();
+        attachCarvingEvents();
+        syncControlsToState();
+        renderSimStrataEditor();
 
-        const sOffset = document.getElementById('modal-slider-offset');
-        if (sOffset) sOffset.value = window.simState.baseCutOffset;
-
-        setModalProcess(window.simState.process, false);
-        updateModalLabels();
+        // Asigurăm dimensiunile inițiale 1:1
+        requestAnimationFrame(() => {
+            resizeSimCanvasToContainer();
+            window.drawSimCanvas();
+        });
     };
 
-    function updateModalLabels() {
-        if (!window.simState) return;
-        document.getElementById('modal-val-dip').innerText = window.simState.dip + '°';
-        document.getElementById('modal-val-dip-badge').innerText = window.simState.dip + '°';
-        document.getElementById('modal-val-slip').innerText = window.simState.slip + ' m';
-        document.getElementById('modal-val-shortening').innerText = window.simState.foldShortening + '%';
-        document.getElementById('modal-val-fold-badge').innerText = window.simState.foldShortening + '%';
-        document.getElementById('modal-val-wavelength').innerText = window.simState.foldWavelength + ' m';
-        document.getElementById('modal-val-offset').innerText = (window.simState.baseCutOffset > 0 ? `+${window.simState.baseCutOffset}` : window.simState.baseCutOffset) + ' m';
-    }
+    function setupSimCanvasResize() {
+        const container = document.getElementById('sim-canvas-container');
+        if (!container) return;
 
-    function setModalProcess(type, updateState = true) {
-        if (updateState && window.simState) window.simState.process = type;
-        const btnN = document.getElementById('modal-btn-normal');
-        const btnR = document.getElementById('modal-btn-reverse');
-
-        if (type === 'normal') {
-            btnN.className = "p-1.5 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-12";
-            btnN.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
-            btnR.className = "p-1.5 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-12";
-            btnR.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
-        } else {
-            btnR.className = "p-1.5 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-12";
-            btnR.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
-            btnN.className = "p-1.5 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-12";
-            btnN.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
-        }
-        if (updateState && typeof window.drawSimulation === 'function') {
-            const badge = document.getElementById('process-title-badge');
-            if (badge) badge.innerText = type === 'normal' ? 'Falie Normală' : 'Falie Inversă';
-            window.drawSimulation();
-        }
-    }
-
-    function updateModalDeformParams() {
-        if (!window.simState) return;
-        window.simState.dip = parseInt(document.getElementById('modal-slider-dip').value);
-        window.simState.slip = parseInt(document.getElementById('modal-slider-slip').value);
-        window.simState.foldShortening = parseInt(document.getElementById('modal-slider-shortening').value);
-        window.simState.foldWavelength = parseInt(document.getElementById('modal-slider-wavelength').value);
-
-        updateModalLabels();
-
-        const foldBadge = document.getElementById('folding-badge');
-        if (foldBadge) {
-            if (window.simState.foldShortening > 0) {
-                foldBadge.classList.remove('hidden');
-                foldBadge.innerText = (window.currentLang === 'ro' ? 'Cutare: ' : 'Folding: ') + window.simState.foldShortening + '%';
-            } else {
-                foldBadge.classList.add('hidden');
+        const observer = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                const width = Math.round(entry.contentRect.width);
+                const height = Math.round(entry.contentRect.height);
+                if (width > 0 && height > 0 && simCanvas) {
+                    simCanvas.width = width;
+                    simCanvas.height = height;
+                    if (window.simState.topoProfile.length !== width) {
+                        initSimTopoProfile();
+                    }
+                    window.drawSimCanvas();
+                }
             }
+        });
+        observer.observe(container);
+    }
+
+    function resizeSimCanvasToContainer() {
+        const container = document.getElementById('sim-canvas-container');
+        if (!container || !simCanvas) return;
+        const rect = container.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+            simCanvas.width = Math.round(rect.width);
+            simCanvas.height = Math.round(rect.height);
+            initSimTopoProfile();
         }
-
-        if (typeof window.drawSimulation === 'function') window.drawSimulation();
     }
 
-    function updateModalReliefParams() {
-        if (!window.simState) return;
-        window.simState.baseCutOffset = parseInt(document.getElementById('modal-slider-offset').value);
-        updateModalLabels();
-        if (typeof window.initTopoProfile === 'function') window.initTopoProfile();
-        if (typeof window.drawSimulation === 'function') window.drawSimulation();
-    }
-
-    function shiftProfileModal(amount) {
-        if (!window.simState) return;
-        window.simState.baseCutOffset = Math.max(-200, Math.min(200, window.simState.baseCutOffset + amount));
-        document.getElementById('modal-slider-offset').value = window.simState.baseCutOffset;
-        updateModalReliefParams();
-    }
-
-    function generateRandomValleysModal() {
-        const depth = parseInt(document.getElementById('modal-slider-valleys').value);
-        const W = window.canvas ? window.canvas.width : 800;
-        const f1 = 0.005;
-        const f2 = 0.012;
-        const phase1 = Math.random() * Math.PI * 2;
-        const phase2 = Math.random() * Math.PI * 2;
-
-        for (let x = 0; x < W; x++) {
-            let wave = Math.sin(x * f1 + phase1) * 0.65 + Math.sin(x * f2 + phase2) * 0.35;
-            window.simState.rawNoise[x] = ((wave + 1) / 2) * depth;
-        }
-
-        const H = window.canvas ? window.canvas.height : 500;
-        const totalThickness = window.strata.reduce((acc, l) => acc + l.thickness, 0);
+    function getBaseGroundY() {
+        const H = simCanvas ? simCanvas.height : 450;
+        const totalThickness = window.simStrata.reduce((acc, l) => acc + l.thickness, 0);
         const anchorY = H * 0.52;
         const baseY = anchorY + (totalThickness * 0.44);
-        const groundY = baseY - totalThickness;
+        return baseY - totalThickness;
+    }
 
+    function initSimTopoProfile() {
+        const W = simCanvas ? simCanvas.width : 750;
+        const groundY = getBaseGroundY();
+        window.simState.topoProfile = new Array(W).fill(groundY + window.simState.baseCutOffset);
+        window.simState.rawNoise = new Array(W).fill(0);
+    }
+
+    function syncControlsToState() {
+        document.getElementById('slider-fault-dip').value = window.simState.dip;
+        document.getElementById('slider-fault-slip').value = window.simState.slip;
+        document.getElementById('slider-fold-short').value = window.simState.foldShortening;
+        document.getElementById('slider-fold-wave').value = window.simState.foldWavelength;
+        document.getElementById('slider-relief-offset').value = window.simState.baseCutOffset;
+
+        updateSimLabels();
+        setSimFaultProcess(window.simState.process, false);
+    }
+
+    function updateSimLabels() {
+        document.getElementById('val-fault-dip').innerText = window.simState.dip + '°';
+        document.getElementById('val-dip-badge').innerText = window.simState.dip + '°';
+        document.getElementById('val-fault-slip').innerText = window.simState.slip + ' m';
+        document.getElementById('val-fold-short').innerText = window.simState.foldShortening + '%';
+        document.getElementById('val-folding-badge').innerText = window.simState.foldShortening + '%';
+        document.getElementById('val-fold-wave').innerText = window.simState.foldWavelength + ' m';
+        document.getElementById('val-relief-offset').innerText = (window.simState.baseCutOffset > 0 ? `+${window.simState.baseCutOffset}` : window.simState.baseCutOffset) + ' m';
+
+        const foldBadge = document.getElementById('sim-badge-folding');
+        if (window.simState.foldShortening > 0) {
+            foldBadge.classList.remove('hidden');
+            foldBadge.innerText = (window.currentLang === 'ro' ? 'Cutare: ' : 'Folding: ') + window.simState.foldShortening + '%';
+        } else {
+            foldBadge.classList.add('hidden');
+        }
+
+        const dipType = document.getElementById('sim-stat-dip-type');
+        const isRo = window.currentLang === 'ro';
+        if (window.simState.dip === 0) dipType.innerText = isRo ? "Orizontală / Decollement" : "Horizontal / Decollement";
+        else if (Math.abs(window.simState.dip) === 90) dipType.innerText = isRo ? "Verticală" : "Vertical Fault";
+        else if (window.simState.dip > 0) dipType.innerText = isRo ? "Cădere spre Dreapta" : "Dipping Right";
+        else dipType.innerText = isRo ? "Cădere spre Stânga" : "Dipping Left";
+    }
+
+    window.updateSimulationParams = function() {
+        window.simState.dip = parseInt(document.getElementById('slider-fault-dip').value);
+        window.simState.slip = parseInt(document.getElementById('slider-fault-slip').value);
+        window.simState.foldShortening = parseInt(document.getElementById('slider-fold-short').value);
+        window.simState.foldWavelength = parseInt(document.getElementById('slider-fold-wave').value);
+
+        updateSimLabels();
+        window.drawSimCanvas();
+    };
+
+    window.setSimFaultProcess = function(type, redraw = true) {
+        window.simState.process = type;
+        const btnN = document.getElementById('btn-fault-normal');
+        const btnR = document.getElementById('btn-fault-reverse');
+        const badge = document.getElementById('sim-badge-process');
+        const isRo = window.currentLang === 'ro';
+
+        if (type === 'normal') {
+            btnN.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-13";
+            btnN.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
+            btnR.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-13";
+            btnR.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
+            badge.innerText = isRo ? "Falie Normală (Extensie)" : "Normal Fault (Extension)";
+        } else {
+            btnR.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-13";
+            btnR.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
+            btnN.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-13";
+            btnN.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
+            badge.innerText = isRo ? "Falie Inversă (Compresiune)" : "Reverse Fault (Compression)";
+        }
+
+        if (redraw) window.drawSimCanvas();
+    };
+
+    window.toggleErosionInModal = function() {
+        window.simState.erosionActive = !window.simState.erosionActive;
+        const btn = document.getElementById('btn-modal-erosion');
+        const badge = document.getElementById('sim-badge-erosion');
+        const isRo = window.currentLang === 'ro';
+
+        if (window.simState.erosionActive) {
+            btn.className = "bg-cyan-600 text-white px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all shadow-sm";
+            badge.className = "bg-cyan-500/20 text-cyan-300 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border border-cyan-500/30";
+            badge.innerText = isRo ? "Eroziune Activă" : "Erosion Active";
+        } else {
+            btn.className = "bg-slate-800 text-slate-400 border border-slate-700 px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all";
+            badge.className = "bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border border-slate-700";
+            badge.innerText = isRo ? "Eroziune Oprită" : "Erosion Disabled";
+        }
+        window.drawSimCanvas();
+    };
+
+    window.resetSimulationInModal = function() {
+        window.simState.slip = 0;
+        window.simState.baseCutOffset = 0;
+        window.simState.foldShortening = 0;
+        window.simState.foldWavelength = 220;
+        syncControlsToState();
+        initSimTopoProfile();
+        window.drawSimCanvas();
+    };
+
+    window.applyReliefShift = function() {
+        window.simState.baseCutOffset = parseInt(document.getElementById('slider-relief-offset').value);
+        updateSimLabels();
+        recalculateSimTopo();
+        window.drawSimCanvas();
+    };
+
+    window.shiftProfileStep = function(amount) {
+        window.simState.baseCutOffset = Math.max(-200, Math.min(200, window.simState.baseCutOffset + amount));
+        document.getElementById('slider-relief-offset').value = window.simState.baseCutOffset;
+        window.applyReliefShift();
+    };
+
+    function recalculateSimTopo() {
+        const W = simCanvas ? simCanvas.width : 750;
+        const groundY = getBaseGroundY();
         for (let x = 0; x < W; x++) {
             window.simState.topoProfile[x] = groundY + window.simState.baseCutOffset + (window.simState.rawNoise[x] || 0);
         }
-
-        if (typeof window.drawSimulation === 'function') window.drawSimulation();
     }
 
-    function triggerFaultAnimation() {
+    window.generateRandomValleys = function() {
+        const depth = parseInt(document.getElementById('slider-relief-amp').value);
+        const W = simCanvas ? simCanvas.width : 750;
+        const f1 = 0.005;
+        const f2 = 0.012;
+        const p1 = Math.random() * Math.PI * 2;
+        const p2 = Math.random() * Math.PI * 2;
+
+        for (let x = 0; x < W; x++) {
+            let wave = Math.sin(x * f1 + p1) * 0.65 + Math.sin(x * f2 + p2) * 0.35;
+            window.simState.rawNoise[x] = ((wave + 1) / 2) * depth;
+        }
+        recalculateSimTopo();
+        window.drawSimCanvas();
+    };
+
+    window.animateFaultMovement = function() {
         if (window.simState.animating) return;
         window.simState.animating = true;
 
-        const targetSlip = parseInt(document.getElementById('modal-slider-slip').value);
+        const targetSlip = parseInt(document.getElementById('slider-fault-slip').value);
         const startTime = performance.now();
         const duration = 1000;
 
@@ -302,47 +445,305 @@
             const ease = 1 - Math.pow(1 - progress, 3);
             
             window.simState.slip = targetSlip * ease;
-            if (typeof window.drawSimulation === 'function') window.drawSimulation();
+            window.drawSimCanvas();
 
             if (progress < 1) {
                 requestAnimationFrame(step);
             } else {
                 window.simState.slip = targetSlip;
                 window.simState.animating = false;
-                if (typeof window.drawSimulation === 'function') window.drawSimulation();
+                window.drawSimCanvas();
             }
         }
         requestAnimationFrame(step);
+    };
+
+    function attachCarvingEvents() {
+        if (!simCanvas) return;
+
+        function carve(clientX, clientY) {
+            if (!window.simState.erosionActive) return;
+            const rect = simCanvas.getBoundingClientRect();
+            const mouseX = Math.round(clientX - rect.left);
+            const mouseY = clientY - rect.top;
+            const radius = 35;
+            const W = simCanvas.width;
+
+            for (let x = Math.max(0, mouseX - radius); x <= Math.min(W - 1, mouseX + radius); x++) {
+                let dist = Math.abs(x - mouseX);
+                let factor = Math.cos((dist / radius) * (Math.PI / 2));
+                let targetY = mouseY * factor + (window.simState.topoProfile[x]) * (1 - factor);
+                
+                if (targetY > window.simState.topoProfile[x]) {
+                    let diff = targetY - window.simState.topoProfile[x];
+                    window.simState.rawNoise[x] = (window.simState.rawNoise[x] || 0) + diff;
+                    window.simState.topoProfile[x] = targetY;
+                }
+            }
+            window.drawSimCanvas();
+        }
+
+        simCanvas.onmousedown = (e) => { isSimCarving = true; carve(e.clientX, e.clientY); };
+        window.onmousemove = (e) => { if (isSimCarving) carve(e.clientX, e.clientY); };
+        window.onmouseup = () => { isSimCarving = false; };
+
+        simCanvas.ontouchstart = (e) => {
+            if (e.touches.length === 1) {
+                isSimCarving = true;
+                carve(e.touches[0].clientX, e.touches[0].clientY);
+                e.preventDefault();
+            }
+        };
+        window.ontouchmove = (e) => {
+            if (isSimCarving && e.touches.length === 1) {
+                carve(e.touches[0].clientX, e.touches[0].clientY);
+                e.preventDefault();
+            }
+        };
+        window.ontouchend = () => { isSimCarving = false; };
     }
 
-    function renderSimulationStrataList() {
-        const list = document.getElementById('strata-edit-list');
-        if (!list || !window.strata || !window.iugsChronodata) return;
-        
+    // ========================================================
+    // RANDARE GRAFICĂ TECTONICĂ 1:1 PE CANVAS-UL DIN MODAL
+    // ========================================================
+    window.drawSimCanvas = function() {
+        if (!simCanvas || !simCtx) return;
+        const W = simCanvas.width;
+        const H = simCanvas.height;
+        if (!W || !H) return;
+
+        simCtx.clearRect(0, 0, W, H);
+
+        // Grid discret
+        simCtx.strokeStyle = '#1e293b';
+        simCtx.lineWidth = 1;
+        for (let x = 0; x < W; x += 45) {
+            simCtx.beginPath(); simCtx.moveTo(x, 0); simCtx.lineTo(x, H); simCtx.stroke();
+        }
+        for (let y = 0; y < H; y += 45) {
+            simCtx.beginPath(); simCtx.moveTo(0, y); simCtx.lineTo(W, y); simCtx.stroke();
+        }
+
+        const boxPaddingX = Math.max(28, W * 0.05);
+        const modelLeftX = boxPaddingX;
+        const modelRightX = W - boxPaddingX;
+
+        let effectiveDip = window.simState.dip;
+        if (effectiveDip === 0) effectiveDip = 0.001;
+
+        const dipRad = (effectiveDip * Math.PI) / 180;
+        const anchorX = W * 0.48;
+        const anchorY = H * 0.52;
+        const getFaultX = (y) => anchorX + (y - anchorY) / Math.tan(dipRad);
+
+        let s = window.simState.slip;
+        let dx = s * Math.cos(Math.abs(dipRad)) * (effectiveDip >= 0 ? 1 : -1);
+        let dy = s * Math.sin(Math.abs(dipRad));
+
+        if (window.simState.process === 'reverse') {
+            dx = -dx;
+            dy = -dy;
+        }
+
+        document.getElementById('sim-stat-throw').innerText = Math.abs(dy).toFixed(1) + 'm';
+        document.getElementById('sim-stat-heave').innerText = Math.abs(dx).toFixed(1) + 'm';
+        document.getElementById('sim-stat-net-slip').innerText = s.toFixed(1) + 'm';
+
+        const totalThickness = window.simStrata.reduce((acc, l) => acc + l.thickness, 0);
+        const baseY = anchorY + (totalThickness * 0.44);
+
+        let layerBounds = [];
+        let currY = baseY;
+        for (let i = 0; i < window.simStrata.length; i++) {
+            let yBot = currY;
+            let yTop = currY - window.simStrata[i].thickness;
+            layerBounds.push({ layer: window.simStrata[i], yTop, yBot });
+            currY = yTop;
+        }
+
+        const foldAmp = ((window.simState.foldShortening || 0) / 100) * 85;
+        const lambda = Math.max(60, window.simState.foldWavelength || 220);
+        const k = (2 * Math.PI) / lambda;
+
+        // Estompare riguroasă la planul de falie pentru tăietură plană impecabilă
+        const getFoldAt = (x, yRef) => {
+            if (foldAmp === 0) return 0;
+            const faultEdgeX = getFaultX(yRef);
+            const distToFault = Math.abs(x - faultEdgeX);
+            const blend = Math.min(1, distToFault / 70);
+            return foldAmp * Math.sin((x - anchorX) * k) * blend;
+        };
+
+        function getLayerColor(age) {
+            if (!window.iugsChronodata) return "#64748b";
+            const k = (age || '').toLowerCase();
+            const item = window.iugsChronodata.find(i => i.nameEn.toLowerCase() === k || i.nameRo.toLowerCase() === k);
+            return item ? item.hex : "#64748b";
+        }
+
+        function getLayerBorder(age) {
+            if (!window.iugsChronodata) return "#334155";
+            const k = (age || '').toLowerCase();
+            const item = window.iugsChronodata.find(i => i.nameEn.toLowerCase() === k || i.nameRo.toLowerCase() === k);
+            return item ? item.border : "#334155";
+        }
+
+        // 1. FOOTWALL (Stânga)
+        layerBounds.forEach(({ layer, yTop, yBot }) => {
+            const xTopFault = getFaultX(yTop);
+            const xBotFault = getFaultX(yBot);
+
+            simCtx.fillStyle = getLayerColor(layer.age);
+            simCtx.strokeStyle = getLayerBorder(layer.age);
+            simCtx.lineWidth = 1.5;
+
+            simCtx.beginPath();
+            simCtx.moveTo(modelLeftX, yTop + getFoldAt(modelLeftX, yTop));
+            const step = 4;
+            for (let x = modelLeftX; x < xTopFault; x += step) {
+                simCtx.lineTo(x, yTop + getFoldAt(x, yTop));
+            }
+            simCtx.lineTo(xTopFault, yTop);
+            simCtx.lineTo(xBotFault, yBot);
+
+            for (let x = xBotFault; x >= modelLeftX; x -= step) {
+                simCtx.lineTo(x, yBot + getFoldAt(x, yBot));
+            }
+            simCtx.lineTo(modelLeftX, yBot + getFoldAt(modelLeftX, yBot));
+
+            simCtx.closePath();
+            simCtx.fill();
+            simCtx.stroke();
+        });
+
+        // 2. HANGING WALL (Dreapta)
+        layerBounds.forEach(({ layer, yTop, yBot }) => {
+            const yTopTrans = yTop + dy;
+            const yBotTrans = yBot + dy;
+            const xTopFaultTrans = getFaultX(yTop) + dx;
+            const xBotFaultTrans = getFaultX(yBot) + dx;
+
+            simCtx.fillStyle = getLayerColor(layer.age);
+            simCtx.strokeStyle = getLayerBorder(layer.age);
+            simCtx.lineWidth = 1.5;
+
+            simCtx.beginPath();
+            simCtx.moveTo(xTopFaultTrans, yTopTrans);
+
+            const step = 4;
+            for (let x = xTopFaultTrans; x <= modelRightX; x += step) {
+                simCtx.lineTo(x, yTopTrans + getFoldAt(x - dx, yTop));
+            }
+            simCtx.lineTo(modelRightX, yTopTrans + getFoldAt(modelRightX - dx, yTop));
+            simCtx.lineTo(modelRightX, yBotTrans + getFoldAt(modelRightX - dx, yBot));
+
+            for (let x = modelRightX; x >= xBotFaultTrans; x -= step) {
+                simCtx.lineTo(x, yBotTrans + getFoldAt(x - dx, yBot));
+            }
+            simCtx.lineTo(xBotFaultTrans, yBotTrans);
+
+            simCtx.closePath();
+            simCtx.fill();
+            simCtx.stroke();
+        });
+
+        // 3. Plan de Falie (Linie dreaptă roșie)
+        const topOriginalY = layerBounds[window.simStrata.length - 1].yTop;
+        const topTranslatedY = topOriginalY + dy;
+        const botTranslatedY = baseY + dy;
+
+        const faultY1 = Math.min(topOriginalY, topTranslatedY) - 50;
+        const faultY2 = Math.max(baseY, botTranslatedY) + 50;
+        const faultX1 = getFaultX(faultY1);
+        const faultX2 = getFaultX(faultY2);
+
+        simCtx.strokeStyle = '#ef4444';
+        simCtx.lineWidth = 3;
+        simCtx.setLineDash([6, 4]);
+        simCtx.beginPath();
+        simCtx.moveTo(faultX1, faultY1);
+        simCtx.lineTo(faultX2, faultY2);
+        simCtx.stroke();
+        simCtx.setLineDash([]);
+
+        // 4. Mască Eroziune & Relief Topografic (1:1)
+        const intW = Math.round(W);
+        if (window.simState.erosionActive && window.simState.topoProfile.length >= intW) {
+            const skyTopY = -200;
+            simCtx.fillStyle = '#020617';
+            simCtx.beginPath();
+            simCtx.moveTo(0, skyTopY);
+            simCtx.lineTo(W, skyTopY);
+            simCtx.lineTo(W, window.simState.topoProfile[intW - 1]);
+
+            for (let x = intW - 1; x >= 0; x--) {
+                simCtx.lineTo(x, window.simState.topoProfile[x]);
+            }
+            simCtx.closePath();
+            simCtx.fill();
+
+            simCtx.strokeStyle = '#38bdf8';
+            simCtx.lineWidth = 2.5;
+            simCtx.beginPath();
+            simCtx.moveTo(modelLeftX, window.simState.topoProfile[Math.round(modelLeftX)]);
+            for (let x = Math.round(modelLeftX); x <= Math.round(modelRightX); x++) {
+                simCtx.lineTo(x, window.simState.topoProfile[x]);
+            }
+            simCtx.stroke();
+        }
+
+        // Margini exterioare
+        simCtx.strokeStyle = '#334155';
+        simCtx.lineWidth = 1.5;
+        simCtx.beginPath();
+        simCtx.moveTo(modelLeftX, topOriginalY + getFoldAt(modelLeftX, topOriginalY));
+        simCtx.lineTo(modelLeftX, baseY + getFoldAt(modelLeftX, baseY));
+        simCtx.moveTo(modelRightX, topTranslatedY + getFoldAt(modelRightX - dx, topOriginalY));
+        simCtx.lineTo(modelRightX, botTranslatedY + getFoldAt(modelRightX - dx, baseY));
+        simCtx.stroke();
+
+        // Etichete
+        const isRo = window.currentLang === 'ro';
+        simCtx.font = 'bold 11px Inter, sans-serif';
+        simCtx.fillStyle = '#94a3b8';
+        simCtx.fillText(isRo ? "FOOTWALL" : "FOOTWALL", modelLeftX + 10, topOriginalY - 12 + getFoldAt(modelLeftX, topOriginalY));
+
+        simCtx.fillStyle = '#cbd5e1';
+        let hwLabelY = topTranslatedY - 12 + getFoldAt(modelRightX - 85 - dx, topOriginalY);
+        simCtx.fillText(isRo ? "HANGING WALL" : "HANGING WALL", modelRightX - 85, hwLabelY);
+    };
+
+    // Editor Coloană Stratigrafică
+    function renderSimStrataEditor() {
+        const list = document.getElementById('sim-strata-list');
+        if (!list || !window.simStrata || !window.iugsChronodata) return;
+
         list.innerHTML = '';
-        window.strata.slice().reverse().forEach((layer, origIdxReversed) => {
-            const actualIdx = window.strata.length - 1 - origIdxReversed;
-            const color = typeof window.getStratumColor === 'function' ? window.getStratumColor(layer.age) : '#718096';
-            const border = typeof window.getStratumBorder === 'function' ? window.getStratumBorder(layer.age) : '#4a5568';
+        window.simStrata.slice().reverse().forEach((layer, origIdxReversed) => {
+            const actualIdx = window.simStrata.length - 1 - origIdxReversed;
+            const k = (layer.age || '').toLowerCase();
+            const item = window.iugsChronodata.find(i => i.nameEn.toLowerCase() === k || i.nameRo.toLowerCase() === k);
+            const color = item ? item.hex : '#718096';
+            const border = item ? item.border : '#4a5568';
 
             list.innerHTML += `
-                <div class="flex items-center space-x-1.5 bg-slate-900/90 p-1.5 rounded-lg border border-slate-800">
+                <div class="flex items-center space-x-1.5 bg-slate-950 p-1.5 rounded-lg border border-slate-800">
                     <div class="w-4 h-4 rounded flex-shrink-0 border" style="background-color: ${color}; border-color: ${border}"></div>
                     
-                    <input type="text" value="${layer.name}" onchange="window.strata[${actualIdx}].name = this.value; window.drawSimulation();" class="flex-1 min-w-0 bg-slate-950 border border-slate-700 px-1.5 py-0.5 rounded text-[11px] text-white focus:outline-none focus:border-indigo-500">
+                    <input type="text" value="${layer.name}" onchange="window.simStrata[${actualIdx}].name = this.value; window.drawSimCanvas();" class="flex-1 min-w-0 bg-slate-900 border border-slate-700 px-1.5 py-0.5 rounded text-[11px] text-white focus:outline-none focus:border-indigo-500">
 
-                    <select onchange="window.strata[${actualIdx}].age = this.value; renderSimulationStrataList(); window.drawSimulation();" class="w-28 bg-slate-950 border border-slate-700 px-1 py-0.5 rounded text-[10px] text-indigo-300 focus:outline-none focus:border-indigo-500">
-                        ${window.iugsChronodata.map(item => {
-                            const isRo = (typeof window.currentLang !== 'undefined' && window.currentLang === 'ro');
-                            const optName = isRo ? item.nameRo : item.nameEn;
-                            const isSelected = layer.age.toLowerCase() === item.nameEn.toLowerCase() || layer.age.toLowerCase() === item.nameRo.toLowerCase();
-                            return `<option value="${item.nameEn}" ${isSelected ? 'selected' : ''}>${optName}</option>`;
+                    <select onchange="window.simStrata[${actualIdx}].age = this.value; renderSimStrataEditor(); window.drawSimCanvas();" class="w-28 bg-slate-900 border border-slate-700 px-1 py-0.5 rounded text-[10px] text-indigo-300 focus:outline-none focus:border-indigo-500">
+                        ${window.iugsChronodata.map(it => {
+                            const isRo = window.currentLang === 'ro';
+                            const optName = isRo ? it.nameRo : it.nameEn;
+                            const isSelected = layer.age.toLowerCase() === it.nameEn.toLowerCase() || layer.age.toLowerCase() === it.nameRo.toLowerCase();
+                            return `<option value="${it.nameEn}" ${isSelected ? 'selected' : ''}>${optName}</option>`;
                         }).join('')}
                     </select>
 
-                    <input type="number" min="10" max="250" value="${layer.thickness}" onchange="window.strata[${actualIdx}].thickness = parseInt(this.value) || 30; window.drawSimulation();" class="w-12 bg-slate-950 border border-slate-700 px-1 py-0.5 rounded text-[11px] text-white text-center focus:outline-none focus:border-indigo-500">
+                    <input type="number" min="10" max="250" value="${layer.thickness}" onchange="window.simStrata[${actualIdx}].thickness = parseInt(this.value) || 30; window.drawSimCanvas();" class="w-12 bg-slate-900 border border-slate-700 px-1 py-0.5 rounded text-[11px] text-white text-center focus:outline-none focus:border-indigo-500">
 
-                    <button onclick="removeStratumModal(${actualIdx})" class="text-rose-400 hover:text-rose-300 p-1 text-xs rounded hover:bg-slate-800" title="Șterge">
+                    <button onclick="removeSimStratum(${actualIdx})" class="text-rose-400 hover:text-rose-300 p-1 text-xs rounded hover:bg-slate-900" title="Șterge">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>
                 </div>
@@ -350,26 +751,24 @@
         });
     }
 
-    function addNewStratumModal() {
-        const isRo = (typeof window.currentLang !== 'undefined' && window.currentLang === 'ro');
-        window.strata.push({
+    window.addNewStratumLayer = function() {
+        const isRo = window.currentLang === 'ro';
+        window.simStrata.push({
             name: isRo ? "Strat Nou" : "New Layer",
             age: "Cretaceous",
             thickness: 50
         });
-        renderSimulationStrataList();
-        if (typeof window.drawSimulation === 'function') window.drawSimulation();
-    }
+        renderSimStrataEditor();
+        window.drawSimCanvas();
+    };
 
-    function removeStratumModal(index) {
-        if (window.strata.length <= 1) {
-            alert(window.currentLang === 'ro' ? "Trebuie să existe cel puțin un strat în secțiune." : "At least one layer must remain.");
+    window.removeSimStratum = function(index) {
+        if (window.simStrata.length <= 1) {
+            alert(window.currentLang === 'ro' ? "Trebuie să existe cel puțin un strat în secțiune." : "At least one layer must remain in section.");
             return;
         }
-        window.strata.splice(index, 1);
-        renderSimulationStrataList();
-        if (typeof window.drawSimulation === 'function') window.drawSimulation();
-    }
-
-    syncSimulationModalValues();
+        window.simStrata.splice(index, 1);
+        renderSimStrataEditor();
+        window.drawSimCanvas();
+    };
 </script>
