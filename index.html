@@ -211,4 +211,420 @@
             const btnEn = document.getElementById('lang-btn-en');
             if (lang === 'ro') {
                 btnRo.className = "px-2 py-1 rounded bg-indigo-600 text-white transition-all";
-                btnEn
+                btnEn.className = "px-2 py-1 rounded text-slate-400 hover:text-white transition-all";
+            } else {
+                btnEn.className = "px-2 py-1 rounded bg-indigo-600 text-white transition-all";
+                btnRo.className = "px-2 py-1 rounded text-slate-400 hover:text-white transition-all";
+            }
+
+            document.getElementById('header-subtitle').innerText = t.headerSubtitle;
+            document.getElementById('btn-label-simulation').innerText = t.btnSimulation;
+            document.getElementById('btn-label-stratigraphy').innerText = t.btnStratigraphy;
+            document.getElementById('label-toggle-erosion').innerText = lang === 'ro' ? 'Eroziune' : 'Erosion';
+            document.getElementById('btn-label-reset').innerText = t.btnReset;
+            document.getElementById('badge-hint-carve').innerText = t.hintCarve;
+
+            updateBadgesAndStatus();
+            drawSimulation();
+
+            // Actualizare în modal-uri dacă sunt deschise
+            if (typeof syncModalLanguage === 'function') syncModalLanguage();
+        }
+
+        function updateBadgesAndStatus() {
+            const t = translations[currentLang];
+            const dipTypeBadge = document.getElementById('stat-dip-type');
+            if (simState.dip === 0) dipTypeBadge.innerText = t.dipHoriz;
+            else if (Math.abs(simState.dip) === 90) dipTypeBadge.innerText = t.dipVert;
+            else if (simState.dip > 0) dipTypeBadge.innerText = t.dipRight;
+            else dipTypeBadge.innerText = t.dipLeft;
+
+            const badge = document.getElementById('process-title-badge');
+            badge.innerText = (simState.process === 'normal') ? t.badgeNormal : t.badgeReverse;
+
+            const foldBadge = document.getElementById('folding-badge');
+            if (simState.foldShortening > 0) {
+                foldBadge.classList.remove('hidden');
+                foldBadge.innerText = (currentLang === 'ro' ? 'Cutare: ' : 'Folding: ') + simState.foldShortening + '%';
+            } else {
+                foldBadge.classList.add('hidden');
+            }
+
+            document.getElementById('stat-throw-lbl').innerText = t.statThrow;
+            document.getElementById('stat-heave-lbl').innerText = t.statHeave;
+            document.getElementById('stat-slip-lbl').innerText = t.statSlip;
+        }
+
+        function getBaseGroundY() {
+            const H = canvas.height || 500;
+            const totalThickness = strata.reduce((acc, l) => acc + l.thickness, 0);
+            const anchorY = H * 0.52;
+            const baseY = anchorY + (totalThickness * 0.44);
+            return baseY - totalThickness;
+        }
+
+        window.initTopoProfile = function() {
+            const W = canvas.width || 800;
+            const groundY = getBaseGroundY();
+            simState.topoProfile = new Array(W).fill(groundY + simState.baseCutOffset);
+            simState.rawNoise = new Array(W).fill(0);
+        };
+
+        function toggleErosion() {
+            simState.erosionActive = !simState.erosionActive;
+            const btn = document.getElementById('btn-toggle-erosion');
+            const badge = document.getElementById('erosion-badge');
+            const t = translations[currentLang];
+
+            if (simState.erosionActive) {
+                btn.className = "bg-cyan-600 text-white px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all shadow-md";
+                badge.className = "bg-slate-900/80 backdrop-blur-md text-cyan-300 border border-slate-700 px-2.5 py-1 rounded-full text-xs font-semibold shadow";
+                badge.innerText = t.erosionActive;
+            } else {
+                btn.className = "bg-slate-800 text-slate-400 border border-slate-700 px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all";
+                badge.className = "bg-slate-900/80 backdrop-blur-md text-slate-400 border border-slate-800 px-2.5 py-1 rounded-full text-xs font-semibold shadow";
+                badge.innerText = t.erosionStopped;
+            }
+            drawSimulation();
+        }
+
+        function carveAtPoint(clientX, clientY) {
+            if (!simState.erosionActive) return;
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = Math.round(clientX - rect.left);
+            const mouseY = clientY - rect.top;
+            const radius = 35;
+            const W = canvas.width;
+
+            for (let x = Math.max(0, mouseX - radius); x <= Math.min(W - 1, mouseX + radius); x++) {
+                let dist = Math.abs(x - mouseX);
+                let factor = Math.cos((dist / radius) * (Math.PI / 2));
+                let targetY = mouseY * factor + (simState.topoProfile[x]) * (1 - factor);
+                
+                if (targetY > simState.topoProfile[x]) {
+                    let diff = targetY - simState.topoProfile[x];
+                    simState.rawNoise[x] = (simState.rawNoise[x] || 0) + diff;
+                    simState.topoProfile[x] = targetY;
+                }
+            }
+            drawSimulation();
+        }
+
+        canvas.addEventListener('mousedown', (e) => { isCarving = true; carveAtPoint(e.clientX, e.clientY); });
+        window.addEventListener('mousemove', (e) => { if (isCarving) carveAtPoint(e.clientX, e.clientY); });
+        window.addEventListener('mouseup', () => { isCarving = false; });
+
+        canvas.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                isCarving = true;
+                carveAtPoint(e.touches[0].clientX, e.touches[0].clientY);
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        window.addEventListener('touchmove', (e) => {
+            if (isCarving && e.touches.length === 1) {
+                carveAtPoint(e.touches[0].clientX, e.touches[0].clientY);
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        window.addEventListener('touchend', () => { isCarving = false; });
+
+        window.resetAll = function() {
+            simState.slip = 0;
+            simState.baseCutOffset = 0;
+            simState.foldShortening = 0;
+            simState.foldWavelength = 220;
+            document.getElementById('folding-badge').classList.add('hidden');
+            initTopoProfile();
+            drawSimulation();
+            if (typeof syncSimulationModalValues === 'function') syncSimulationModalValues();
+        };
+
+        // ==========================================
+        // RANDARE GEOMETRICĂ RIGUROASĂ (1:1)
+        // ==========================================
+        window.drawSimulation = function() {
+            const W = canvas.width;
+            const H = canvas.height;
+            if (!W || !H) return;
+
+            ctx.clearRect(0, 0, W, H);
+
+            // Grid Sandbox
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < W; x += 45) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+            }
+            for (let y = 0; y < H; y += 45) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+            }
+
+            const boxPaddingX = Math.max(30, W * 0.05);
+            const modelLeftX = boxPaddingX;
+            const modelRightX = W - boxPaddingX;
+
+            let effectiveDip = simState.dip;
+            if (effectiveDip === 0) effectiveDip = 0.001;
+
+            const dipRad = (effectiveDip * Math.PI) / 180;
+            const anchorX = W * 0.48;
+            const anchorY = H * 0.52;
+            const getFaultX = (y) => anchorX + (y - anchorY) / Math.tan(dipRad);
+
+            let s = simState.slip;
+            let dx = s * Math.cos(Math.abs(dipRad)) * (effectiveDip >= 0 ? 1 : -1);
+            let dy = s * Math.sin(Math.abs(dipRad));
+
+            if (simState.process === 'reverse') {
+                dx = -dx;
+                dy = -dy;
+            }
+
+            document.getElementById('stat-throw').innerText = Math.abs(dy).toFixed(1) + 'm';
+            document.getElementById('stat-heave').innerText = Math.abs(dx).toFixed(1) + 'm';
+            document.getElementById('stat-net-slip').innerText = s.toFixed(1) + 'm';
+
+            const totalThickness = strata.reduce((acc, l) => acc + l.thickness, 0);
+            const baseY = anchorY + (totalThickness * 0.44);
+
+            let layerBounds = [];
+            let currY = baseY;
+            for (let i = 0; i < strata.length; i++) {
+                let yBot = currY;
+                let yTop = currY - strata[i].thickness;
+                layerBounds.push({ layer: strata[i], yTop, yBot });
+                currY = yTop;
+            }
+
+            const foldAmp = ((simState.foldShortening || 0) / 100) * 85;
+            const lambda = Math.max(60, simState.foldWavelength || 220);
+            const k = (2 * Math.PI) / lambda;
+
+            // Atenuare graduală la contactul cu planul de falie pentru tăietură plană rectilinie
+            const getFoldAt = (x, yRef) => {
+                if (foldAmp === 0) return 0;
+                const faultEdgeX = getFaultX(yRef);
+                const distToFault = Math.abs(x - faultEdgeX);
+                const blend = Math.min(1, distToFault / 70);
+                return foldAmp * Math.sin((x - anchorX) * k) * blend;
+            };
+
+            // 1. FOOTWALL (Stânga)
+            layerBounds.forEach(({ layer, yTop, yBot }) => {
+                const xTopFault = getFaultX(yTop);
+                const xBotFault = getFaultX(yBot);
+
+                ctx.fillStyle = getStratumColor(layer.age);
+                ctx.strokeStyle = getStratumBorder(layer.age);
+                ctx.lineWidth = 1.5;
+
+                ctx.beginPath();
+                ctx.moveTo(modelLeftX, yTop + getFoldAt(modelLeftX, yTop));
+                const step = 4;
+                for (let x = modelLeftX; x < xTopFault; x += step) {
+                    ctx.lineTo(x, yTop + getFoldAt(x, yTop));
+                }
+                ctx.lineTo(xTopFault, yTop);
+                ctx.lineTo(xBotFault, yBot);
+
+                for (let x = xBotFault; x >= modelLeftX; x -= step) {
+                    ctx.lineTo(x, yBot + getFoldAt(x, yBot));
+                }
+                ctx.lineTo(modelLeftX, yBot + getFoldAt(modelLeftX, yBot));
+
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            });
+
+            // 2. HANGING WALL (Dreapta)
+            layerBounds.forEach(({ layer, yTop, yBot }) => {
+                const yTopTrans = yTop + dy;
+                const yBotTrans = yBot + dy;
+                const xTopFaultTrans = getFaultX(yTop) + dx;
+                const xBotFaultTrans = getFaultX(yBot) + dx;
+
+                ctx.fillStyle = getStratumColor(layer.age);
+                ctx.strokeStyle = getStratumBorder(layer.age);
+                ctx.lineWidth = 1.5;
+
+                ctx.beginPath();
+                ctx.moveTo(xTopFaultTrans, yTopTrans);
+
+                const step = 4;
+                for (let x = xTopFaultTrans; x <= modelRightX; x += step) {
+                    ctx.lineTo(x, yTopTrans + getFoldAt(x - dx, yTop));
+                }
+                ctx.lineTo(modelRightX, yTopTrans + getFoldAt(modelRightX - dx, yTop));
+                ctx.lineTo(modelRightX, yBotTrans + getFoldAt(modelRightX - dx, yBot));
+
+                for (let x = modelRightX; x >= xBotFaultTrans; x -= step) {
+                    ctx.lineTo(x, yBotTrans + getFoldAt(x - dx, yBot));
+                }
+                ctx.lineTo(xBotFaultTrans, yBotTrans);
+
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            });
+
+            // 3. Plan de Falie (Linie roșie rectilinie dreaptă)
+            const topOriginalY = layerBounds[strata.length - 1].yTop;
+            const topTranslatedY = topOriginalY + dy;
+            const botTranslatedY = baseY + dy;
+
+            const faultY1 = Math.min(topOriginalY, topTranslatedY) - 50;
+            const faultY2 = Math.max(baseY, botTranslatedY) + 50;
+            const faultX1 = getFaultX(faultY1);
+            const faultX2 = getFaultX(faultY2);
+
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([6, 4]);
+            ctx.beginPath();
+            ctx.moveTo(faultX1, faultY1);
+            ctx.lineTo(faultX2, faultY2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 4. Mască de Eroziune & Relief
+            const intW = Math.round(W);
+            if (simState.erosionActive && simState.topoProfile.length >= intW) {
+                const skyTopY = -200;
+                ctx.fillStyle = '#020617';
+                ctx.beginPath();
+                ctx.moveTo(0, skyTopY);
+                ctx.lineTo(W, skyTopY);
+                ctx.lineTo(W, simState.topoProfile[intW - 1]);
+
+                for (let x = intW - 1; x >= 0; x--) {
+                    ctx.lineTo(x, simState.topoProfile[x]);
+                }
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.moveTo(modelLeftX, simState.topoProfile[Math.round(modelLeftX)]);
+                for (let x = Math.round(modelLeftX); x <= Math.round(modelRightX); x++) {
+                    ctx.lineTo(x, simState.topoProfile[x]);
+                }
+                ctx.stroke();
+            }
+
+            // Margini laterale
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(modelLeftX, topOriginalY + getFoldAt(modelLeftX, topOriginalY));
+            ctx.lineTo(modelLeftX, baseY + getFoldAt(modelLeftX, baseY));
+            ctx.moveTo(modelRightX, topTranslatedY + getFoldAt(modelRightX - dx, topOriginalY));
+            ctx.lineTo(modelRightX, botTranslatedY + getFoldAt(modelRightX - dx, baseY));
+            ctx.stroke();
+
+            // Etichete bilingve
+            const t = translations[currentLang];
+            ctx.font = 'bold 11px Inter, sans-serif';
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillText(t.footwall, modelLeftX + 10, topOriginalY - 12 + getFoldAt(modelLeftX, topOriginalY));
+
+            ctx.fillStyle = '#cbd5e1';
+            let hwLabelY = topTranslatedY - 12 + getFoldAt(modelRightX - 85 - dx, topOriginalY);
+            ctx.fillText(t.hangingWall, modelRightX - 85, hwLabelY);
+        };
+
+        function setupResponsiveCanvas() {
+            const container = document.getElementById('canvas-container');
+            const observer = new ResizeObserver(entries => {
+                for (let entry of entries) {
+                    const width = Math.round(entry.contentRect.width);
+                    const height = Math.round(entry.contentRect.height);
+                    if (width > 0 && height > 0) {
+                        canvas.width = width;
+                        canvas.height = height;
+                        if (simState.topoProfile.length !== width) {
+                            initTopoProfile();
+                        }
+                        drawSimulation();
+                    }
+                }
+            });
+            observer.observe(container);
+        }
+
+        async function loadModalComponent(url, containerId) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP ${response.status} pentru ${url}`);
+                const htmlText = await response.text();
+                
+                const container = document.getElementById(containerId);
+                container.innerHTML = htmlText;
+
+                const scripts = container.querySelectorAll('script');
+                scripts.forEach(oldScript => {
+                    const newScript = document.createElement('script');
+                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                    newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                    oldScript.parentNode.replaceChild(newScript, oldScript);
+                });
+            } catch (err) {
+                console.error(`Eroare la încărcarea componentei ${url}:`, err);
+            }
+        }
+
+        async function loadAllModals() {
+            await Promise.all([
+                loadModalComponent('modal-stratigraphy.html?v=1.2.0', 'modal-stratigraphy-container'),
+                loadModalComponent('modal-simulation.html?v=2.0.0', 'modal-simulation-container')
+            ]);
+            setLanguage(currentLang);
+        }
+
+        function openStratigraphyModal() {
+            const m = document.getElementById('stratigraphy-modal');
+            if (m) {
+                m.classList.remove('hidden');
+                if (typeof filterStratigraphyList === 'function') filterStratigraphyList();
+            }
+        }
+
+        function closeStratigraphyModal() {
+            const m = document.getElementById('stratigraphy-modal');
+            if (m) m.classList.add('hidden');
+        }
+
+        function openSimulationModal() {
+            const m = document.getElementById('simulation-modal');
+            if (m) {
+                if (typeof openSimulationConsole === 'function') openSimulationConsole();
+                m.classList.remove('hidden');
+            }
+        }
+
+        function closeSimulationModal() {
+            const m = document.getElementById('simulation-modal');
+            if (m) m.classList.add('hidden');
+        }
+
+        window.onload = () => {
+            setupResponsiveCanvas();
+            loadAllModals();
+            requestAnimationFrame(() => {
+                const container = document.getElementById('canvas-container');
+                const rect = container.getBoundingClientRect();
+                if (rect.width > 0 && rect.height > 0) {
+                    canvas.width = Math.round(rect.width);
+                    canvas.height = Math.round(rect.height);
+                    initTopoProfile();
+                    drawSimulation();
+                }
+            });
+        };
+    </script>
+</body>
+</html>
