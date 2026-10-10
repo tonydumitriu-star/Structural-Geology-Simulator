@@ -1,4 +1,4 @@
-<!-- Modal 3D: Laborator Geologic Solid cu Cinematică Riguroasă și Sculptare DEM (v4.8.0-3D) -->
+<!-- Modal 3D: Laborator Geologic Solid cu Cinematică Riguroasă și Sculptare DEM (v4.9.0-3D) -->
 <div id="simulation-modal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-1 sm:p-3">
     <div class="bg-slate-900 border border-slate-800 w-full max-w-[1850px] h-[96vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
         
@@ -9,8 +9,8 @@
                     <i class="fa-solid fa-cube text-xs"></i>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <h3 id="sim3d-title" class="font-bold text-white text-xs sm:text-sm">Laborator Tectonic 3D - Solid DEM & Sculptare Manuală</h3>
-                    <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v4.8.0-3D</span>
+                    <h3 id="sim3d-title" class="font-bold text-white text-xs sm:text-sm">Laborator Tectonic 3D - Solid DEM & Sculptare</h3>
+                    <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v4.9.0-3D</span>
                 </div>
             </div>
 
@@ -18,7 +18,7 @@
             <div class="flex items-center space-x-1.5 sm:space-x-2">
                 <div class="bg-slate-900 border border-slate-800 p-0.5 rounded-lg flex text-[10px] font-semibold">
                     <button onclick="setSim3DCamera('iso')" id="cam-btn-iso" class="px-2 py-1 rounded bg-indigo-600 text-white transition-all">3D Izometric</button>
-                    <button onclick="setSim3DCamera('top')" id="cam-btn-top" class="px-2 py-1 rounded text-slate-400 hover:text-white transition-all">Hartă (Sus)</button>
+                    <button onclick="setSim3DCamera('top')" id="cam-btn-top" class="px-2 py-1 rounded text-slate-400 hover:text-white transition-all">Hartă Geologică</button>
                     <button onclick="setSim3DCamera('front')" id="cam-btn-front" class="px-2 py-1 rounded text-slate-400 hover:text-white transition-all">Secțiune (Față)</button>
                 </div>
 
@@ -42,7 +42,7 @@
                         <span id="sim3d-badge-process" class="bg-slate-900/80 backdrop-blur-md text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full font-semibold shadow">Falie Normală</span>
                     </div>
                     <div class="bg-slate-900/80 backdrop-blur-md text-amber-400 border border-slate-800 px-2.5 py-0.5 rounded-full hidden sm:block shadow-lg">
-                        <i class="fa-solid fa-hand-pointer mr-1"></i> Trage cu mouse-ul pe suprafața superioară pentru a SCULPTA! | Orbitare: Clic Dreapta
+                        <i class="fa-solid fa-hand-pointer mr-1"></i> Trage cu mouse-ul pe suprafață pentru a SCULPTA! | Orbitare: Clic Dreapta
                     </div>
                 </div>
 
@@ -60,11 +60,32 @@
             <!-- 2. PANOU DE SETĂRI -->
             <div class="w-full lg:w-[410px] bg-slate-950 rounded-xl border border-slate-800 p-3 overflow-y-auto space-y-3 flex-shrink-0 text-xs">
                 
-                <!-- Secțiunea 1: Faliere 3D (Fragil) -->
+                <!-- Secțiunea 1: Plane de Secționare -->
+                <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-2">
+                    <span class="text-[11px] font-bold uppercase text-cyan-300 flex items-center">
+                        <i class="fa-solid fa-scissors text-cyan-400 mr-1.5"></i> 1. Plane de Tăiere (Clipping)
+                    </span>
+                    <div>
+                        <div class="flex justify-between text-[11px] mb-0.5">
+                            <span class="text-slate-300">Felie Transversală (Axa X):</span>
+                            <span id="val-clip-x" class="font-bold text-emerald-400">Max</span>
+                        </div>
+                        <input type="range" id="slider-clip-x" min="-280" max="300" value="300" oninput="update3DModelParams()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[11px] mb-0.5">
+                            <span class="text-slate-300">Felie Longitudinală (Axa Z):</span>
+                            <span id="val-clip-z" class="font-bold text-amber-400">Max</span>
+                        </div>
+                        <input type="range" id="slider-clip-z" min="-180" max="200" value="200" oninput="update3DModelParams()" class="w-full accent-amber-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                    </div>
+                </div>
+
+                <!-- Secțiunea 2: Faliere 3D (Fragil) -->
                 <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-2">
                     <div class="flex justify-between items-center">
                         <span class="text-[11px] font-bold uppercase text-indigo-300 flex items-center">
-                            <i class="fa-solid fa-bolt text-indigo-400 mr-1.5"></i> 1. Faliere (Fragil)
+                            <i class="fa-solid fa-bolt text-indigo-400 mr-1.5"></i> 2. Faliere (Fragil)
                         </span>
                         <span id="val-dip-badge" class="text-[10px] font-mono text-indigo-300 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">60°</span>
                     </div>
@@ -102,10 +123,10 @@
                     </div>
                 </div>
 
-                <!-- Secțiunea 2: Cutare 3D (Ductil) -->
+                <!-- Secțiunea 3: Cutare 3D (Ductil) -->
                 <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-2">
                     <span class="text-[11px] font-bold uppercase text-purple-300 flex items-center">
-                        <i class="fa-solid fa-water text-purple-400 mr-1.5"></i> 2. Cutare (Ductil)
+                        <i class="fa-solid fa-water text-purple-400 mr-1.5"></i> 3. Cutare (Ductil)
                     </span>
                     <div class="space-y-1.5">
                         <div>
@@ -125,13 +146,21 @@
                     </div>
                 </div>
 
-                <!-- Secțiunea 3: Morfologie DEM (Eroziune) -->
+                <!-- Secțiunea 4: Morfologie DEM & Peneplanizare -->
                 <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-2">
                     <span class="text-[11px] font-bold uppercase text-cyan-300 flex items-center">
-                        <i class="fa-solid fa-mountain-sun text-cyan-400 mr-1.5"></i> 3. Morfologie Topografică (DEM)
+                        <i class="fa-solid fa-mountain-sun text-cyan-400 mr-1.5"></i> 4. Topografie, Peneplanizare & Văi
                     </span>
+
+                    <div>
+                        <div class="flex justify-between text-[11px] mb-0.5">
+                            <span class="text-slate-300">Peneplanizare / Nivelare (Y-Top):</span>
+                            <span id="val-clip-top" class="font-bold text-cyan-400">240 m</span>
+                        </div>
+                        <input type="range" id="slider-clip-top" min="-120" max="240" value="240" oninput="update3DModelParams()" class="w-full accent-cyan-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                    </div>
                     
-                    <div class="grid grid-cols-2 gap-1.5">
+                    <div class="grid grid-cols-2 gap-1.5 pt-1">
                         <button onclick="generateRandomRelief3D()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-1.5 rounded-lg text-xs transition-all flex items-center justify-center space-x-1">
                             <i class="fa-solid fa-shuffle text-[10px]"></i>
                             <span>Văi Aleatoare</span>
@@ -144,31 +173,10 @@
 
                     <div class="pt-1">
                         <div class="flex justify-between text-[11px] mb-0.5">
-                            <span class="text-slate-300">Ajustare Cotă Nivelare (Sus/Jos):</span>
+                            <span class="text-slate-300">Ajustare Cotă DEM (Sus/Jos):</span>
                             <span id="val-topo-offset" class="font-bold text-emerald-400">0 m</span>
                         </div>
                         <input type="range" id="slider-topo-offset" min="-150" max="150" value="0" oninput="shiftTopography()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                    </div>
-                </div>
-
-                <!-- Secțiunea 4: Plane Secționare -->
-                <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-2">
-                    <span class="text-[11px] font-bold uppercase text-orange-300 flex items-center">
-                        <i class="fa-solid fa-scissors text-orange-400 mr-1.5"></i> 4. Plane de Secționare
-                    </span>
-                    <div>
-                        <div class="flex justify-between text-[11px] mb-0.5">
-                            <span class="text-slate-300">Felie Transversală (X):</span>
-                            <span id="val-clip-x" class="font-bold text-orange-400">600 m</span>
-                        </div>
-                        <input type="range" id="slider-clip-x" min="-300" max="300" value="300" oninput="update3DModelParams()" class="w-full accent-orange-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-[11px] mb-0.5">
-                            <span class="text-slate-300">Felie Longitudinală (Z):</span>
-                            <span id="val-clip-z" class="font-bold text-orange-400">400 m</span>
-                        </div>
-                        <input type="range" id="slider-clip-z" min="-200" max="200" value="200" oninput="update3DModelParams()" class="w-full accent-orange-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
                     </div>
                 </div>
 
@@ -224,10 +232,11 @@
         slip: 45,
         foldShortening: 0,
         foldWavelength: 220,
+        clipTopY: 240,
         clipX: 300,
         clipZ: 200,
         topoOffset: 0,
-        topoProfile: new Float32Array(1001) // Profil larg pentru a acoperi translațiile
+        topoProfile: new Float32Array(1001) 
     };
 
     let scene3D, camera3D, renderer3D, controls3D;
@@ -238,7 +247,7 @@
     let isThreeInitialized = false;
 
     const HALF_W = 300;
-    const EXTRA_W = 800; // Pentru a preveni golurile la glisare
+    const EXTRA_W = 800; // Asigură margini infinite pentru decupare
     const DEPTH_Z = 400;
     const BASE_TOPO_Y = 180;
 
@@ -289,7 +298,7 @@
         controls3D = new THREE.OrbitControls(camera3D, renderer3D.domElement);
         controls3D.enableDamping = true;
         controls3D.dampingFactor = 0.05;
-        // Mutează orbitarea pe Click Dreapta ca să elibereze Click Stânga pt sculptare
+        // Extragem sculptarea din Click Stânga, mutăm rotirea pe Dreapta
         controls3D.mouseButtons = { LEFT: null, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE };
 
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
@@ -311,10 +320,8 @@
         scene3D.add(modelMainGroup);
 
         clippingPlanes = [
-            new THREE.Plane(new THREE.Vector3(-1, 0, 0), 300), // Felia X (Dreapta)
-            new THREE.Plane(new THREE.Vector3(1, 0, 0), 300),  // Felia X (Stânga - Fixă)
-            new THREE.Plane(new THREE.Vector3(0, 0, -1), 200), // Felia Z (Față)
-            new THREE.Plane(new THREE.Vector3(0, 0, 1), 200)   // Felia Z (Spate - Fixă)
+            new THREE.Plane(new THREE.Vector3(-1, 0, 0), 300), 
+            new THREE.Plane(new THREE.Vector3(0, 0, -1), 200)
         ];
 
         raycaster = new THREE.Raycaster();
@@ -339,10 +346,426 @@
     }
 
     // ==========================================
-    // EROZIUNE DEM (Sculptare pe Mesh)
+    // EROZIUNE DEM & SCULPTARE
     // ==========================================
     function attachRaycasterErosion() {
         const container = document.getElementById('threejs-container');
         
         container.addEventListener('mousedown', (e) => {
-            if (e.button === 0) { isCarving3D = true
+            if (e.button === 0) { isCarving3D = true; carveTopography(e); }
+        });
+        container.addEventListener('mousemove', (e) => {
+            if (isCarving3D) carveTopography(e);
+        });
+        window.addEventListener('mouseup', () => { isCarving3D = false; });
+    }
+
+    function carveTopography(e) {
+        const container = document.getElementById('threejs-container');
+        const rect = container.getBoundingClientRect();
+        mouse.x = ((e.clientX - rect.left) / container.clientWidth) * 2 - 1;
+        mouse.y = -((e.clientY - rect.top) / container.clientHeight) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera3D);
+        const intersects = raycaster.intersectObjects(modelMainGroup.children, true);
+
+        if (intersects.length > 0) {
+            const worldX = intersects[0].point.x;
+            const radius = 45;
+            const force = 6.0;
+
+            for (let i = 0; i <= 1000; i++) {
+                let actualX = i - 500; 
+                let dist = Math.abs(actualX - worldX);
+                if (dist < radius) {
+                    let factor = Math.cos((dist / radius) * (Math.PI / 2));
+                    window.sim3DState.topoProfile[i] -= force * factor;
+                }
+            }
+            rebuildGeological3DModel();
+        }
+    }
+
+    function getTopoElevation(worldX) {
+        let idx = Math.round(worldX + 500);
+        idx = Math.max(0, Math.min(1000, idx));
+        let demY = window.sim3DState.topoProfile[idx] + window.sim3DState.topoOffset;
+        return Math.min(demY, window.sim3DState.clipTopY);
+    }
+
+    window.flattenTopography = function(rebuild = true) {
+        window.sim3DState.topoProfile.fill(BASE_TOPO_Y);
+        const s = document.getElementById('slider-topo-offset');
+        if (s) s.value = 0;
+        window.sim3DState.topoOffset = 0;
+        const val = document.getElementById('val-topo-offset');
+        if (val) val.innerText = "0 m";
+        if (rebuild) rebuildGeological3DModel();
+    };
+
+    window.generateRandomRelief3D = function() {
+        const f1 = 0.005 + Math.random() * 0.005;
+        const f2 = 0.015 + Math.random() * 0.01;
+        const p1 = Math.random() * 10;
+        const p2 = Math.random() * 10;
+        
+        for (let i = 0; i <= 1000; i++) {
+            let x = i - 500;
+            let wave = Math.sin(x * f1 + p1) * 35 + Math.sin(x * f2 + p2) * 20;
+            window.sim3DState.topoProfile[i] = BASE_TOPO_Y - 25 + wave;
+        }
+        rebuildGeological3DModel();
+    };
+
+    window.shiftTopography = function() {
+        const s = document.getElementById('slider-topo-offset');
+        if (!s) return;
+        window.sim3DState.topoOffset = parseInt(s.value);
+        document.getElementById('val-topo-offset').innerText = (window.sim3DState.topoOffset > 0 ? `+${window.sim3DState.topoOffset}` : window.sim3DState.topoOffset) + ' m';
+        rebuildGeological3DModel();
+    };
+
+    function get3DColor(age) {
+        const k = (age || '').toLowerCase();
+        const chronodata = (window.iugsChronodata && window.iugsChronodata.length > 0) ? window.iugsChronodata : window.sim3DChronodata;
+        const found = chronodata.find(i => (i.nameEn && i.nameEn.toLowerCase() === k) || (i.nameRo && i.nameRo.toLowerCase() === k));
+        return found ? parseInt(found.hex.replace('#', '0x')) : 0x64748b;
+    }
+
+    // ==========================================
+    // ALGORITM TĂIERE SUTHERLAND-HODGMAN v2 (Solid)
+    // ==========================================
+    function getLocalTopo(x, isHW, dx, dy) {
+        let worldX = isHW ? x + dx : x;
+        return getTopoElevation(worldX) - (isHW ? dy : 0);
+    }
+
+    function clipPolygonByTopo(points, isHW, dx, dy) {
+        const output = [];
+        for (let i = 0; i < points.length; i++) {
+            const cur = points[i];
+            const prv = points[(i + points.length - 1) % points.length];
+            
+            const curIn = cur.y <= getLocalTopo(cur.x, isHW, dx, dy);
+            const prvIn = prv.y <= getLocalTopo(prv.x, isHW, dx, dy);
+            
+            if (curIn) {
+                if (!prvIn) output.push(findIntersectDEM(prv, cur, isHW, dx, dy));
+                output.push(cur);
+            } else if (prvIn) {
+                output.push(findIntersectDEM(prv, cur, isHW, dx, dy));
+            }
+        }
+        return output;
+    }
+
+    function findIntersectDEM(p1, p2, isHW, dx, dy) {
+        let pIn = (p1.y <= getLocalTopo(p1.x, isHW, dx, dy)) ? p1 : p2;
+        let pOut = (pIn === p1) ? p2 : p1;
+        
+        let low = 0, high = 1;
+        for(let i=0; i<12; i++) {
+            let t = (low + high) / 2;
+            let mx = pIn.x + t * (pOut.x - pIn.x);
+            let my = pIn.y + t * (pOut.y - pIn.y);
+            if (my <= getLocalTopo(mx, isHW, dx, dy)) low = t;
+            else high = t;
+        }
+        let t = (low + high) / 2;
+        return new THREE.Vector2(pIn.x + t * (pOut.x - pIn.x), pIn.y + t * (pOut.y - pIn.y));
+    }
+
+    function createSolidPolygon(yBot, yTop, foldAmp, k, cotDip, isHW, dx, dy) {
+        const points = [];
+        const X_fault_bot = yBot * cotDip;
+        const X_fault_top = yTop * cotDip;
+        
+        const getFoldedY = (x, yBase) => yBase + foldAmp * Math.sin(x * k);
+
+        if (!isHW) {
+            const startX = -EXTRA_W;
+            for (let x = startX; x <= X_fault_bot; x += 15) points.push(new THREE.Vector2(x, getFoldedY(x, yBot)));
+            points.push(new THREE.Vector2(X_fault_bot, yBot));
+            
+            // Densificăm falia pentru decupaj fin la suprafață
+            const faultSteps = Math.max(2, Math.ceil((yTop - yBot) / 10));
+            for (let i = 1; i <= faultSteps; i++) {
+                let t = i / faultSteps;
+                let cY = yBot + t * (yTop - yBot);
+                points.push(new THREE.Vector2(cY * cotDip, cY));
+            }
+            
+            for (let x = X_fault_top; x >= startX; x -= 15) points.push(new THREE.Vector2(x, getFoldedY(x, yTop)));
+        } else {
+            const rightLimit = EXTRA_W;
+            points.push(new THREE.Vector2(X_fault_bot, yBot));
+            for (let x = X_fault_bot; x <= rightLimit; x += 15) points.push(new THREE.Vector2(x, getFoldedY(x, yBot)));
+            points.push(new THREE.Vector2(rightLimit, getFoldedY(rightLimit, yBot)));
+            points.push(new THREE.Vector2(rightLimit, getFoldedY(rightLimit, yTop)));
+            for (let x = rightLimit; x >= X_fault_top; x -= 15) points.push(new THREE.Vector2(x, getFoldedY(x, yTop)));
+            
+            const faultSteps = Math.max(2, Math.ceil((yTop - yBot) / 10));
+            for (let i = faultSteps - 1; i >= 0; i--) {
+                let t = i / faultSteps;
+                let cY = yBot + t * (yTop - yBot);
+                points.push(new THREE.Vector2(cY * cotDip, cY));
+            }
+        }
+        
+        const clippedPoints = clipPolygonByTopo(points, isHW, dx, dy);
+        if (clippedPoints.length < 3) return null;
+        
+        const cleanPoints = [];
+        for(let i=0; i<clippedPoints.length; i++) {
+            if (i===0 || clippedPoints[i].distanceTo(clippedPoints[i-1]) > 0.1) {
+                cleanPoints.push(clippedPoints[i]);
+            }
+        }
+        return cleanPoints;
+    }
+
+    window.rebuildGeological3DModel = function() {
+        if (!scene3D || !modelMainGroup) return;
+
+        while (modelMainGroup.children.length > 0) {
+            modelMainGroup.remove(modelMainGroup.children[0]);
+        }
+
+        let dipDeg = window.sim3DState.dip;
+        if (Math.abs(dipDeg) < 5) dipDeg = 5 * Math.sign(dipDeg || 1); 
+        
+        const dipRad = (dipDeg * Math.PI) / 180;
+        const slip = window.sim3DState.slip;
+
+        const cotDip = 1.0 / Math.tan(dipRad);
+
+        const signDip = Math.sign(dipDeg);
+        let dxMag = slip * Math.cos(Math.abs(dipRad));
+        let dyMag = slip * Math.sin(Math.abs(dipRad));
+
+        let dx = 0, dy = 0;
+        if (window.sim3DState.process === 'normal') {
+            dy = -dyMag; 
+            dx = signDip * dxMag;
+        } else {
+            dy = dyMag;  
+            dx = -signDip * dxMag;
+        }
+
+        const eThrow = document.getElementById('sim3d-throw');
+        const eHeave = document.getElementById('sim3d-heave');
+        const eSlip = document.getElementById('sim3d-slip');
+        if(eThrow) eThrow.innerText = Math.abs(dy).toFixed(1) + 'm';
+        if(eHeave) eHeave.innerText = Math.abs(dx).toFixed(1) + 'm';
+        if(eSlip) eSlip.innerText = slip.toFixed(1) + 'm';
+
+        const foldAmp = (window.sim3DState.foldShortening / 100) * 45;
+        const lambda = Math.max(60, window.sim3DState.foldWavelength);
+        const k = (2 * Math.PI) / lambda;
+
+        let currY = -140;
+
+        const fwGroup = new THREE.Group();
+        const hwGroup = new THREE.Group();
+        modelMainGroup.add(fwGroup);
+        modelMainGroup.add(hwGroup);
+
+        window.sim3DStrata.forEach((stratum) => {
+            const h = stratum.thickness;
+            const colorHex = get3DColor(stratum.age);
+
+            const fwPoly = createSolidPolygon(currY, currY + h, foldAmp, k, cotDip, false, 0, 0);
+            if (fwPoly) {
+                const geom = new THREE.ExtrudeGeometry(new THREE.Shape(fwPoly), { depth: DEPTH_Z, bevelEnabled: false, steps: 1 });
+                geom.computeVertexNormals();
+                const mesh = new THREE.Mesh(geom, new THREE.MeshStandardMaterial({
+                    color: colorHex, roughness: 0.65, metalness: 0.05, side: THREE.DoubleSide, clippingPlanes: clippingPlanes
+                }));
+                mesh.position.z = -DEPTH_Z / 2;
+                mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geom, 25), new THREE.LineBasicMaterial({ color: 0x0f172a, clippingPlanes: clippingPlanes })));
+                fwGroup.add(mesh);
+            }
+
+            const hwPoly = createSolidPolygon(currY, currY + h, foldAmp, k, cotDip, true, dx, dy);
+            if (hwPoly) {
+                const geom = new THREE.ExtrudeGeometry(new THREE.Shape(hwPoly), { depth: DEPTH_Z, bevelEnabled: false, steps: 1 });
+                geom.computeVertexNormals();
+                const mesh = new THREE.Mesh(geom, new THREE.MeshStandardMaterial({
+                    color: colorHex, roughness: 0.65, metalness: 0.05, side: THREE.DoubleSide, clippingPlanes: clippingPlanes
+                }));
+                mesh.position.z = -DEPTH_Z / 2;
+                mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geom, 25), new THREE.LineBasicMaterial({ color: 0x0f172a, clippingPlanes: clippingPlanes })));
+                hwGroup.add(mesh);
+            }
+
+            currY += h;
+        });
+
+        hwGroup.position.set(dx, dy, 0);
+    };
+
+    window.update3DModelParams = function() {
+        const dDip = document.getElementById('slider-3d-dip');
+        if(dDip) window.sim3DState.dip = parseInt(dDip.value);
+        
+        const dSlip = document.getElementById('slider-3d-slip');
+        if(dSlip) window.sim3DState.slip = parseInt(dSlip.value);
+        
+        const dShort = document.getElementById('slider-3d-fold-short');
+        if(dShort) window.sim3DState.foldShortening = parseInt(dShort.value);
+        
+        const dWave = document.getElementById('slider-3d-fold-wave');
+        if(dWave) window.sim3DState.foldWavelength = parseInt(dWave.value);
+        
+        const dClipTop = document.getElementById('slider-clip-top');
+        if(dClipTop) window.sim3DState.clipTopY = parseInt(dClipTop.value);
+        
+        const dClipX = document.getElementById('slider-clip-x');
+        if(dClipX) window.sim3DState.clipX = parseInt(dClipX.value);
+        
+        const dClipZ = document.getElementById('slider-clip-z');
+        if(dClipZ) window.sim3DState.clipZ = parseInt(dClipZ.value);
+
+        if(clippingPlanes.length >= 2) {
+            clippingPlanes[0].constant = window.sim3DState.clipX;
+            clippingPlanes[1].constant = window.sim3DState.clipZ;
+        }
+
+        const tDip = document.getElementById('val-3d-dip');
+        if(tDip) tDip.innerText = window.sim3DState.dip + '°';
+        const bDip = document.getElementById('val-dip-badge');
+        if(bDip) bDip.innerText = window.sim3DState.dip + '°';
+        
+        const tSlip = document.getElementById('val-3d-slip');
+        if(tSlip) tSlip.innerText = window.sim3DState.slip + ' m';
+        
+        const tShort = document.getElementById('val-3d-fold-short');
+        if(tShort) tShort.innerText = window.sim3DState.foldShortening + '%';
+        
+        const tWave = document.getElementById('val-3d-fold-wave');
+        if(tWave) tWave.innerText = window.sim3DState.foldWavelength + ' m';
+        
+        const tClipTop = document.getElementById('val-clip-top');
+        if(tClipTop) tClipTop.innerText = window.sim3DState.clipTopY >= 235 ? 'Oprit' : `${window.sim3DState.clipTopY} m`;
+        
+        const tClipX = document.getElementById('val-clip-x');
+        if(tClipX) tClipX.innerText = window.sim3DState.clipX >= 295 ? 'Max' : `${window.sim3DState.clipX + 300} m`;
+        
+        const tClipZ = document.getElementById('val-clip-z');
+        if(tClipZ) tClipZ.innerText = window.sim3DState.clipZ >= 195 ? 'Max' : `${window.sim3DState.clipZ + 200} m`;
+
+        rebuildGeological3DModel();
+    };
+
+    window.setSim3DFaultProcess = function(type) {
+        window.sim3DState.process = type;
+        const btnN = document.getElementById('btn-3d-normal');
+        const btnR = document.getElementById('btn-3d-reverse');
+
+        if (type === 'normal') {
+            if(btnN) btnN.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-12";
+            if(btnN) btnN.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
+            if(btnR) btnR.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-12";
+            if(btnR) btnR.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
+            const b = document.getElementById('sim3d-badge-process');
+            if(b) b.innerText = "Falie Normală";
+        } else {
+            if(btnR) btnR.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-12";
+            if(btnR) btnR.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
+            if(btnN) btnN.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-12";
+            if(btnN) btnN.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
+            const b = document.getElementById('sim3d-badge-process');
+            if(b) b.innerText = "Falie Inversă";
+        }
+        rebuildGeological3DModel();
+    };
+
+    window.setSim3DCamera = function(view) {
+        if (!camera3D || !controls3D) return;
+        ['iso', 'top', 'front'].forEach(v => {
+            const el = document.getElementById(`cam-btn-${v}`);
+            if(el) el.className = (v === view) ? "px-2 py-1 rounded bg-indigo-600 text-white transition-all" : "px-2 py-1 rounded text-slate-400 hover:text-white transition-all";
+        });
+        if (view === 'iso') camera3D.position.set(480, 430, 530);
+        else if (view === 'top') camera3D.position.set(0, 900, 1);
+        else if (view === 'front') camera3D.position.set(0, 0, 850);
+        controls3D.target.set(0, 0, 0);
+        controls3D.update();
+    };
+
+    window.resetSim3DParams = function() {
+        window.sim3DState.slip = 0;
+        window.sim3DState.foldShortening = 0;
+        window.sim3DState.clipTopY = 240;
+        window.sim3DState.clipX = 300;
+        window.sim3DState.clipZ = 200;
+        
+        const sd = document.getElementById('slider-3d-slip'); if(sd) sd.value = 0;
+        const sf = document.getElementById('slider-3d-fold-short'); if(sf) sf.value = 0;
+        const sct = document.getElementById('slider-clip-top'); if(sct) sct.value = 240;
+        const scx = document.getElementById('slider-clip-x'); if(scx) scx.value = 300;
+        const scz = document.getElementById('slider-clip-z'); if(scz) scz.value = 200;
+        
+        window.flattenTopography();
+        update3DModelParams();
+        setSim3DCamera('iso');
+    };
+
+    function sync3DControls() {
+        const sd = document.getElementById('slider-3d-dip'); if(sd) sd.value = window.sim3DState.dip;
+        const ss = document.getElementById('slider-3d-slip'); if(ss) ss.value = window.sim3DState.slip;
+        const sfs = document.getElementById('slider-3d-fold-short'); if(sfs) sfs.value = window.sim3DState.foldShortening;
+        const sfw = document.getElementById('slider-3d-fold-wave'); if(sfw) sfw.value = window.sim3DState.foldWavelength;
+        const sct = document.getElementById('slider-clip-top'); if(sct) sct.value = window.sim3DState.clipTopY;
+        const scx = document.getElementById('slider-clip-x'); if(scx) scx.value = window.sim3DState.clipX;
+        const scz = document.getElementById('slider-clip-z'); if(scz) scz.value = window.sim3DState.clipZ;
+        update3DModelParams();
+    }
+
+    function render3DStrataList() {
+        const list = document.getElementById('sim3d-strata-list');
+        if (!list || !window.sim3DStrata) return;
+
+        const chronodata = (window.iugsChronodata && window.iugsChronodata.length > 0) ? window.iugsChronodata : window.sim3DChronodata;
+        list.innerHTML = '';
+
+        window.sim3DStrata.slice().reverse().forEach((layer, origIdxReversed) => {
+            const actualIdx = window.sim3DStrata.length - 1 - origIdxReversed;
+            const colorHex = '#' + get3DColor(layer.age).toString(16).padStart(6, '0');
+
+            list.innerHTML += `
+                <div class="flex items-center space-x-1.5 bg-slate-950 p-1.5 rounded-lg border border-slate-800">
+                    <div class="w-4 h-4 rounded flex-shrink-0 border" style="background-color: ${colorHex}; border-color: #475569"></div>
+                    <input type="text" value="${layer.name}" onchange="window.sim3DStrata[${actualIdx}].name = this.value; rebuildGeological3DModel();" class="flex-1 min-w-0 bg-slate-900 border border-slate-700 px-1.5 py-0.5 rounded text-[11px] text-white focus:outline-none focus:border-indigo-500">
+                    <select onchange="window.sim3DStrata[${actualIdx}].age = this.value; render3DStrataList(); rebuildGeological3DModel();" class="w-28 bg-slate-900 border border-slate-700 px-1 py-0.5 rounded text-[10px] text-indigo-300 focus:outline-none focus:border-indigo-500">
+                        ${chronodata.map(it => {
+                            const optName = it.nameRo || it.nameEn;
+                            const isSelected = (layer.age && it.nameEn && layer.age.toLowerCase() === it.nameEn.toLowerCase()) || 
+                                               (layer.age && it.nameRo && layer.age.toLowerCase() === it.nameRo.toLowerCase());
+                            return `<option value="${it.nameEn || it.nameRo}" ${isSelected ? 'selected' : ''}>${optName}</option>`;
+                        }).join('')}
+                    </select>
+                    <input type="number" min="10" max="250" value="${layer.thickness}" onchange="window.sim3DStrata[${actualIdx}].thickness = parseInt(this.value) || 30; rebuildGeological3DModel();" class="w-12 bg-slate-900 border border-slate-700 px-1 py-0.5 rounded text-[11px] text-white text-center focus:outline-none focus:border-indigo-500">
+                    <button onclick="remove3DStratum(${actualIdx})" class="text-rose-400 hover:text-rose-300 p-1 text-xs rounded hover:bg-slate-900" title="Șterge"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+            `;
+        });
+    }
+
+    window.addNew3DStratum = function() {
+        window.sim3DStrata.push({ name: "Strat Nou", age: "Cretaceous", thickness: 50 });
+        render3DStrataList();
+        rebuildGeological3DModel();
+    };
+
+    window.remove3DStratum = function(index) {
+        if (window.sim3DStrata.length <= 1) return alert("Trebuie să existe cel puțin un strat în blocul 3D.");
+        window.sim3DStrata.splice(index, 1);
+        render3DStrataList();
+        rebuildGeological3DModel();
+    };
+
+    if (document.getElementById('simulation-modal') && !document.getElementById('simulation-modal').classList.contains('hidden')) {
+        window.initSimulationEnvironment();
+    }
+</script>
