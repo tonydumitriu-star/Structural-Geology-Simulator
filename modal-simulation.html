@@ -9,7 +9,7 @@
                     <i class="fa-solid fa-cube text-xs"></i>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <h3 id="sim3d-title" class="font-bold text-white text-xs sm:text-sm">Laborator Tectonic 3D - Solid DEM & Sculptare</h3>
+                    <h3 id="sim3d-title" class="font-bold text-white text-xs sm:text-sm">Laborator Tectonic 3D - Solid DEM & Sculptare Manuală</h3>
                     <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v4.8.0-3D</span>
                 </div>
             </div>
@@ -18,7 +18,7 @@
             <div class="flex items-center space-x-1.5 sm:space-x-2">
                 <div class="bg-slate-900 border border-slate-800 p-0.5 rounded-lg flex text-[10px] font-semibold">
                     <button onclick="setSim3DCamera('iso')" id="cam-btn-iso" class="px-2 py-1 rounded bg-indigo-600 text-white transition-all">3D Izometric</button>
-                    <button onclick="setSim3DCamera('top')" id="cam-btn-top" class="px-2 py-1 rounded text-slate-400 hover:text-white transition-all">Hartă Geologică</button>
+                    <button onclick="setSim3DCamera('top')" id="cam-btn-top" class="px-2 py-1 rounded text-slate-400 hover:text-white transition-all">Hartă (Sus)</button>
                     <button onclick="setSim3DCamera('front')" id="cam-btn-front" class="px-2 py-1 rounded text-slate-400 hover:text-white transition-all">Secțiune (Față)</button>
                 </div>
 
@@ -41,8 +41,8 @@
                     <div class="flex items-center space-x-1.5">
                         <span id="sim3d-badge-process" class="bg-slate-900/80 backdrop-blur-md text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full font-semibold shadow">Falie Normală</span>
                     </div>
-                    <div class="bg-slate-900/80 backdrop-blur-md text-slate-400 border border-slate-800 px-2.5 py-0.5 rounded-full hidden sm:block">
-                        <i class="fa-solid fa-hand-pointer text-amber-400 mr-1"></i> Trage cu mouse-ul pe bloc pentru a SCULPTA văi! | Orbitare: Clic Dreapta
+                    <div class="bg-slate-900/80 backdrop-blur-md text-amber-400 border border-slate-800 px-2.5 py-0.5 rounded-full hidden sm:block shadow-lg">
+                        <i class="fa-solid fa-hand-pointer mr-1"></i> Trage cu mouse-ul pe bloc pentru a SCULPTA văi! | Orbitare: Clic Dreapta
                     </div>
                 </div>
 
@@ -125,7 +125,7 @@
                     </div>
                 </div>
 
-                <!-- Secțiunea 3: Morfologie DEM (Eroziune) -->
+                <!-- Secțiunea 3: Morfologie Topografică (DEM) -->
                 <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-2">
                     <span class="text-[11px] font-bold uppercase text-cyan-300 flex items-center">
                         <i class="fa-solid fa-mountain-sun text-cyan-400 mr-1.5"></i> 3. Morfologie Topografică (DEM)
@@ -151,11 +151,32 @@
                     </div>
                 </div>
 
-                <!-- Secțiunea 4: Strate Geologice -->
+                <!-- Secțiunea 4: Plane Secționare -->
+                <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-2">
+                    <span class="text-[11px] font-bold uppercase text-orange-300 flex items-center">
+                        <i class="fa-solid fa-scissors text-orange-400 mr-1.5"></i> 4. Plane de Secționare
+                    </span>
+                    <div>
+                        <div class="flex justify-between text-[11px] mb-0.5">
+                            <span class="text-slate-300">Felie Transversală (X):</span>
+                            <span id="val-clip-x" class="font-bold text-orange-400">600 m</span>
+                        </div>
+                        <input type="range" id="slider-clip-x" min="-300" max="300" value="300" oninput="update3DModelParams()" class="w-full accent-orange-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[11px] mb-0.5">
+                            <span class="text-slate-300">Felie Longitudinală (Z):</span>
+                            <span id="val-clip-z" class="font-bold text-orange-400">400 m</span>
+                        </div>
+                        <input type="range" id="slider-clip-z" min="-200" max="200" value="200" oninput="update3DModelParams()" class="w-full accent-orange-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                    </div>
+                </div>
+
+                <!-- Secțiunea 5: Strate Geologice -->
                 <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-2">
                     <div class="flex justify-between items-center text-slate-400 text-[11px] font-bold uppercase tracking-wider">
                         <span class="flex items-center text-amber-300">
-                            <i class="fa-solid fa-layer-group text-amber-400 mr-1.5"></i> 4. Strate Bloc-Diagramă
+                            <i class="fa-solid fa-layer-group text-amber-400 mr-1.5"></i> 5. Strate Bloc-Diagramă
                         </span>
                     </div>
                     
@@ -203,14 +224,18 @@
         slip: 45,
         foldShortening: 0,
         foldWavelength: 220,
+        clipX: 300,
+        clipZ: 200,
         topoOffset: 0,
-        topoProfile: new Float32Array(701) // Profil de la -350 la +350 (700 unități + 1)
+        topoProfile: new Float32Array(701) 
     };
 
     let scene3D, camera3D, renderer3D, controls3D;
     let modelMainGroup;
+    let clippingPlanes = [];
     let raycaster, mouse;
     let isCarving3D = false;
+    let isThreeInitialized = false;
 
     const HALF_W = 300;
     const DEPTH_Z = 400;
@@ -232,10 +257,11 @@
 
     window.initSimulationEnvironment = function() {
         ensureThreeScripts(() => {
-            if (!scene3D) {
+            if (!isThreeInitialized) {
                 setupThreeJSScene();
-                flattenTopography(false);
+                window.flattenTopography(false);
                 attachRaycasterErosion();
+                isThreeInitialized = true;
             }
             sync3DControls();
             render3DStrataList();
@@ -255,13 +281,14 @@
         renderer3D = new THREE.WebGLRenderer({ antialias: true, alpha: true, logarithmicDepthBuffer: true });
         renderer3D.setSize(container.clientWidth, container.clientHeight);
         renderer3D.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer3D.localClippingEnabled = true;
         container.innerHTML = '';
         container.appendChild(renderer3D.domElement);
 
         controls3D = new THREE.OrbitControls(camera3D, renderer3D.domElement);
         controls3D.enableDamping = true;
         controls3D.dampingFactor = 0.05;
-        // Orbităm cu Click Dreapta pentru a elibera Click Stânga pentru sculptare
+        // Orbitare pusă pe Click Dreapta (RIGHT)
         controls3D.mouseButtons = { LEFT: null, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE };
 
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
@@ -281,6 +308,11 @@
 
         modelMainGroup = new THREE.Group();
         scene3D.add(modelMainGroup);
+
+        clippingPlanes = [
+            new THREE.Plane(new THREE.Vector3(-1, 0, 0), 300),
+            new THREE.Plane(new THREE.Vector3(0, 0, -1), 200)
+        ];
 
         raycaster = new THREE.Raycaster();
         mouse = new THREE.Vector2();
@@ -304,7 +336,7 @@
     }
 
     // ==========================================
-    // EROZIUNE DE MÂNĂ (SCULPTARE) & GENERARE DEM
+    // DEM & EROZIUNE MANUALĂ (Sculptare pe Mesh)
     // ==========================================
     function attachRaycasterErosion() {
         const container = document.getElementById('threejs-container');
@@ -329,12 +361,11 @@
 
         if (intersects.length > 0) {
             const worldX = intersects[0].point.x;
-            const radius = 40;
-            const force = 3.5;
+            const radius = 35;
+            const force = 4.0;
 
-            // Sculptăm Gaussian profilul global de la suprafață
-            for (let i = 0; i < window.sim3DState.topoProfile.length; i++) {
-                let actualX = i - 350; // Index 0..700 mapat pe X = -350..350
+            for (let i = 0; i <= 700; i++) {
+                let actualX = i - 350; 
                 let dist = Math.abs(actualX - worldX);
                 if (dist < radius) {
                     let factor = Math.cos((dist / radius) * (Math.PI / 2));
@@ -347,7 +378,7 @@
 
     function getTopoElevation(worldX) {
         let idx = Math.round(worldX + 350);
-        idx = Math.max(0, Math.min(window.sim3DState.topoProfile.length - 1, idx));
+        idx = Math.max(0, Math.min(700, idx));
         return window.sim3DState.topoProfile[idx] + window.sim3DState.topoOffset;
     }
 
@@ -365,7 +396,7 @@
         const p1 = Math.random() * 10;
         const p2 = Math.random() * 10;
         
-        for (let i = 0; i < window.sim3DState.topoProfile.length; i++) {
+        for (let i = 0; i <= 700; i++) {
             let x = i - 350;
             let wave = Math.sin(x * f1 + p1) * 40 + Math.sin(x * f2 + p2) * 20;
             window.sim3DState.topoProfile[i] = BASE_TOPO_Y - 30 + wave;
@@ -379,116 +410,69 @@
         rebuildGeological3DModel();
     };
 
-    // ==========================================
-    // ALGORITM MATEMATIC: SUTHERLAND-HODGMAN CLIPPING
-    // ==========================================
-    // Taie poligonul dat de dreapta faliei: D(x,y) = x - y*cotDip.
-    function clipPolygonByFault(points, dipRad, keepFootwall) {
-        // Dacă e vertical, cotDip = 0, falia e x=0.
-        let cotDip = 0;
-        if (Math.abs(dipRad) % Math.PI !== Math.PI/2) {
-            cotDip = 1.0 / Math.tan(dipRad);
-        }
-
-        const evaluatePoint = (p) => p.x - p.y * cotDip;
-
-        const output = [];
-        for (let i = 0; i < points.length; i++) {
-            const cur = points[i];
-            const prv = points[(i + points.length - 1) % points.length];
-
-            const curVal = evaluatePoint(cur);
-            const prvVal = evaluatePoint(prv);
-
-            // Footwall e mereu în stânga planului de falie (D <= 0)
-            const curIn = keepFootwall ? (curVal <= 0) : (curVal >= 0);
-            const prvIn = keepFootwall ? (prvVal <= 0) : (prvVal >= 0);
-
-            if (curIn) {
-                if (!prvIn) {
-                    const t = prvVal / (prvVal - curVal);
-                    output.push(new THREE.Vector2(prv.x + t * (cur.x - prv.x), prv.y + t * (cur.y - prv.y)));
-                }
-                output.push(cur);
-            } else if (prvIn) {
-                const t = prvVal / (prvVal - curVal);
-                output.push(new THREE.Vector2(prv.x + t * (cur.x - prv.x), prv.y + t * (cur.y - prv.y)));
-            }
-        }
-        return output;
+    function get3DColor(age) {
+        const k = (age || '').toLowerCase();
+        const chronodata = (window.iugsChronodata && window.iugsChronodata.length > 0) ? window.iugsChronodata : window.sim3DChronodata;
+        const found = chronodata.find(i => (i.nameEn && i.nameEn.toLowerCase() === k) || (i.nameRo && i.nameRo.toLowerCase() === k));
+        return found ? parseInt(found.hex.replace('#', '0x')) : 0x64748b;
     }
 
     // ==========================================
-    // GENERARE GEOMETRIE BLOCURI SOLIDE
+    // GENERATOR DE POLIGOANE RIGUROS (Fără Clipping Arrays distructive)
     // ==========================================
-    function createStratumPolygonAndExtrude(isFootwall, yBase, yTop, dx, dy, dipRad, foldAmp, k, colorHex) {
-        const points = [];
-        // Lățimea de generare: pentru HW generăm exact aceeași lățime unificată și decupăm ulterior
-        const xStart = -HALF_W - 50; 
-        const xEnd = HALF_W + 50;
-        const steps = 60;
-        const stepSize = (xEnd - xStart) / steps;
-
-        // Construim poligonul brut (sus curbat + jos curbat, retezat de topografie la nivel mondial)
-        const topEdge = [];
-        for (let i = 0; i <= steps; i++) {
-            let x = xStart + i * stepSize;
-            let rawY = yTop + foldAmp * Math.sin(x * k);
-            
-            // Limităm înălțimea stratului la Topografia curentă (Eroziune)
-            let worldX = isFootwall ? x : x + dx;
-            let topoY = getTopoElevation(worldX);
-            let localTopoY = isFootwall ? topoY : topoY - dy; // aducem topografia în sistemul local înainte de shift
-            
-            topEdge.push(new THREE.Vector2(x, Math.min(rawY, localTopoY)));
-        }
-
-        const botEdge = [];
-        for (let i = steps; i >= 0; i--) {
-            let x = xStart + i * stepSize;
-            let rawY = yBase + foldAmp * Math.sin(x * k);
-            
-            let worldX = isFootwall ? x : x + dx;
-            let topoY = getTopoElevation(worldX);
-            let localTopoY = isFootwall ? topoY : topoY - dy;
-            
-            botEdge.push(new THREE.Vector2(x, Math.min(rawY, localTopoY)));
-        }
-
-        const rawPoly = [...topEdge, ...botEdge];
-
-        // Decupăm poligonul cu planul faliei (Tăietura Laser)
-        let clippedPoly = clipPolygonByFault(rawPoly, dipRad, isFootwall);
+    function createBlockShape(xStart, xEnd, yBot, yTop, getFaultX, isLeftBlock, dx, dy) {
+        if (xStart >= xEnd) return null; // E secționat complet
         
-        // Decupăm pe marginile cutiei (Sutherland-Hodgman axa X)
-        clippedPoly = clippedPoly.filter(p => p.x >= (isFootwall ? -HALF_W : -HALF_W - dx) && p.x <= (isFootwall ? HALF_W : HALF_W - dx));
+        const shape = new THREE.Shape();
+        const steps = 150; // Rezoluție înaltă pentru tăietură fină DEM
+        
+        const getSurfaceY = (x, yBase) => {
+            let xFault = getFaultX(yBase);
+            let foldAmp = (window.sim3DState.foldShortening / 100) * 45;
+            let k = (2 * Math.PI) / Math.max(60, window.sim3DState.foldWavelength);
+            
+            // Estompăm cuta la falie pentru plan perfect
+            let blend = Math.min(1, Math.abs(x - xFault) / 60);
+            let rawY = yBase + foldAmp * Math.sin(x * k) * blend;
+            
+            // Limităm înălțimea stratului la Topografia curentă (Eroziune DEM)
+            let worldX = isLeftBlock ? x : x + dx;
+            let topoY = getTopoElevation(worldX);
+            let localTopoY = isLeftBlock ? topoY : topoY - dy;
+            
+            return Math.min(rawY, localTopoY);
+        };
 
-        if (clippedPoly.length < 3) return null;
+        let xTopF = getFaultX(yTop);
+        let xBotF = getFaultX(yBot);
 
-        const shape = new THREE.Shape(clippedPoly);
-        const geom = new THREE.ExtrudeGeometry(shape, { depth: DEPTH_Z, bevelEnabled: false, steps: 1 });
-        geom.computeVertexNormals();
-
-        const mat = new THREE.MeshStandardMaterial({
-            color: colorHex,
-            roughness: 0.65,
-            metalness: 0.05,
-            side: THREE.FrontSide,
-            polygonOffset: true,
-            polygonOffsetFactor: 1,
-            polygonOffsetUnits: 1
-        });
-
-        const mesh = new THREE.Mesh(geom, mat);
-        mesh.position.z = -DEPTH_Z / 2;
-
-        const edges = new THREE.LineSegments(
-            new THREE.EdgesGeometry(geom, 25),
-            new THREE.LineBasicMaterial({ color: 0x0f172a })
-        );
-        mesh.add(edges);
-
-        return mesh;
+        if (isLeftBlock) {
+            // Bloc Stâng (Footwall)
+            shape.moveTo(-300, getSurfaceY(-300, yTop));
+            for(let i=1; i<=steps; i++) {
+                let x = -300 + (xTopF - -300) * (i/steps);
+                shape.lineTo(x, getSurfaceY(x, yTop));
+            }
+            shape.lineTo(xBotF, getSurfaceY(xBotF, yBot));
+            for(let i=steps-1; i>=0; i--) {
+                let x = -300 + (xBotF - -300) * (i/steps);
+                shape.lineTo(x, getSurfaceY(x, yBot));
+            }
+        } else {
+            // Bloc Drept (Hanging Wall)
+            let currentRightLimit = 300 - dx; // Înainte de translație
+            shape.moveTo(xBotF, getSurfaceY(xBotF, yBot));
+            shape.lineTo(xTopF, getSurfaceY(xTopF, yTop));
+            for(let i=1; i<=steps; i++) {
+                let x = xTopF + (currentRightLimit - xTopF) * (i/steps);
+                shape.lineTo(x, getSurfaceY(x, yTop));
+            }
+            for(let i=steps-1; i>=0; i--) {
+                let x = xBotF + (currentRightLimit - xBotF) * (i/steps);
+                shape.lineTo(x, getSurfaceY(x, yBot));
+            }
+        }
+        return shape;
     }
 
     window.rebuildGeological3DModel = function() {
@@ -499,23 +483,22 @@
         }
 
         let dipDeg = window.sim3DState.dip;
-        // Prevenim erorile asimptotice la 0 sau 90 grade perfecte
-        if (Math.abs(dipDeg) < 5) dipDeg = 5 * Math.sign(dipDeg || 1);
+        if (Math.abs(dipDeg) < 5) dipDeg = 5 * Math.sign(dipDeg || 1); // Evită prăbușirea matematică la orizontală
+        
         const dipRad = (dipDeg * Math.PI) / 180;
         const slip = window.sim3DState.slip;
 
-        // CINEMATICĂ TANGENȚIALĂ: Alunecare strict lipită de planul faliei
-        // Planul este y = x * tan(theta). Vectorul pantă este (cos, sin).
+        // CINEMATICĂ TANGENȚIALĂ PERFECTĂ:
         const signDip = Math.sign(dipDeg);
         let dxMag = slip * Math.cos(Math.abs(dipRad));
         let dyMag = slip * Math.sin(Math.abs(dipRad));
 
         let dx = 0, dy = 0;
         if (window.sim3DState.process === 'normal') {
-            dy = -dyMag; // Normala: acoperișul coboară
+            dy = -dyMag; 
             dx = signDip * dxMag;
         } else {
-            dy = dyMag;  // Inversa: acoperișul urcă
+            dy = dyMag;  
             dx = -signDip * dxMag;
         }
 
@@ -523,11 +506,9 @@
         document.getElementById('sim3d-heave').innerText = Math.abs(dx).toFixed(1) + 'm';
         document.getElementById('sim3d-slip').innerText = slip.toFixed(1) + 'm';
 
-        const foldAmp = (window.sim3DState.foldShortening / 100) * 45;
-        const lambda = Math.max(60, window.sim3DState.foldWavelength);
-        const k = (2 * Math.PI) / lambda;
-
         let currY = -140;
+        const cotDip = 1.0 / Math.tan(dipRad);
+        const getFaultX = (y) => y * cotDip;
 
         const fwGroup = new THREE.Group();
         const hwGroup = new THREE.Group();
@@ -536,20 +517,37 @@
 
         window.sim3DStrata.forEach((stratum) => {
             const h = stratum.thickness;
-            const colorHex = '#' + get3DColor(stratum.age).toString(16).padStart(6, '0');
+            const colorHex = get3DColor(stratum.age);
 
-            // Footwall (Stânga - Fix)
-            const fwMesh = createStratumPolygonAndExtrude(true, currY, currY + h, dx, dy, dipRad, foldAmp, k, colorHex);
-            if (fwMesh) fwGroup.add(fwMesh);
+            // FOOTWALL
+            let fwShape = createBlockShape(-300, getFaultX(currY+h), currY, currY + h, getFaultX, true, 0, 0);
+            if (fwShape) {
+                let geom = new THREE.ExtrudeGeometry(fwShape, { depth: DEPTH_Z, bevelEnabled: false, steps: 1 });
+                geom.computeVertexNormals();
+                let mesh = new THREE.Mesh(geom, new THREE.MeshStandardMaterial({
+                    color: colorHex, roughness: 0.65, metalness: 0.05, side: THREE.DoubleSide, clippingPlanes: clippingPlanes, clipShadows: true
+                }));
+                mesh.position.z = -DEPTH_Z / 2;
+                mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geom, 25), new THREE.LineBasicMaterial({ color: 0x0f172a, clippingPlanes: clippingPlanes })));
+                fwGroup.add(mesh);
+            }
 
-            // Hanging Wall (Dreapta - Generat pe loc și translatat perfect)
-            const hwMesh = createStratumPolygonAndExtrude(false, currY, currY + h, dx, dy, dipRad, foldAmp, k, colorHex);
-            if (hwMesh) hwGroup.add(hwMesh);
-
+            // HANGING WALL
+            let hwShape = createBlockShape(getFaultX(currY+h), 300 - dx, currY, currY + h, getFaultX, false, dx, dy);
+            if (hwShape) {
+                let geom = new THREE.ExtrudeGeometry(hwShape, { depth: DEPTH_Z, bevelEnabled: false, steps: 1 });
+                geom.computeVertexNormals();
+                let mesh = new THREE.Mesh(geom, new THREE.MeshStandardMaterial({
+                    color: colorHex, roughness: 0.65, metalness: 0.05, side: THREE.DoubleSide, clippingPlanes: clippingPlanes, clipShadows: true
+                }));
+                mesh.position.z = -DEPTH_Z / 2;
+                mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geom, 25), new THREE.LineBasicMaterial({ color: 0x0f172a, clippingPlanes: clippingPlanes })));
+                hwGroup.add(mesh);
+            }
             currY += h;
         });
 
-        // Mutăm blocul drept (Hanging Wall) pe coordonatele tangențiale
+        // Translația blocului aplicată fizic la nivel de grup
         hwGroup.position.set(dx, dy, 0);
     };
 
@@ -558,12 +556,23 @@
         window.sim3DState.slip = parseInt(document.getElementById('slider-3d-slip').value);
         window.sim3DState.foldShortening = parseInt(document.getElementById('slider-3d-fold-short').value);
         window.sim3DState.foldWavelength = parseInt(document.getElementById('slider-3d-fold-wave').value);
+        
+        window.sim3DState.clipX = parseInt(document.getElementById('slider-clip-x').value);
+        window.sim3DState.clipZ = parseInt(document.getElementById('slider-clip-z').value);
+
+        if(clippingPlanes.length > 0) {
+            clippingPlanes[0].constant = window.sim3DState.clipX;
+            clippingPlanes[1].constant = window.sim3DState.clipZ;
+        }
 
         document.getElementById('val-3d-dip').innerText = window.sim3DState.dip + '°';
         document.getElementById('val-dip-badge').innerText = window.sim3DState.dip + '°';
         document.getElementById('val-3d-slip').innerText = window.sim3DState.slip + ' m';
         document.getElementById('val-3d-fold-short').innerText = window.sim3DState.foldShortening + '%';
         document.getElementById('val-3d-fold-wave').innerText = window.sim3DState.foldWavelength + ' m';
+        
+        document.getElementById('val-clip-x').innerText = window.sim3DState.clipX >= 295 ? 'Max' : `${window.sim3DState.clipX + 300} m`;
+        document.getElementById('val-clip-z').innerText = window.sim3DState.clipZ >= 195 ? 'Max' : `${window.sim3DState.clipZ + 200} m`;
 
         rebuildGeological3DModel();
     };
@@ -572,20 +581,19 @@
         window.sim3DState.process = type;
         const btnN = document.getElementById('btn-3d-normal');
         const btnR = document.getElementById('btn-3d-reverse');
-        const badge = document.getElementById('sim3d-badge-process');
 
         if (type === 'normal') {
             btnN.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-12";
             btnN.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
             btnR.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-12";
             btnR.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
-            badge.innerText = "Falie Normală";
+            document.getElementById('sim3d-badge-process').innerText = "Falie Normală";
         } else {
             btnR.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-12";
             btnR.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
             btnN.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-12";
             btnN.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
-            badge.innerText = "Falie Inversă";
+            document.getElementById('sim3d-badge-process').innerText = "Falie Inversă";
         }
         rebuildGeological3DModel();
     };
@@ -605,8 +613,14 @@
     window.resetSim3DParams = function() {
         window.sim3DState.slip = 0;
         window.sim3DState.foldShortening = 0;
+        window.sim3DState.clipX = 300;
+        window.sim3DState.clipZ = 200;
+        
         document.getElementById('slider-3d-slip').value = 0;
         document.getElementById('slider-3d-fold-short').value = 0;
+        document.getElementById('slider-clip-x').value = 300;
+        document.getElementById('slider-clip-z').value = 200;
+        
         window.flattenTopography();
         update3DModelParams();
         setSim3DCamera('iso');
@@ -617,6 +631,8 @@
         document.getElementById('slider-3d-slip').value = window.sim3DState.slip;
         document.getElementById('slider-3d-fold-short').value = window.sim3DState.foldShortening;
         document.getElementById('slider-3d-fold-wave').value = window.sim3DState.foldWavelength;
+        document.getElementById('slider-clip-x').value = window.sim3DState.clipX;
+        document.getElementById('slider-clip-z').value = window.sim3DState.clipZ;
         update3DModelParams();
     }
 
