@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Simulator de Geologie Structurală - Tectono-Lab</title>
+    <title>Sandbox Geologie Structurală - Tectono-Lab</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <style>
@@ -13,6 +13,8 @@
             user-select: none; 
             -webkit-user-select: none; 
             touch-action: manipulation;
+            overflow: hidden;
+            height: 100vh;
         }
         canvas { 
             touch-action: none; 
@@ -20,252 +22,111 @@
             width: 100%; 
             height: 100%; 
         }
-
-        @media (orientation: landscape) and (max-height: 550px) {
-            body { overflow: hidden !important; height: 100vh !important; }
-            #main-workspace {
-                display: flex !important;
-                flex-direction: row !important;
-                height: calc(100vh - 44px) !important;
-                padding: 4px 8px !important;
-                gap: 8px !important;
-                overflow: hidden !important;
-            }
-            #canvas-wrapper {
-                flex: 1 1 65% !important;
-                height: 100% !important;
-                display: flex !important;
-                flex-direction: column !important;
-                padding: 6px !important;
-            }
-            #canvas-container { flex: 1 1 auto !important; height: auto !important; min-height: 0 !important; }
-            #controls-sidebar {
-                flex: 0 0 35% !important;
-                max-width: 380px !important;
-                height: 100% !important;
-                overflow-y: auto !important;
-                padding-right: 4px !important;
-            }
-            .landscape-compact-header { padding-top: 4px !important; padding-bottom: 4px !important; }
-        }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+<body class="bg-slate-950 text-slate-100 flex flex-col h-screen">
 
-    <!-- Antet Principal -->
-    <header class="bg-slate-900 border-b border-slate-800 px-3 sm:px-4 py-2 sm:py-2.5 flex justify-between items-center shadow-lg sticky top-0 z-50 landscape-compact-header">
+    <!-- Antet Minimal Sandbox -->
+    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-2.5 flex justify-between items-center shadow-lg z-40 flex-shrink-0">
         <div class="flex items-center space-x-2">
-            <div class="bg-indigo-600 p-1.5 sm:p-2 rounded-lg text-white shadow-md">
-                <i class="fa-solid fa-mountain text-xs sm:text-base"></i>
+            <div class="bg-indigo-600 p-1.5 rounded-lg text-white shadow-md">
+                <i class="fa-solid fa-mountain text-sm"></i>
             </div>
             <div>
-                <div class="flex items-center space-x-1.5 sm:space-x-2">
-                    <h1 class="text-xs sm:text-base font-bold tracking-wide text-white leading-tight">TECTONO-LAB</h1>
-                    <span id="app-version-badge" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v3.4.0</span>
+                <div class="flex items-center space-x-2">
+                    <h1 class="text-sm sm:text-base font-bold tracking-wide text-white leading-tight">TECTONO-LAB</h1>
+                    <span id="app-version-badge" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v4.0.0</span>
                 </div>
-                <p id="header-subtitle" class="hidden sm:block text-[10px] text-slate-400">Simulator Tectonic & Scara Stratigrafică Internațională</p>
+                <p id="header-subtitle" class="hidden sm:block text-[10px] text-slate-400">Sandbox Tectonic & Scara Stratigrafică Internațională</p>
             </div>
         </div>
 
-        <div class="flex items-center space-x-1.5 sm:space-x-2">
+        <div class="flex items-center space-x-2">
+            <!-- Selector Limbă RO / EN -->
             <div class="flex bg-slate-950 p-0.5 rounded-lg border border-slate-800 text-[10px] font-bold">
                 <button onclick="setLanguage('ro')" id="lang-btn-ro" class="px-2 py-1 rounded bg-indigo-600 text-white transition-all">RO</button>
                 <button onclick="setLanguage('en')" id="lang-btn-en" class="px-2 py-1 rounded text-slate-400 hover:text-white transition-all">EN</button>
             </div>
 
-            <button onclick="openStratigraphyModal()" class="bg-amber-600 hover:bg-amber-500 text-white px-2 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all shadow-sm">
-                <i class="fa-solid fa-book-atlas text-[10px]"></i>
-                <span id="btn-label-stratigraphy" class="text-[11px] sm:text-xs">Scara Stratigrafică</span>
+            <!-- Deschide Consola de Simulare & Deformare -->
+            <button onclick="openSimulationModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all shadow-md">
+                <i class="fa-solid fa-sliders text-xs"></i>
+                <span id="btn-label-simulation">Panou Simulare</span>
+            </button>
+
+            <!-- Deschide Scara Stratigrafică IUGS -->
+            <button onclick="openStratigraphyModal()" class="bg-amber-600 hover:bg-amber-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all shadow-md">
+                <i class="fa-solid fa-book-atlas text-xs"></i>
+                <span id="btn-label-stratigraphy">Scara Stratigrafică</span>
             </button>
             
-            <button onclick="openSimulationModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all shadow-sm">
-                <i class="fa-solid fa-layer-group text-[10px]"></i>
-                <span id="btn-label-simulation" class="text-[11px] sm:text-xs">Strate Secțiune</span>
+            <!-- Toggle Eroziune direct din Sandbox -->
+            <button onclick="toggleErosion()" id="btn-toggle-erosion" class="bg-cyan-600 text-white px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all shadow-md">
+                <i id="icon-toggle-erosion" class="fa-solid fa-wind text-xs"></i>
+                <span id="label-toggle-erosion">Eroziune</span>
             </button>
             
-            <button onclick="toggleErosion()" id="btn-toggle-erosion" class="bg-cyan-600 text-white px-2 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all">
-                <i id="icon-toggle-erosion" class="fa-solid fa-wind text-[10px]"></i>
-                <span id="label-toggle-erosion" class="text-[11px] sm:text-xs">Eroziune</span>
-            </button>
-            
-            <button onclick="resetAll()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold px-2 py-1 rounded-lg border border-slate-700 transition-all flex items-center space-x-1" title="Resetare">
-                <i class="fa-solid fa-rotate-right text-[10px]"></i>
-                <span id="btn-label-reset" class="text-[11px] sm:text-xs">Reset</span>
+            <!-- Reset Sandbox -->
+            <button onclick="resetAll()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-slate-700 transition-all flex items-center space-x-1" title="Resetare">
+                <i class="fa-solid fa-rotate-right text-xs"></i>
+                <span id="btn-label-reset">Reset</span>
             </button>
         </div>
     </header>
 
-    <!-- Spațiu Principal de Lucru -->
-    <main id="main-workspace" class="flex-1 max-w-[1700px] w-full mx-auto p-2 sm:p-4 md:p-6 flex flex-col lg:grid lg:grid-cols-4 gap-3 sm:gap-4">
-
-        <!-- Zona Canvas -->
-        <div id="canvas-wrapper" class="order-1 lg:order-2 lg:col-span-3 bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl shadow-xl p-2 sm:p-4 flex flex-col justify-between">
-            <div class="flex justify-between items-center mb-1.5 sm:mb-2 text-xs">
-                <div class="flex items-center space-x-1.5">
-                    <span id="process-title-badge" class="bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold border border-indigo-500/30">Falie Normală (Extensie)</span>
-                    <span id="folding-badge" class="bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold border border-purple-500/30 hidden">Cutare: 0%</span>
-                    <span id="erosion-badge" class="bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold border border-cyan-500/30">Eroziune Activă</span>
-                </div>
-                <div class="text-[10px] text-slate-400">
-                    <span id="badge-hint-carve"><i class="fa-solid fa-hand-pointer text-amber-400 mr-1"></i> Sapă pe ecran</span>
-                </div>
+    <!-- Sandbox Viewport 100% Fullscreen -->
+    <main class="flex-1 w-full h-full relative overflow-hidden bg-slate-950 flex flex-col">
+        <!-- Floating Info Bar (Suprapusă sus pe Canvas) -->
+        <div class="absolute top-3 left-3 right-3 flex justify-between items-center pointer-events-none z-10">
+            <div class="flex items-center space-x-2">
+                <span id="process-title-badge" class="bg-slate-900/80 backdrop-blur-md text-indigo-300 border border-slate-700 px-2.5 py-1 rounded-full text-xs font-semibold shadow">Falie Normală</span>
+                <span id="folding-badge" class="bg-slate-900/80 backdrop-blur-md text-purple-300 border border-slate-700 px-2.5 py-1 rounded-full text-xs font-semibold shadow hidden">Cutare: 0%</span>
+                <span id="erosion-badge" class="bg-slate-900/80 backdrop-blur-md text-cyan-300 border border-slate-700 px-2.5 py-1 rounded-full text-xs font-semibold shadow">Eroziune Activă</span>
             </div>
-
-            <div id="canvas-container" class="w-full bg-slate-950 rounded-lg sm:rounded-xl border border-slate-800 relative overflow-hidden flex items-center justify-center h-[260px] sm:h-[420px] lg:h-[540px]">
-                <canvas id="geologyCanvas" class="cursor-crosshair"></canvas>
-            </div>
-
-            <div class="mt-1.5 sm:mt-2 bg-slate-950 border border-slate-800 px-2.5 py-1.5 rounded-lg sm:rounded-xl flex items-center justify-between text-[10px] sm:text-xs">
-                <div class="flex items-center space-x-3 sm:space-x-6">
-                    <div><span id="stat-throw-lbl" class="text-slate-400">Rejet vertical:</span> <span id="stat-throw" class="font-bold text-cyan-400">38.9m</span></div>
-                    <div><span id="stat-heave-lbl" class="text-slate-400">Decalaj orizontal:</span> <span id="stat-heave" class="font-bold text-amber-400">22.5m</span></div>
-                    <div><span id="stat-slip-lbl" class="text-slate-400">Deplasare pe falie:</span> <span id="stat-net-slip" class="font-bold text-emerald-400">45.0m</span></div>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <div id="stat-dip-type" class="hidden sm:block text-slate-400 font-mono text-[10px]">Cădere spre Dreapta</div>
-                    <span class="text-[9px] font-mono text-slate-500 bg-slate-900 px-1 py-0.5 rounded border border-slate-800">v3.4.0</span>
-                </div>
+            <div class="bg-slate-900/80 backdrop-blur-md text-slate-300 border border-slate-700 px-3 py-1 rounded-full text-xs font-medium shadow hidden sm:block">
+                <i class="fa-solid fa-hand-pointer text-amber-400 mr-1.5"></i> <span id="badge-hint-carve">Apasă & sapă pe ecran pentru a sculpta relieful</span>
             </div>
         </div>
 
-        <!-- Panou Lateral -->
-        <div id="controls-sidebar" class="order-2 lg:order-1 lg:col-span-1 space-y-2.5 sm:space-y-4">
-            <!-- 1. Tectonică de Falie -->
-            <div class="bg-slate-900 border border-slate-800 p-2.5 sm:p-4 rounded-xl sm:rounded-2xl shadow-xl space-y-2.5">
-                <h2 id="section-title-tecto" class="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center">
-                    <i class="fa-solid fa-gears text-indigo-400 mr-1.5"></i> 1. Tectonică de Falie
-                </h2>
-                
-                <div class="grid grid-cols-2 gap-1.5 sm:gap-2">
-                    <button onclick="setProcess('normal')" id="btn-proc-normal" class="process-btn bg-indigo-600 text-white p-2 rounded-lg sm:rounded-xl text-xs font-semibold text-left border border-indigo-500 shadow-sm flex flex-col justify-between h-12 sm:h-16">
-                        <span class="flex items-center justify-between w-full">
-                            <span id="btn-proc-normal-title">Falie Normală</span>
-                            <i class="fa-solid fa-circle-check text-[10px]"></i>
-                        </span>
-                        <span id="btn-proc-normal-sub" class="text-[9px] text-indigo-200 font-normal">Extensie</span>
-                    </button>
-                    
-                    <button onclick="setProcess('reverse')" id="btn-proc-reverse" class="process-btn bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-lg sm:rounded-xl text-xs font-semibold text-left border border-slate-700 flex flex-col justify-between h-12 sm:h-16">
-                        <span class="flex items-center justify-between w-full">
-                            <span id="btn-proc-reverse-title">Falie Inversă</span>
-                            <i class="fa-solid fa-circle text-[10px] opacity-0"></i>
-                        </span>
-                        <span id="btn-proc-reverse-sub" class="text-[9px] text-slate-400 font-normal">Compresiune</span>
-                    </button>
-                </div>
-
-                <div class="space-y-2 pt-1">
-                    <div>
-                        <div class="flex justify-between text-[11px] mb-0.5">
-                            <span id="lbl-dip" class="text-slate-300">Unghi de înclinare falie (&theta;):</span>
-                            <span id="val-dip" class="font-bold text-indigo-400">60°</span>
-                        </div>
-                        <input type="range" id="slider-dip" min="-90" max="90" value="60" oninput="updateParameters()" class="w-full accent-indigo-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-[11px] mb-0.5">
-                            <span id="lbl-slip" class="text-slate-300">Deplasare pe falie (0 - 250m):</span>
-                            <span id="val-slip" class="font-bold text-emerald-400">45 m</span>
-                        </div>
-                        <input type="range" id="slider-slip" min="0" max="250" value="45" oninput="updateParameters()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                    </div>
-                </div>
-
-                <button onclick="animateFault()" class="w-full bg-indigo-600/30 hover:bg-indigo-600 border border-indigo-500/50 text-indigo-200 hover:text-white font-medium py-1.5 rounded-lg text-xs transition-all flex items-center justify-center space-x-1.5">
-                    <i class="fa-solid fa-play text-[9px]"></i>
-                    <span id="btn-animate-label">Animează Deplasarea</span>
-                </button>
-            </div>
-
-            <!-- 2. Relief & Eroziune -->
-            <div class="bg-slate-900 border border-slate-800 p-2.5 sm:p-4 rounded-xl sm:rounded-2xl shadow-xl space-y-2.5">
-                <h2 id="section-title-relief" class="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center">
-                    <i class="fa-solid fa-wind text-cyan-400 mr-1.5"></i> 2. Relief & Nivelare
-                </h2>
-
-                <div class="space-y-1">
-                    <div class="flex justify-between text-[11px]">
-                        <span id="lbl-level-cut" class="text-slate-400">Nivelare (Sus/Jos):</span>
-                        <span id="val-level-cut" class="font-bold text-emerald-400">0 m</span>
-                    </div>
-                    <input type="range" id="slider-level-cut" min="-200" max="200" value="0" oninput="applyElevationShift()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                    <div class="grid grid-cols-2 gap-1.5 pt-0.5">
-                        <button onclick="shiftProfileVertical(-25)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 py-1 rounded-lg text-xs border border-slate-700 flex items-center justify-center space-x-1">
-                            <i class="fa-solid fa-arrow-up text-[9px]"></i>
-                            <span id="btn-shift-up">Sus 25m</span>
-                        </button>
-                        <button onclick="shiftProfileVertical(25)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 py-1 rounded-lg text-xs border border-slate-700 flex items-center justify-center space-x-1">
-                            <i class="fa-solid fa-arrow-down text-[9px]"></i>
-                            <span id="btn-shift-down">Jos 25m</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="pt-1.5 border-t border-slate-800/80 space-y-1.5">
-                    <div class="flex justify-between text-[11px]">
-                        <span id="lbl-erode-depth" class="text-slate-400">Amplitudine Văi:</span>
-                        <span id="val-erode-depth" class="font-bold text-cyan-400">45 m</span>
-                    </div>
-                    <input type="range" id="slider-erode-depth" min="10" max="150" value="45" oninput="document.getElementById('val-erode-depth').innerText = this.value + ' m'" class="w-full accent-cyan-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                    <button onclick="generateRandomErosion()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-1.5 rounded-lg text-xs transition-all flex items-center justify-center space-x-1.5">
-                        <i class="fa-solid fa-shuffle text-[10px]"></i>
-                        <span id="btn-random-erosion">Generează Văi Aleatoare</span>
-                    </button>
-                </div>
-
-                <!-- Coloană Stratigrafică Secțiune -->
-                <div class="pt-1.5 border-t border-slate-800">
-                    <div class="flex justify-between items-center mb-1">
-                        <h3 id="lbl-strat-col" class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">Coloană Stratigrafică</h3>
-                        <button onclick="openSimulationModal()" id="btn-strat-modify" class="text-[10px] text-indigo-400 hover:text-indigo-300 font-semibold underline flex items-center">
-                            <i class="fa-solid fa-pen-to-square mr-1"></i> Modifică
-                        </button>
-                    </div>
-                    <div id="strat-legend" class="grid grid-cols-2 sm:grid-cols-1 gap-1 text-[9px] sm:text-[11px]"></div>
-                </div>
-            </div>
+        <!-- Canvas Container -->
+        <div id="canvas-container" class="w-full h-full flex-1 relative">
+            <canvas id="geologyCanvas" class="cursor-crosshair"></canvas>
         </div>
 
+        <!-- Floating Status Bar (Suprapusă jos pe Canvas) -->
+        <div class="absolute bottom-3 left-3 right-3 bg-slate-900/85 backdrop-blur-md border border-slate-800 px-4 py-2 rounded-xl flex items-center justify-between text-xs z-10 shadow-xl">
+            <div class="flex items-center space-x-4 sm:space-x-8">
+                <div><span id="stat-throw-lbl" class="text-slate-400">Rejet vertical:</span> <span id="stat-throw" class="font-bold text-cyan-400">38.9m</span></div>
+                <div><span id="stat-heave-lbl" class="text-slate-400">Decalaj orizontal:</span> <span id="stat-heave" class="font-bold text-amber-400">22.5m</span></div>
+                <div><span id="stat-slip-lbl" class="text-slate-400">Deplasare pe falie:</span> <span id="stat-net-slip" class="font-bold text-emerald-400">45.0m</span></div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <div id="stat-dip-type" class="hidden sm:block text-slate-400 font-mono text-xs">Cădere spre Dreapta</div>
+                <span class="text-[10px] font-mono text-slate-500 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">Sandbox v4.0.0</span>
+            </div>
+        </div>
     </main>
 
-    <!-- Containere goale pentru injectarea modalelor externe -->
+    <!-- Containere Injectare Modale Externe -->
     <div id="modal-stratigraphy-container"></div>
     <div id="modal-simulation-container"></div>
 
-    <!-- Motor JavaScript Central -->
+    <!-- Script Principal al Sandbox-ului -->
     <script>
-        const APP_VERSION = "3.4.0";
-        console.log(`TECTONO-LAB inițializat la versiunea: ${APP_VERSION}`);
-
+        const APP_VERSION = "4.0.0";
         let currentLang = 'ro';
 
         const translations = {
             ro: {
-                headerSubtitle: "Simulator Tectonic & Scara Stratigrafică Internațională",
+                headerSubtitle: "Sandbox Tectonic & Scara Stratigrafică Internațională",
+                btnSimulation: "Panou Simulare",
                 btnStratigraphy: "Scara Stratigrafică",
-                btnSimulation: "Strate Secțiune",
                 btnReset: "Reset",
                 badgeNormal: "Falie Normală (Extensie)",
                 badgeReverse: "Falie Inversă (Compresiune)",
                 erosionActive: "Eroziune Activă",
                 erosionStopped: "Eroziune Oprită",
-                hintCarve: "<i class='fa-solid fa-hand-pointer text-amber-400 mr-1'></i> Sapă pe ecran",
-                secTecto: "<i class='fa-solid fa-gears text-indigo-400 mr-1.5'></i> 1. Tectonică de Falie",
-                normalTitle: "Falie Normală",
-                normalSub: "Extensie",
-                reverseTitle: "Falie Inversă",
-                reverseSub: "Compresiune",
-                lblDip: "Unghi de înclinare falie (&theta;):",
-                lblSlip: "Deplasare pe falie (0 - 250m):",
-                btnAnimate: "Animează Deplasarea",
-                secRelief: "<i class='fa-solid fa-wind text-cyan-400 mr-1.5'></i> 2. Relief & Nivelare",
-                lblLevelCut: "Nivelare (Sus/Jos):",
-                btnShiftUp: "Sus 25m",
-                btnShiftDown: "Jos 25m",
-                lblErodeDepth: "Amplitudine Văi:",
-                btnRandomErosion: "Generează Văi Aleatoare",
-                lblStratCol: "Coloană Stratigrafică",
-                btnStratModify: "<i class='fa-solid fa-pen-to-square mr-1'></i> Modifică",
+                hintCarve: "Apasă & sapă pe ecran pentru a sculpta relieful",
                 statThrow: "Rejet vertical:",
                 statHeave: "Decalaj orizontal:",
                 statSlip: "Deplasare pe falie:",
@@ -274,45 +135,18 @@
                 dipHoriz: "Orizontală / Decollement",
                 dipVert: "Verticală",
                 footwall: "FOOTWALL",
-                hangingWall: "HANGING WALL",
-                stratigraphyModalTitle: "Scara Stratigrafică Internațională (IUGS / ICS)",
-                stratigraphyModalSub: "Bază completă cu vârste, nuanțe și denumirile standard ale culorilor",
-                stratigraphySearchPlaceholder: "Caută după nume sau culoare (ex: Jurasic, albastru, verde, Cretacic...)",
-                stratigraphyAllRanks: "Toate rangurile",
-                stratigraphyUnitsSuffix: "unități",
-                btnClose: "Închide",
-                simulationModalTitle: "Editor Stratigrafie & Cutare",
-                btnAddStratum: "Adaugă Strat Nou",
-                btnCancel: "Anulează",
-                btnApply: "Aplică pe Model",
-                stratumPlaceholder: "Nume Strat..."
+                hangingWall: "HANGING WALL"
             },
             en: {
-                headerSubtitle: "Tectonic Simulator & International Chronostratigraphic Chart",
+                headerSubtitle: "Tectonic Sandbox & International Chronostratigraphic Chart",
+                btnSimulation: "Simulation Console",
                 btnStratigraphy: "Stratigraphic Chart",
-                btnSimulation: "Cross-Section Strata",
                 btnReset: "Reset",
                 badgeNormal: "Normal Fault (Extension)",
                 badgeReverse: "Reverse Fault (Compression)",
                 erosionActive: "Erosion Active",
                 erosionStopped: "Erosion Disabled",
-                hintCarve: "<i class='fa-solid fa-hand-pointer text-amber-400 mr-1'></i> Tap & carve surface",
-                secTecto: "<i class='fa-solid fa-gears text-indigo-400 mr-1.5'></i> 1. Fault Tectonics",
-                normalTitle: "Normal Fault",
-                normalSub: "Extension",
-                reverseTitle: "Reverse Fault",
-                reverseSub: "Compression",
-                lblDip: "Fault Dip Angle (&theta;):",
-                lblSlip: "Fault Slip (0 - 250m):",
-                btnAnimate: "Animate Fault Slip",
-                secRelief: "<i class='fa-solid fa-wind text-cyan-400 mr-1.5'></i> 2. Relief & Planation",
-                lblLevelCut: "Planation Level (Up/Down):",
-                btnShiftUp: "Up 25m",
-                btnShiftDown: "Down 25m",
-                lblErodeDepth: "Valley Amplitude:",
-                btnRandomErosion: "Generate Random Valleys",
-                lblStratCol: "Stratigraphic Column",
-                btnStratModify: "<i class='fa-solid fa-pen-to-square mr-1'></i> Edit",
+                hintCarve: "Tap & carve surface to sculpt topography",
                 statThrow: "Vertical Throw:",
                 statHeave: "Horizontal Heave:",
                 statSlip: "Fault Slip:",
@@ -321,25 +155,15 @@
                 dipHoriz: "Horizontal / Decollement",
                 dipVert: "Vertical Fault",
                 footwall: "FOOTWALL",
-                hangingWall: "HANGING WALL",
-                stratigraphyModalTitle: "International Chronostratigraphic Chart (IUGS / ICS)",
-                stratigraphyModalSub: "Official chart: numeric ages, colors & standard color names",
-                stratigraphySearchPlaceholder: "Search by name or color (e.g. Jurassic, blue, green, Cretaceous...)",
-                stratigraphyAllRanks: "All Ranks",
-                stratigraphyUnitsSuffix: "units",
-                btnClose: "Close",
-                simulationModalTitle: "Cross-Section Stratigraphy & Folding",
-                btnAddStratum: "Add New Layer",
-                btnCancel: "Cancel",
-                btnApply: "Apply to Model",
-                stratumPlaceholder: "Layer Name..."
+                hangingWall: "HANGING WALL"
             }
         };
 
         const canvas = document.getElementById('geologyCanvas');
         const ctx = canvas.getContext('2d');
 
-        let strata = [
+        // Starea modelului geologic
+        window.strata = [
             { name: "Fundament Cristalin", age: "Precambrian", thickness: 110 },
             { name: "Calcare Recifale", age: "Jurassic", thickness: 75 },
             { name: "Gresii de Tarcău", age: "Cretaceous", thickness: 70 },
@@ -347,7 +171,7 @@
             { name: "Prundișuri Cuaternare", age: "Quaternary", thickness: 45 }
         ];
 
-        let simState = {
+        window.simState = {
             process: 'normal',
             dip: 60,
             slip: 45,
@@ -360,613 +184,31 @@
             rawNoise: []
         };
 
-        let tempStrataEdit = [];
         let isCarving = false;
 
         function findIugsItem(key) {
-            if (typeof iugsChronodata === 'undefined') return null;
+            if (!window.iugsChronodata) return null;
             const k = (key || '').toLowerCase();
-            return iugsChronodata.find(item => item.nameEn.toLowerCase() === k || item.nameRo.toLowerCase() === k);
+            return window.iugsChronodata.find(item => item.nameEn.toLowerCase() === k || item.nameRo.toLowerCase() === k);
         }
 
-        function getStratumColor(age) {
+        window.getStratumColor = function(age) {
             const found = findIugsItem(age);
             return found ? found.hex : "#718096";
-        }
+        };
 
-        function getStratumBorder(age) {
+        window.getStratumBorder = function(age) {
             const found = findIugsItem(age);
             return found ? found.border : "#4a5568";
-        }
-
-        function initLegend() {
-            const legendContainer = document.getElementById('strat-legend');
-            if (!legendContainer) return;
-            legendContainer.innerHTML = '';
-            strata.slice().reverse().forEach((layer) => {
-                const color = getStratumColor(layer.age);
-                const border = getStratumBorder(layer.age);
-                const item = findIugsItem(layer.age);
-                const ageLabel = item ? (currentLang === 'ro' ? item.nameRo : item.nameEn) : layer.age;
-
-                legendContainer.innerHTML += `
-                    <div class="flex items-center justify-between p-1 bg-slate-950/70 rounded-md border border-slate-800">
-                        <div class="flex items-center space-x-1.5 overflow-hidden">
-                            <span class="w-2.5 h-2.5 rounded-sm flex-shrink-0" style="background-color: ${color}; border: 1px solid ${border}"></span>
-                            <span class="text-slate-300 truncate font-medium">${layer.name}</span>
-                        </div>
-                        <div class="flex items-center space-x-1 flex-shrink-0">
-                            <span class="text-indigo-300 font-mono text-[9px] bg-slate-900 px-1 rounded">${ageLabel}</span>
-                            <span class="text-slate-500 font-mono text-[9px]">${layer.thickness}m</span>
-                        </div>
-                    </div>
-                `;
-            });
-        }
+        };
 
         function setLanguage(lang) {
             currentLang = lang;
+            window.currentLang = lang;
             const t = translations[lang];
 
             const btnRo = document.getElementById('lang-btn-ro');
             const btnEn = document.getElementById('lang-btn-en');
             if (lang === 'ro') {
                 btnRo.className = "px-2 py-1 rounded bg-indigo-600 text-white transition-all";
-                btnEn.className = "px-2 py-1 rounded text-slate-400 hover:text-white transition-all";
-            } else {
-                btnEn.className = "px-2 py-1 rounded bg-indigo-600 text-white transition-all";
-                btnRo.className = "px-2 py-1 rounded text-slate-400 hover:text-white transition-all";
-            }
-
-            document.getElementById('header-subtitle').innerText = t.headerSubtitle;
-            document.getElementById('btn-label-stratigraphy').innerText = t.btnStratigraphy;
-            document.getElementById('btn-label-simulation').innerText = t.btnSimulation;
-            document.getElementById('label-toggle-erosion').innerText = lang === 'ro' ? 'Eroziune' : 'Erosion';
-            document.getElementById('btn-label-reset').innerText = t.btnReset;
-
-            document.getElementById('badge-hint-carve').innerHTML = t.hintCarve;
-            document.getElementById('section-title-tecto').innerHTML = t.secTecto;
-            document.getElementById('btn-proc-normal-title').innerText = t.normalTitle;
-            document.getElementById('btn-proc-normal-sub').innerText = t.normalSub;
-            document.getElementById('btn-proc-reverse-title').innerText = t.reverseTitle;
-            document.getElementById('btn-proc-reverse-sub').innerText = t.reverseSub;
-            document.getElementById('lbl-dip').innerHTML = t.lblDip;
-            document.getElementById('lbl-slip').innerText = t.lblSlip;
-            document.getElementById('btn-animate-label').innerText = t.btnAnimate;
-
-            document.getElementById('section-title-relief').innerHTML = t.secRelief;
-            document.getElementById('lbl-level-cut').innerText = t.lblLevelCut;
-            document.getElementById('btn-shift-up').innerText = t.btnShiftUp;
-            document.getElementById('btn-shift-down').innerText = t.btnShiftDown;
-            document.getElementById('lbl-erode-depth').innerText = t.lblErodeDepth;
-            document.getElementById('btn-random-erosion').innerText = t.btnRandomErosion;
-            document.getElementById('lbl-strat-col').innerText = t.lblStratCol;
-            document.getElementById('btn-strat-modify').innerHTML = t.btnStratModify;
-
-            // Actualizare texte dacă modalele sunt deja injectate
-            if (document.getElementById('stratigraphy-modal-title')) {
-                document.getElementById('stratigraphy-modal-title').innerText = t.stratigraphyModalTitle;
-                document.getElementById('stratigraphy-modal-sub').innerText = t.stratigraphyModalSub;
-                document.getElementById('stratigraphy-search-input').placeholder = t.stratigraphySearchPlaceholder;
-                document.getElementById('btn-close-stratigraphy').innerText = t.btnClose;
-            }
-            if (document.getElementById('simulation-modal-title')) {
-                document.getElementById('simulation-modal-title').innerText = t.simulationModalTitle;
-                document.getElementById('btn-add-stratum').innerText = t.btnAddStratum;
-                document.getElementById('btn-cancel-simulation').innerText = t.btnCancel;
-                document.getElementById('btn-apply-simulation').innerText = t.btnApply;
-            }
-
-            updateBadgesAndStatus();
-            initLegend();
-            drawSimulation();
-        }
-
-        function setProcess(procType) {
-            simState.process = procType;
-            const btnNormal = document.getElementById('btn-proc-normal');
-            const btnReverse = document.getElementById('btn-proc-reverse');
-            const badge = document.getElementById('process-title-badge');
-            const t = translations[currentLang];
-
-            if (procType === 'normal') {
-                btnNormal.className = "process-btn bg-indigo-600 text-white p-2 rounded-lg sm:rounded-xl text-xs font-semibold text-left border border-indigo-500 shadow-sm flex flex-col justify-between h-12 sm:h-16";
-                btnNormal.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
-                
-                btnReverse.className = "process-btn bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-lg sm:rounded-xl text-xs font-semibold text-left border border-slate-700 flex flex-col justify-between h-12 sm:h-16";
-                btnReverse.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
-                badge.innerText = t.badgeNormal;
-            } else {
-                btnReverse.className = "process-btn bg-indigo-600 text-white p-2 rounded-lg sm:rounded-xl text-xs font-semibold text-left border border-indigo-500 shadow-sm flex flex-col justify-between h-12 sm:h-16";
-                btnReverse.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
-                
-                btnNormal.className = "process-btn bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-lg sm:rounded-xl text-xs font-semibold text-left border border-slate-700 flex flex-col justify-between h-12 sm:h-16";
-                btnNormal.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
-                badge.innerText = t.badgeReverse;
-            }
-            drawSimulation();
-        }
-
-        function updateParameters() {
-            simState.dip = parseInt(document.getElementById('slider-dip').value);
-            simState.slip = parseInt(document.getElementById('slider-slip').value);
-
-            document.getElementById('val-dip').innerText = simState.dip + '°';
-            document.getElementById('val-slip').innerText = simState.slip + ' m';
-
-            updateBadgesAndStatus();
-            drawSimulation();
-        }
-
-        function updateBadgesAndStatus() {
-            const t = translations[currentLang];
-            const dipTypeBadge = document.getElementById('stat-dip-type');
-            if (simState.dip === 0) dipTypeBadge.innerText = t.dipHoriz;
-            else if (Math.abs(simState.dip) === 90) dipTypeBadge.innerText = t.dipVert;
-            else if (simState.dip > 0) dipTypeBadge.innerText = t.dipRight;
-            else dipTypeBadge.innerText = t.dipLeft;
-
-            const badge = document.getElementById('process-title-badge');
-            badge.innerText = (simState.process === 'normal') ? t.badgeNormal : t.badgeReverse;
-
-            const foldBadge = document.getElementById('folding-badge');
-            if (simState.foldShortening > 0) {
-                foldBadge.classList.remove('hidden');
-                foldBadge.innerText = (currentLang === 'ro' ? 'Cutare: ' : 'Folding: ') + simState.foldShortening + '%';
-            } else {
-                foldBadge.classList.add('hidden');
-            }
-
-            document.getElementById('stat-throw-lbl').innerText = t.statThrow;
-            document.getElementById('stat-heave-lbl').innerText = t.statHeave;
-            document.getElementById('stat-slip-lbl').innerText = t.statSlip;
-        }
-
-        function getBaseGroundY() {
-            const H = canvas.height || 420;
-            const totalThickness = strata.reduce((acc, l) => acc + l.thickness, 0);
-            const anchorY = H * 0.52;
-            const baseY = anchorY + (totalThickness * 0.44);
-            return baseY - totalThickness;
-        }
-
-        function initTopoProfile() {
-            const W = canvas.width || 700;
-            const groundY = getBaseGroundY();
-            simState.topoProfile = new Array(W).fill(groundY + simState.baseCutOffset);
-            simState.rawNoise = new Array(W).fill(0);
-        }
-
-        function toggleErosion() {
-            simState.erosionActive = !simState.erosionActive;
-            const btn = document.getElementById('btn-toggle-erosion');
-            const badge = document.getElementById('erosion-badge');
-            const t = translations[currentLang];
-
-            if (simState.erosionActive) {
-                btn.className = "bg-cyan-600 text-white px-2 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all";
-                badge.className = "bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold border border-cyan-500/30";
-                badge.innerText = t.erosionActive;
-            } else {
-                btn.className = "bg-slate-800 text-slate-400 border border-slate-700 px-2 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all";
-                badge.className = "bg-slate-700/30 text-slate-400 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold border border-slate-700";
-                badge.innerText = t.erosionStopped;
-            }
-            drawSimulation();
-        }
-
-        function applyElevationShift() {
-            simState.baseCutOffset = parseInt(document.getElementById('slider-level-cut').value);
-            document.getElementById('val-level-cut').innerText = (simState.baseCutOffset > 0 ? `+${simState.baseCutOffset}` : `${simState.baseCutOffset}`) + ' m';
-            recalculateTopoProfile();
-            drawSimulation();
-        }
-
-        function shiftProfileVertical(amount) {
-            simState.baseCutOffset = Math.max(-200, Math.min(200, simState.baseCutOffset + amount));
-            document.getElementById('slider-level-cut').value = simState.baseCutOffset;
-            document.getElementById('val-level-cut').innerText = (simState.baseCutOffset > 0 ? `+${simState.baseCutOffset}` : `${simState.baseCutOffset}`) + ' m';
-            recalculateTopoProfile();
-            drawSimulation();
-        }
-
-        function recalculateTopoProfile() {
-            const W = canvas.width || 700;
-            const groundY = getBaseGroundY();
-            for (let x = 0; x < W; x++) {
-                simState.topoProfile[x] = groundY + simState.baseCutOffset + (simState.rawNoise[x] || 0);
-            }
-        }
-
-        function generateRandomErosion() {
-            const W = canvas.width || 700;
-            const depth = parseInt(document.getElementById('slider-erode-depth').value);
-
-            const f1 = 0.005;
-            const f2 = 0.012;
-            const phase1 = Math.random() * Math.PI * 2;
-            const phase2 = Math.random() * Math.PI * 2;
-
-            for (let x = 0; x < W; x++) {
-                let wave = Math.sin(x * f1 + phase1) * 0.65 + Math.sin(x * f2 + phase2) * 0.35;
-                simState.rawNoise[x] = ((wave + 1) / 2) * depth;
-            }
-
-            recalculateTopoProfile();
-            drawSimulation();
-        }
-
-        function carveAtPoint(clientX, clientY) {
-            if (!simState.erosionActive) return;
-            const rect = canvas.getBoundingClientRect();
-            const mouseX = Math.round(clientX - rect.left);
-            const mouseY = clientY - rect.top;
-            const radius = 30;
-            const W = canvas.width;
-
-            for (let x = Math.max(0, mouseX - radius); x <= Math.min(W - 1, mouseX + radius); x++) {
-                let dist = Math.abs(x - mouseX);
-                let factor = Math.cos((dist / radius) * (Math.PI / 2));
-                let targetY = mouseY * factor + (simState.topoProfile[x]) * (1 - factor);
-                
-                if (targetY > simState.topoProfile[x]) {
-                    let diff = targetY - simState.topoProfile[x];
-                    simState.rawNoise[x] = (simState.rawNoise[x] || 0) + diff;
-                    simState.topoProfile[x] = targetY;
-                }
-            }
-            drawSimulation();
-        }
-
-        canvas.addEventListener('mousedown', (e) => { isCarving = true; carveAtPoint(e.clientX, e.clientY); });
-        window.addEventListener('mousemove', (e) => { if (isCarving) carveAtPoint(e.clientX, e.clientY); });
-        window.addEventListener('mouseup', () => { isCarving = false; });
-
-        canvas.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 1) {
-                isCarving = true;
-                carveAtPoint(e.touches[0].clientX, e.touches[0].clientY);
-                e.preventDefault();
-            }
-        }, { passive: false });
-
-        window.addEventListener('touchmove', (e) => {
-            if (isCarving && e.touches.length === 1) {
-                carveAtPoint(e.touches[0].clientX, e.touches[0].clientY);
-                e.preventDefault();
-            }
-        }, { passive: false });
-
-        window.addEventListener('touchend', () => { isCarving = false; });
-
-        function animateFault() {
-            if (simState.animating) return;
-            simState.animating = true;
-
-            const targetSlip = parseInt(document.getElementById('slider-slip').value);
-            const startTime = performance.now();
-            const duration = 1000;
-
-            function step(time) {
-                const elapsed = time - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const ease = 1 - Math.pow(1 - progress, 3);
-                
-                simState.slip = targetSlip * ease;
-                drawSimulation();
-
-                if (progress < 1) {
-                    requestAnimationFrame(step);
-                } else {
-                    simState.slip = targetSlip;
-                    simState.animating = false;
-                    drawSimulation();
-                }
-            }
-            requestAnimationFrame(step);
-        }
-
-        function resetAll() {
-            simState.slip = 0;
-            simState.baseCutOffset = 0;
-            simState.foldShortening = 0;
-            simState.foldWavelength = 220;
-            document.getElementById('slider-slip').value = 0;
-            document.getElementById('val-slip').innerText = '0 m';
-            document.getElementById('slider-level-cut').value = 0;
-            document.getElementById('val-level-cut').innerText = '0 m';
-            document.getElementById('folding-badge').classList.add('hidden');
-            initTopoProfile();
-            drawSimulation();
-        }
-
-        // ==========================================
-        // RANDARE GRAFICĂ TECTONICĂ & CUTARE (1:1)
-        // ==========================================
-        function drawSimulation() {
-            const W = canvas.width;
-            const H = canvas.height;
-            if (!W || !H) return;
-
-            ctx.clearRect(0, 0, W, H);
-
-            // Grid
-            ctx.strokeStyle = '#1e293b';
-            ctx.lineWidth = 1;
-            for (let x = 0; x < W; x += 45) {
-                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-            }
-            for (let y = 0; y < H; y += 45) {
-                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-            }
-
-            const boxPaddingX = Math.max(28, W * 0.05);
-            const modelLeftX = boxPaddingX;
-            const modelRightX = W - boxPaddingX;
-
-            let effectiveDip = simState.dip;
-            if (effectiveDip === 0) effectiveDip = 0.001;
-
-            const dipRad = (effectiveDip * Math.PI) / 180;
-            const anchorX = W * 0.48;
-            const anchorY = H * 0.52;
-            const getFaultX = (y) => anchorX + (y - anchorY) / Math.tan(dipRad);
-
-            let s = simState.slip;
-            let dx = s * Math.cos(Math.abs(dipRad)) * (effectiveDip >= 0 ? 1 : -1);
-            let dy = s * Math.sin(Math.abs(dipRad));
-
-            if (simState.process === 'reverse') {
-                dx = -dx;
-                dy = -dy;
-            }
-
-            document.getElementById('stat-throw').innerText = Math.abs(dy).toFixed(1) + 'm';
-            document.getElementById('stat-heave').innerText = Math.abs(dx).toFixed(1) + 'm';
-            document.getElementById('stat-net-slip').innerText = s.toFixed(1) + 'm';
-
-            const totalThickness = strata.reduce((acc, l) => acc + l.thickness, 0);
-            const baseY = anchorY + (totalThickness * 0.44);
-
-            let layerBounds = [];
-            let currY = baseY;
-            for (let i = 0; i < strata.length; i++) {
-                let yBot = currY;
-                let yTop = currY - strata[i].thickness;
-                layerBounds.push({ layer: strata[i], yTop, yBot });
-                currY = yTop;
-            }
-
-            // Calcul deformare cutare
-            const foldAmp = ((simState.foldShortening || 0) / 100) * 85;
-            const lambda = Math.max(60, simState.foldWavelength || 220);
-            const k = (2 * Math.PI) / lambda;
-            const getFoldOffset = (x) => foldAmp * Math.sin((x - anchorX) * k);
-
-            // 1. FOOTWALL
-            layerBounds.forEach(({ layer, yTop, yBot }) => {
-                const xTopFault = getFaultX(yTop);
-                const xBotFault = getFaultX(yBot);
-
-                ctx.fillStyle = getStratumColor(layer.age);
-                ctx.strokeStyle = getStratumBorder(layer.age);
-                ctx.lineWidth = 1.5;
-
-                ctx.beginPath();
-                ctx.moveTo(modelLeftX, yTop + getFoldOffset(modelLeftX));
-                const step = 4;
-                for (let x = modelLeftX; x <= xTopFault; x += step) {
-                    ctx.lineTo(x, yTop + getFoldOffset(x));
-                }
-                ctx.lineTo(xTopFault, yTop + getFoldOffset(xTopFault));
-                ctx.lineTo(xBotFault, yBot + getFoldOffset(xBotFault));
-
-                for (let x = xBotFault; x >= modelLeftX; x -= step) {
-                    ctx.lineTo(x, yBot + getFoldOffset(x));
-                }
-                ctx.lineTo(modelLeftX, yBot + getFoldOffset(modelLeftX));
-
-                ctx.closePath();
-                ctx.fill();
-                ctx.stroke();
-            });
-
-            // 2. HANGING WALL
-            layerBounds.forEach(({ layer, yTop, yBot }) => {
-                const yTopTrans = yTop + dy;
-                const yBotTrans = yBot + dy;
-                const xTopFaultTrans = getFaultX(yTop) + dx;
-                const xBotFaultTrans = getFaultX(yBot) + dx;
-
-                ctx.fillStyle = getStratumColor(layer.age);
-                ctx.strokeStyle = getStratumBorder(layer.age);
-                ctx.lineWidth = 1.5;
-
-                ctx.beginPath();
-                ctx.moveTo(xTopFaultTrans, yTopTrans + getFoldOffset(xTopFaultTrans - dx));
-
-                const step = 4;
-                for (let x = xTopFaultTrans; x <= modelRightX; x += step) {
-                    ctx.lineTo(x, yTopTrans + getFoldOffset(x - dx));
-                }
-                ctx.lineTo(modelRightX, yTopTrans + getFoldOffset(modelRightX - dx));
-                ctx.lineTo(modelRightX, yBotTrans + getFoldOffset(modelRightX - dx));
-
-                for (let x = modelRightX; x >= xBotFaultTrans; x -= step) {
-                    ctx.lineTo(x, yBotTrans + getFoldOffset(x - dx));
-                }
-                ctx.lineTo(xBotFaultTrans, yBotTrans + getFoldOffset(xBotFaultTrans - dx));
-
-                ctx.closePath();
-                ctx.fill();
-                ctx.stroke();
-            });
-
-            // 3. Plan de Falie
-            const topOriginalY = layerBounds[strata.length - 1].yTop;
-            const topTranslatedY = topOriginalY + dy;
-            const botTranslatedY = baseY + dy;
-
-            const faultY1 = Math.min(topOriginalY, topTranslatedY) - 50;
-            const faultY2 = Math.max(baseY, botTranslatedY) + 50;
-            const faultX1 = getFaultX(faultY1);
-            const faultX2 = getFaultX(faultY2);
-
-            ctx.strokeStyle = '#ef4444';
-            ctx.lineWidth = 3;
-            ctx.setLineDash([6, 4]);
-            ctx.beginPath();
-            ctx.moveTo(faultX1, faultY1);
-            ctx.lineTo(faultX2, faultY2);
-            ctx.stroke();
-            ctx.setLineDash([]);
-
-            // 4. Mască de Eroziune & Relief
-            const intW = Math.round(W);
-            if (simState.erosionActive && simState.topoProfile.length >= intW) {
-                const skyTopY = -200;
-                ctx.fillStyle = '#020617';
-                ctx.beginPath();
-                ctx.moveTo(0, skyTopY);
-                ctx.lineTo(W, skyTopY);
-                ctx.lineTo(W, simState.topoProfile[intW - 1]);
-
-                for (let x = intW - 1; x >= 0; x--) {
-                    ctx.lineTo(x, simState.topoProfile[x]);
-                }
-                ctx.closePath();
-                ctx.fill();
-
-                ctx.strokeStyle = '#38bdf8';
-                ctx.lineWidth = 2.5;
-                ctx.beginPath();
-                ctx.moveTo(modelLeftX, simState.topoProfile[Math.round(modelLeftX)]);
-                for (let x = Math.round(modelLeftX); x <= Math.round(modelRightX); x++) {
-                    ctx.lineTo(x, simState.topoProfile[x]);
-                }
-                ctx.stroke();
-            }
-
-            // Margini de contur laterale
-            ctx.strokeStyle = '#334155';
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.moveTo(modelLeftX, topOriginalY + getFoldOffset(modelLeftX));
-            ctx.lineTo(modelLeftX, baseY + getFoldOffset(modelLeftX));
-            ctx.moveTo(modelRightX, topTranslatedY + getFoldOffset(modelRightX - dx));
-            ctx.lineTo(modelRightX, botTranslatedY + getFoldOffset(modelRightX - dx));
-            ctx.stroke();
-
-            // Etichete blocuri
-            const t = translations[currentLang];
-            ctx.font = 'bold 10px Inter, sans-serif';
-            ctx.fillStyle = '#94a3b8';
-            ctx.fillText(t.footwall, modelLeftX + 10, topOriginalY - 10 + getFoldOffset(modelLeftX));
-
-            ctx.fillStyle = '#cbd5e1';
-            let hwLabelY = topTranslatedY - 10 + getFoldOffset(modelRightX - 85 - dx);
-            ctx.fillText(t.hangingWall, modelRightX - 85, hwLabelY);
-        }
-
-        function setupResponsiveCanvas() {
-            const container = document.getElementById('canvas-container');
-            const observer = new ResizeObserver(entries => {
-                for (let entry of entries) {
-                    const width = Math.round(entry.contentRect.width);
-                    const height = Math.round(entry.contentRect.height);
-                    if (width > 0 && height > 0) {
-                        canvas.width = width;
-                        canvas.height = height;
-                        if (simState.topoProfile.length !== width) {
-                            initTopoProfile();
-                        }
-                        drawSimulation();
-                    }
-                }
-            });
-            observer.observe(container);
-        }
-
-        // ========================================================
-        // ÎNCĂRCARE ASINCRONĂ A MODALELOR & EXECUȚIE SCRIPTURI
-        // ========================================================
-        async function loadModalComponent(url, containerId) {
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error(`HTTP ${response.status} pentru ${url}`);
-                const htmlText = await response.text();
-                
-                const container = document.getElementById(containerId);
-                container.innerHTML = htmlText;
-
-                // Re-atașăm și executăm scripturile din interiorul modalului injectat
-                const scripts = container.querySelectorAll('script');
-                scripts.forEach(oldScript => {
-                    const newScript = document.createElement('script');
-                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                    newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                    oldScript.parentNode.replaceChild(newScript, oldScript);
-                });
-            } catch (err) {
-                console.error(`Eroare la încărcarea fișierului ${url}:`, err);
-            }
-        }
-
-        async function loadAllModals() {
-            await Promise.all([
-                loadModalComponent('modal-stratigraphy.html?v=1.0.0', 'modal-stratigraphy-container'),
-                loadModalComponent('modal-simulation.html?v=1.1.0', 'modal-simulation-container')
-            ]);
-            setLanguage(currentLang);
-        }
-
-        function openStratigraphyModal() {
-            const m = document.getElementById('stratigraphy-modal');
-            if (m) {
-                m.classList.remove('hidden');
-                if (typeof filterStratigraphyList === 'function') filterStratigraphyList();
-            } else {
-                console.warn("modal-stratigraphy.html nu este încărcat încă.");
-            }
-        }
-
-        function closeStratigraphyModal() {
-            const m = document.getElementById('stratigraphy-modal');
-            if (m) m.classList.add('hidden');
-        }
-
-        function openSimulationModal() {
-            const m = document.getElementById('simulation-modal');
-            if (m) {
-                tempStrataEdit = JSON.parse(JSON.stringify(strata));
-                if (typeof syncFoldingControls === 'function') syncFoldingControls();
-                if (typeof renderSimulationEditorList === 'function') renderSimulationEditorList();
-                m.classList.remove('hidden');
-            } else {
-                console.warn("modal-simulation.html nu este încărcat încă.");
-            }
-        }
-
-        function closeSimulationModal() {
-            const m = document.getElementById('simulation-modal');
-            if (m) m.classList.add('hidden');
-        }
-
-        window.onload = () => {
-            setLanguage('ro');
-            setupResponsiveCanvas();
-            loadAllModals();
-            requestAnimationFrame(() => {
-                const container = document.getElementById('canvas-container');
-                const rect = container.getBoundingClientRect();
-                if (rect.width > 0 && rect.height > 0) {
-                    canvas.width = Math.round(rect.width);
-                    canvas.height = Math.round(rect.height);
-                    initTopoProfile();
-                    drawSimulation();
-                }
-            });
-        };
-    </script>
-</body>
-</html>
+                btnEn
