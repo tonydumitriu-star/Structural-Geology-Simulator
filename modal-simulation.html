@@ -1,199 +1,189 @@
-<!-- Modal Complet: Ecran de Simulare (Canvas) + Panou de Setări în Timp Real -->
-<div id="simulation-modal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-2 sm:p-4">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-[1750px] h-[94vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+<!-- Modal 3D: Bloc-Diagramă Geologică Interactivă (Three.js) -->
+<div id="simulation-modal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-1 sm:p-3">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-[1850px] h-[96vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
         
-        <!-- Header Fereastră Simulare -->
+        <!-- Header Fereastră 3D -->
         <div class="px-4 py-2.5 border-b border-slate-800 flex justify-between items-center bg-slate-950/90 flex-shrink-0">
             <div class="flex items-center space-x-2.5">
                 <div class="bg-indigo-600 p-1.5 rounded-lg text-white">
-                    <i class="fa-solid fa-mountain text-xs"></i>
+                    <i class="fa-solid fa-cube text-xs"></i>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <h3 id="sim-window-title" class="font-bold text-white text-xs sm:text-sm">Laborator Tectonic - Simulare Secțiune în Timp Real</h3>
-                    <span id="simulation-modal-version" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v3.1.0</span>
+                    <h3 id="sim3d-title" class="font-bold text-white text-xs sm:text-sm">Laborator Tectonic 3D - Bloc-Diagramă Structurală</h3>
+                    <span id="simulation-modal-version" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">v4.0.0-3D</span>
                 </div>
             </div>
 
-            <div class="flex items-center space-x-2">
-                <button onclick="toggleErosionInModal()" id="btn-modal-erosion" class="bg-cyan-600 text-white px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all">
-                    <i class="fa-solid fa-wind text-[10px]"></i>
-                    <span id="lbl-modal-erosion">Eroziune</span>
-                </button>
-                <button onclick="resetSimulationInModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg text-xs font-semibold border border-slate-700 transition-all flex items-center space-x-1">
+            <!-- Butoane Camere & Acțiuni Rapide -->
+            <div class="flex items-center space-x-1.5 sm:space-x-2">
+                <div class="bg-slate-900 border border-slate-800 p-0.5 rounded-lg flex text-[10px] font-semibold">
+                    <button onclick="setSim3DCamera('iso')" id="cam-btn-iso" class="px-2 py-1 rounded bg-indigo-600 text-white transition-all">3D Izometric</button>
+                    <button onclick="setSim3DCamera('top')" id="cam-btn-top" class="px-2 py-1 rounded text-slate-400 hover:text-white transition-all">Hartă (Sus)</button>
+                    <button onclick="setSim3DCamera('front')" id="cam-btn-front" class="px-2 py-1 rounded text-slate-400 hover:text-white transition-all">Secțiune (Față)</button>
+                </div>
+
+                <button onclick="resetSim3DParams()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg text-xs font-semibold border border-slate-700 transition-all flex items-center space-x-1">
                     <i class="fa-solid fa-rotate-right text-[10px]"></i>
-                    <span id="lbl-modal-reset">Reset</span>
+                    <span class="hidden sm:inline">Reset</span>
                 </button>
-                <button onclick="closeSimulationModal()" class="text-slate-400 hover:text-white p-1 text-base ml-2" title="Închide">
+                <button onclick="closeSimulationModal()" class="text-slate-400 hover:text-white p-1 text-base ml-1" title="Închide">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
         </div>
 
-        <!-- Conținut Principal Simulare: Ecran Canvas (Stânga) + Panou Setări (Dreapta) -->
-        <div class="flex-1 flex flex-col lg:flex-row overflow-hidden p-3 gap-3">
+        <!-- Conținut Principal: Viewport WebGL 3D (Stânga) + Panou Control Tectonic & Felii (Dreapta) -->
+        <div class="flex-1 flex flex-col lg:flex-row overflow-hidden p-2.5 gap-2.5">
             
-            <!-- 1. ECRANUL CU SIMULAREA EFECTIVĂ (CANVAS 1:1) -->
-            <div class="flex-1 flex flex-col bg-slate-950 rounded-xl border border-slate-800 p-2 relative overflow-hidden">
-                
-                <!-- Status Badges Sus pe Canvas -->
-                <div class="flex justify-between items-center mb-1.5 px-1 text-xs">
+            <!-- 1. VIEWPORT 3D WEBGL -->
+            <div class="flex-1 flex flex-col bg-slate-950 rounded-xl border border-slate-800 relative overflow-hidden">
+                <!-- Badges plutitoare peste 3D -->
+                <div class="absolute top-2.5 left-2.5 right-2.5 flex justify-between items-center pointer-events-none z-10 text-[11px]">
                     <div class="flex items-center space-x-1.5">
-                        <span id="sim-badge-process" class="bg-indigo-500/20 text-indigo-300 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border border-indigo-500/30">Falie Normală (Extensie)</span>
-                        <span id="sim-badge-folding" class="bg-purple-500/20 text-purple-300 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border border-purple-500/30 hidden">Cutare: 0%</span>
-                        <span id="sim-badge-erosion" class="bg-cyan-500/20 text-cyan-300 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border border-cyan-500/30">Eroziune Activă</span>
+                        <span id="sim3d-badge-process" class="bg-slate-900/80 backdrop-blur-md text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full font-semibold shadow">Falie Normală</span>
+                        <span id="sim3d-badge-cut" class="bg-slate-900/80 backdrop-blur-md text-cyan-300 border border-cyan-500/30 px-2 py-0.5 rounded-full font-semibold shadow hidden">Tăiere Activă</span>
                     </div>
-                    <div class="text-[11px] text-slate-400">
-                        <i class="fa-solid fa-hand-pointer text-amber-400 mr-1"></i> <span id="sim-hint-carve">Apasă & sapă pe ecran pentru relief</span>
+                    <div class="bg-slate-900/80 backdrop-blur-md text-slate-400 border border-slate-800 px-2.5 py-0.5 rounded-full hidden sm:block">
+                        <i class="fa-solid fa-arrows-spin text-indigo-400 mr-1"></i> Trage cu mouse-ul pentru a orbita 360° | Scroll pentru zoom
                     </div>
                 </div>
 
-                <!-- Suprafața Canvas -->
-                <div id="sim-canvas-container" class="flex-1 w-full bg-slate-950 rounded-lg relative overflow-hidden flex items-center justify-center min-h-[280px]">
-                    <canvas id="geologyCanvas" class="cursor-crosshair w-full h-full"></canvas>
-                </div>
+                <!-- Container Canvas Three.js -->
+                <div id="threejs-container" class="w-full h-full flex-1 relative cursor-grab active:cursor-grabbing"></div>
 
-                <!-- Bara de Date Tectonice Jos pe Canvas -->
-                <div class="mt-2 bg-slate-900/90 border border-slate-800 px-3 py-1.5 rounded-lg flex items-center justify-between text-xs flex-shrink-0">
-                    <div class="flex items-center space-x-4 sm:space-x-8">
-                        <div><span id="sim-stat-throw-lbl" class="text-slate-400">Rejet vertical:</span> <span id="sim-stat-throw" class="font-bold text-cyan-400">38.9m</span></div>
-                        <div><span id="sim-stat-heave-lbl" class="text-slate-400">Decalaj orizontal:</span> <span id="sim-stat-heave" class="font-bold text-amber-400">22.5m</span></div>
-                        <div><span id="sim-stat-slip-lbl" class="text-slate-400">Deplasare pe falie:</span> <span id="sim-stat-net-slip" class="font-bold text-emerald-400">45.0m</span></div>
+                <!-- Indicator de Axe și Rejet Jos -->
+                <div class="absolute bottom-2.5 left-2.5 right-2.5 bg-slate-900/85 backdrop-blur-md border border-slate-800 px-3 py-1.5 rounded-xl flex items-center justify-between text-[11px] z-10">
+                    <div class="flex items-center space-x-4 sm:space-x-6">
+                        <div><span class="text-slate-400">Rejet Vertical:</span> <span id="sim3d-throw" class="font-bold text-cyan-400">38.9m</span></div>
+                        <div><span class="text-slate-400">Decalaj Orizontal:</span> <span id="sim3d-heave" class="font-bold text-amber-400">22.5m</span></div>
+                        <div><span class="text-slate-400">Deplasare pe Falie:</span> <span id="sim3d-slip" class="font-bold text-emerald-400">45.0m</span></div>
                     </div>
-                    <div id="sim-stat-dip-type" class="hidden sm:block text-slate-400 font-mono text-[11px]">Cădere spre Dreapta</div>
+                    <div class="text-slate-500 font-mono text-[10px]">Bloc 3D: 600m &times; 350m &times; 400m</div>
                 </div>
             </div>
 
-            <!-- 2. PANOUL CU TOATE SETĂRILE SIMULĂRII (DREAPTA) -->
+            <!-- 2. PANOU DE SETĂRI: TECTONICĂ, FELII & STRATIGRAFIE -->
             <div class="w-full lg:w-[410px] bg-slate-950 rounded-xl border border-slate-800 p-3 overflow-y-auto space-y-3 flex-shrink-0 text-xs">
                 
-                <!-- Secțiunea A: Faliere (Fragil) -->
-                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-2">
+                <!-- Secțiunea 1: Plane de Secțiune & Decupaj (Clipping Planes) -->
+                <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-2">
+                    <span class="text-[11px] font-bold uppercase text-cyan-300 flex items-center">
+                        <i class="fa-solid fa-scissors text-cyan-400 mr-1.5"></i> 1. Plane de Tăiere & Felii Mobile
+                    </span>
+
+                    <!-- Tăiere de sus în jos (Peneplanizare / Suprafață la zi) -->
+                    <div>
+                        <div class="flex justify-between text-[11px] mb-0.5">
+                            <span class="text-slate-300">Nivelare de sus în jos (Z-Eroziune):</span>
+                            <span id="val-clip-top" class="font-bold text-cyan-400">0 m</span>
+                        </div>
+                        <input type="range" id="slider-clip-top" min="-180" max="180" value="180" oninput="update3DClippingPlanes()" class="w-full accent-cyan-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                    </div>
+
+                    <!-- Felie Transversală (Axa X) -->
+                    <div>
+                        <div class="flex justify-between text-[11px] mb-0.5">
+                            <span class="text-slate-300">Felie Transversală (Axa X):</span>
+                            <span id="val-clip-x" class="font-bold text-emerald-400">Max (600m)</span>
+                        </div>
+                        <input type="range" id="slider-clip-x" min="-300" max="300" value="300" oninput="update3DClippingPlanes()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                    </div>
+
+                    <!-- Felie Longitudinală (Axa Z / Adâncime) -->
+                    <div>
+                        <div class="flex justify-between text-[11px] mb-0.5">
+                            <span class="text-slate-300">Felie Longitudinală (Axa Z):</span>
+                            <span id="val-clip-z" class="font-bold text-amber-400">Max (400m)</span>
+                        </div>
+                        <input type="range" id="slider-clip-z" min="-200" max="200" value="200" oninput="update3DClippingPlanes()" class="w-full accent-amber-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                    </div>
+                </div>
+
+                <!-- Secțiunea 2: Faliere 3D (Fragil) -->
+                <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-2">
                     <div class="flex justify-between items-center">
-                        <span id="sec-title-faults" class="text-[11px] font-bold uppercase text-indigo-300 flex items-center">
-                            <i class="fa-solid fa-bolt text-indigo-400 mr-1.5"></i> 1. Faliere (Deformare Fragilă)
+                        <span class="text-[11px] font-bold uppercase text-indigo-300 flex items-center">
+                            <i class="fa-solid fa-bolt text-indigo-400 mr-1.5"></i> 2. Faliere (Deformare Fragilă)
                         </span>
-                        <span id="val-dip-badge" class="text-[10px] font-mono text-indigo-300 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">60°</span>
+                        <span id="sim3d-val-dip-badge" class="text-[10px] font-mono text-indigo-300 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">60°</span>
                     </div>
 
                     <div class="grid grid-cols-2 gap-1.5">
-                        <button onclick="setSimFaultProcess('normal')" id="btn-fault-normal" class="p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-13">
+                        <button onclick="setSim3DFaultProcess('normal')" id="btn-3d-normal" class="p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-12">
                             <span class="flex items-center justify-between w-full">
-                                <span id="txt-fault-normal">Falie Normală</span>
+                                <span>Falie Normală</span>
                                 <i class="fa-solid fa-circle-check text-[10px]"></i>
                             </span>
-                            <span id="sub-fault-normal" class="text-[9px] text-indigo-200 font-normal">Extensie</span>
+                            <span class="text-[9px] text-indigo-200">Extensie</span>
                         </button>
-                        <button onclick="setSimFaultProcess('reverse')" id="btn-fault-reverse" class="p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-13">
+                        <button onclick="setSim3DFaultProcess('reverse')" id="btn-3d-reverse" class="p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-12">
                             <span class="flex items-center justify-between w-full">
-                                <span id="txt-fault-reverse">Falie Inversă</span>
+                                <span>Falie Inversă</span>
                                 <i class="fa-solid fa-circle text-[10px] opacity-0"></i>
                             </span>
-                            <span id="sub-fault-reverse" class="text-[9px] text-slate-400 font-normal">Compresiune</span>
+                            <span class="text-[9px] text-slate-400">Compresiune</span>
                         </button>
                     </div>
 
                     <div class="space-y-1.5 pt-0.5">
                         <div>
                             <div class="flex justify-between text-[11px] mb-0.5">
-                                <span id="lbl-fault-dip" class="text-slate-300">Înclinare falie (&theta;):</span>
-                                <span id="val-fault-dip" class="font-bold text-indigo-400">60°</span>
+                                <span class="text-slate-300">Înclinare falie (&theta;):</span>
+                                <span id="val-3d-dip" class="font-bold text-indigo-400">60°</span>
                             </div>
-                            <input type="range" id="slider-fault-dip" min="-90" max="90" value="60" oninput="updateSimulationParams()" class="w-full accent-indigo-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                            <input type="range" id="slider-3d-dip" min="-85" max="85" value="60" oninput="update3DModelParams()" class="w-full accent-indigo-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
                         </div>
                         <div>
                             <div class="flex justify-between text-[11px] mb-0.5">
-                                <span id="lbl-fault-slip" class="text-slate-300">Deplasare pe falie:</span>
-                                <span id="val-fault-slip" class="font-bold text-emerald-400">45 m</span>
+                                <span class="text-slate-300">Deplasare pe falie:</span>
+                                <span id="val-3d-slip" class="font-bold text-emerald-400">45 m</span>
                             </div>
-                            <input type="range" id="slider-fault-slip" min="0" max="250" value="45" oninput="updateSimulationParams()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                            <input type="range" id="slider-3d-slip" min="0" max="220" value="45" oninput="update3DModelParams()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
                         </div>
                     </div>
-
-                    <button onclick="animateFaultMovement()" class="w-full bg-indigo-600/30 hover:bg-indigo-600 border border-indigo-500/50 text-indigo-200 hover:text-white font-medium py-1.5 rounded-lg text-xs transition-all flex items-center justify-center space-x-1.5 mt-1">
-                        <i class="fa-solid fa-play text-[9px]"></i>
-                        <span id="btn-fault-anim">Animează Deplasarea Faliei</span>
-                    </button>
                 </div>
 
-                <!-- Secțiunea B: Cutare (Ductil) -->
-                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-2">
+                <!-- Secțiunea 3: Cutare 3D (Ductil) -->
+                <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-2">
                     <div class="flex justify-between items-center">
-                        <span id="sec-title-folding" class="text-[11px] font-bold uppercase text-purple-300 flex items-center">
-                            <i class="fa-solid fa-water text-purple-400 mr-1.5"></i> 2. Cutare (Deformare Ductilă)
+                        <span class="text-[11px] font-bold uppercase text-purple-300 flex items-center">
+                            <i class="fa-solid fa-water text-purple-400 mr-1.5"></i> 3. Cutare Cilindrică (Ductil)
                         </span>
-                        <span id="val-folding-badge" class="text-[10px] font-mono text-purple-300 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">0%</span>
+                        <span id="sim3d-val-fold-badge" class="text-[10px] font-mono text-purple-300 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">0%</span>
                     </div>
 
                     <div class="space-y-1.5">
                         <div>
                             <div class="flex justify-between text-[11px] mb-0.5">
-                                <span id="lbl-fold-short" class="text-slate-300">Scurtare orizontală:</span>
-                                <span id="val-fold-short" class="font-bold text-purple-400">0%</span>
+                                <span class="text-slate-300">Scurtare orizontală:</span>
+                                <span id="val-3d-fold-short" class="font-bold text-purple-400">0%</span>
                             </div>
-                            <input type="range" id="slider-fold-short" min="0" max="60" value="0" oninput="updateSimulationParams()" class="w-full accent-purple-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                            <input type="range" id="slider-3d-fold-short" min="0" max="60" value="0" oninput="update3DModelParams()" class="w-full accent-purple-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
                         </div>
                         <div>
                             <div class="flex justify-between text-[11px] mb-0.5">
-                                <span id="lbl-fold-wave" class="text-slate-300">Lungime de undă (&lambda;):</span>
-                                <span id="val-fold-wave" class="font-bold text-pink-400">220 m</span>
+                                <span class="text-slate-300">Lungime de undă (&lambda;):</span>
+                                <span id="val-3d-fold-wave" class="font-bold text-pink-400">220 m</span>
                             </div>
-                            <input type="range" id="slider-fold-wave" min="80" max="450" value="220" oninput="updateSimulationParams()" class="w-full accent-pink-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+                            <input type="range" id="slider-3d-fold-wave" min="80" max="450" value="220" oninput="update3DModelParams()" class="w-full accent-pink-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
                         </div>
                     </div>
                 </div>
 
-                <!-- Secțiunea C: Relief & Nivelare -->
-                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-2">
-                    <span id="sec-title-relief" class="text-[11px] font-bold uppercase text-cyan-300 flex items-center">
-                        <i class="fa-solid fa-wind text-cyan-400 mr-1.5"></i> 3. Relief & Topografie
-                    </span>
-
-                    <div class="space-y-1">
-                        <div class="flex justify-between text-[11px]">
-                            <span id="lbl-relief-offset" class="text-slate-400">Nivelare decupaj:</span>
-                            <span id="val-relief-offset" class="font-bold text-emerald-400">0 m</span>
-                        </div>
-                        <input type="range" id="slider-relief-offset" min="-200" max="200" value="0" oninput="applyReliefShift()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                        
-                        <div class="grid grid-cols-2 gap-1.5 pt-0.5">
-                            <button onclick="shiftProfileStep(-25)" class="bg-slate-950 hover:bg-slate-800 text-slate-200 py-1 rounded-lg text-xs border border-slate-800 flex items-center justify-center space-x-1">
-                                <i class="fa-solid fa-arrow-up text-[9px]"></i>
-                                <span id="btn-relief-up">Sus 25m</span>
-                            </button>
-                            <button onclick="shiftProfileStep(25)" class="bg-slate-950 hover:bg-slate-800 text-slate-200 py-1 rounded-lg text-xs border border-slate-800 flex items-center justify-center space-x-1">
-                                <i class="fa-solid fa-arrow-down text-[9px]"></i>
-                                <span id="btn-relief-down">Jos 25m</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="pt-1.5 border-t border-slate-800/80 space-y-1">
-                        <div class="flex justify-between text-[11px]">
-                            <span id="lbl-relief-amp" class="text-slate-400">Amplitudine văi:</span>
-                            <span id="val-relief-amp" class="font-bold text-cyan-400">45 m</span>
-                        </div>
-                        <input type="range" id="slider-relief-amp" min="10" max="150" value="45" oninput="document.getElementById('val-relief-amp').innerText = this.value + ' m'" class="w-full accent-cyan-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
-                        <button onclick="generateRandomValleys()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-1.5 rounded-lg text-xs transition-all flex items-center justify-center space-x-1.5">
-                            <i class="fa-solid fa-shuffle text-[10px]"></i>
-                            <span id="btn-relief-gen">Generează Văi Aleatoare</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Secțiunea D: Coloană Stratigrafică (Editor Strate) -->
-                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-2">
+                <!-- Secțiunea 4: Strate Geologice în Bloc -->
+                <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-2">
                     <div class="flex justify-between items-center text-slate-400 text-[11px] font-bold uppercase tracking-wider">
-                        <span id="sec-title-strata" class="flex items-center text-amber-300">
-                            <i class="fa-solid fa-layer-group text-amber-400 mr-1.5"></i> 4. Strate Secțiune
+                        <span class="flex items-center text-amber-300">
+                            <i class="fa-solid fa-layer-group text-amber-400 mr-1.5"></i> 4. Strate Bloc-Diagramă
                         </span>
                         <span class="text-[9px] text-slate-500">Grosime (m)</span>
                     </div>
                     
-                    <div class="space-y-1.5" id="sim-strata-list"></div>
+                    <div class="space-y-1.5" id="sim3d-strata-list"></div>
 
-                    <button onclick="addNewStratumLayer()" class="w-full bg-slate-950 hover:bg-slate-800 text-indigo-300 border border-slate-800 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all">
+                    <button onclick="addNew3DStratum()" class="w-full bg-slate-950 hover:bg-slate-800 text-indigo-300 border border-slate-800 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all">
                         <i class="fa-solid fa-plus text-[10px]"></i>
-                        <span id="btn-strata-add">Adaugă Strat Nou</span>
+                        <span>Adaugă Strat Nou</span>
                     </button>
                 </div>
 
@@ -202,574 +192,401 @@
     </div>
 </div>
 
-<script>
-    const SIMULATION_MODAL_VERSION = "3.1.0";
+<!-- Încărcare Three.js și OrbitControls prin CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
-    // Dicționar de unități cronostratigrafice standard (disponibil direct în simulator fără dependențe externe)
-    window.simChronodata = [
-        { nameRo: "Cuaternar", nameEn: "Quaternary", hex: "#f9f97f", border: "#eab308" },
-        { nameRo: "Neogen", nameEn: "Neogene", hex: "#ffe619", border: "#ca8a04" },
-        { nameRo: "Paleogen", nameEn: "Paleogene", hex: "#fd9a52", border: "#ea580c" },
-        { nameRo: "Cretacic", nameEn: "Cretaceous", hex: "#7fc64e", border: "#65a30d" },
-        { nameRo: "Jurasic", nameEn: "Jurassic", hex: "#34b2c9", border: "#0891b2" },
-        { nameRo: "Triasic", nameEn: "Triassic", hex: "#812b92", border: "#7e22ce" },
-        { nameRo: "Permian", nameEn: "Permian", hex: "#f04028", border: "#dc2626" },
-        { nameRo: "Carbonifer", nameEn: "Carboniferous", hex: "#67a599", border: "#0d9488" },
-        { nameRo: "Devonian", nameEn: "Devonian", hex: "#cb8c37", border: "#d97706" },
-        { nameRo: "Silurian", nameEn: "Silurian", hex: "#b3e1b6", border: "#22c55e" },
-        { nameRo: "Ordovician", nameEn: "Ordovician", hex: "#009270", border: "#15803d" },
-        { nameRo: "Cambrian", nameEn: "Cambrian", hex: "#7fa056", border: "#4d7c0f" },
-        { nameRo: "Precambrian", nameEn: "Precambrian", hex: "#f74370", border: "#be123c" }
+<script>
+    const SIMULATION_3D_VERSION = "4.0.0-3D";
+
+    // Bază cronostratigrafică locală integrată garantată
+    window.sim3DChronodata = [
+        { nameRo: "Cuaternar", nameEn: "Quaternary", hex: "#f9f97f" },
+        { nameRo: "Neogen", nameEn: "Neogene", hex: "#ffe619" },
+        { nameRo: "Paleogen", nameEn: "Paleogene", hex: "#fd9a52" },
+        { nameRo: "Cretacic", nameEn: "Cretaceous", hex: "#7fc64e" },
+        { nameRo: "Jurasic", nameEn: "Jurassic", hex: "#34b2c9" },
+        { nameRo: "Triasic", nameEn: "Triassic", hex: "#812b92" },
+        { nameRo: "Permian", nameEn: "Permian", hex: "#f04028" },
+        { nameRo: "Carbonifer", nameEn: "Carboniferous", hex: "#67a599" },
+        { nameRo: "Devonian", nameEn: "Devonian", hex: "#cb8c37" },
+        { nameRo: "Silurian", nameEn: "Silurian", hex: "#b3e1b6" },
+        { nameRo: "Ordovician", nameEn: "Ordovician", hex: "#009270" },
+        { nameRo: "Cambrian", nameEn: "Cambrian", hex: "#7fa056" },
+        { nameRo: "Precambrian", nameEn: "Precambrian", hex: "#f74370" }
     ];
 
-    // Stratele geologice active
-    window.simStrata = [
-        { name: "Fundament Cristalin", age: "Precambrian", thickness: 110 },
-        { name: "Calcare Recifale", age: "Jurassic", thickness: 75 },
-        { name: "Gresii de Tarcău", age: "Cretaceous", thickness: 70 },
-        { name: "Marne cu Globigerine", age: "Paleogene", thickness: 60 },
+    window.sim3DStrata = [
+        { name: "Fundament Cristalin", age: "Precambrian", thickness: 90 },
+        { name: "Calcare Recifale", age: "Jurassic", thickness: 60 },
+        { name: "Gresii de Tarcău", age: "Cretaceous", thickness: 55 },
+        { name: "Marne cu Globigerine", age: "Paleogene", thickness: 50 },
         { name: "Prundișuri Cuaternare", age: "Quaternary", thickness: 45 }
     ];
 
-    window.simState = {
+    window.sim3DState = {
         process: 'normal',
         dip: 60,
         slip: 45,
         foldShortening: 0,
         foldWavelength: 220,
-        animating: false,
-        erosionActive: true,
-        baseCutOffset: 0,
-        topoProfile: [],
-        rawNoise: []
+        clipTopY: 180,
+        clipX: 300,
+        clipZ: 200
     };
 
-    let simCanvas = null;
-    let simCtx = null;
-    let isSimCarving = false;
+    // Componente Three.js
+    let scene3D, camera3D, renderer3D, controls3D;
+    let footwallGroup, hangingwallGroup, faultPlaneMesh;
+    let clippingPlanes = [];
+    let isThreeInitialized = false;
 
-    // Returnează lista completă de unități (IUGS globală dacă există, altfel dicționarul integrat)
-    function getActiveChronodata() {
-        if (window.iugsChronodata && Array.isArray(window.iugsChronodata) && window.iugsChronodata.length > 0) {
-            return window.iugsChronodata;
-        }
-        return window.simChronodata;
-    }
+    const BLOCK_WIDTH = 600;  // X [-300, 300]
+    const BLOCK_DEPTH = 400;  // Z [-200, 200]
 
-    function getStratumColor(age) {
-        const list = getActiveChronodata();
-        const k = (age || '').toLowerCase();
-        const found = list.find(i => (i.nameEn && i.nameEn.toLowerCase() === k) || (i.nameRo && i.nameRo.toLowerCase() === k));
-        return found ? found.hex : "#718096";
-    }
-
-    function getStratumBorder(age) {
-        const list = getActiveChronodata();
-        const k = (age || '').toLowerCase();
-        const found = list.find(i => (i.nameEn && i.nameEn.toLowerCase() === k) || (i.nameRo && i.nameRo.toLowerCase() === k));
-        return found ? found.border : "#4a5568";
-    }
-
+    // Inițializare Scenă 3D
     window.initSimulationEnvironment = function() {
-        simCanvas = document.getElementById('geologyCanvas');
-        if (!simCanvas) return;
-        simCtx = simCanvas.getContext('2d');
-
-        setupSimCanvasResize();
-        attachCarvingEvents();
-        syncControlsToState();
-        renderSimStrataEditor();
-
-        requestAnimationFrame(() => {
-            resizeSimCanvasToContainer();
-            window.drawSimCanvas();
-        });
+        if (!isThreeInitialized) {
+            setupThreeJSScene();
+            isThreeInitialized = true;
+        }
+        sync3DControls();
+        render3DStrataList();
+        rebuildGeological3DModel();
+        onWindowResize3D();
     };
 
-    function setupSimCanvasResize() {
-        const container = document.getElementById('sim-canvas-container');
+    function setupThreeJSScene() {
+        const container = document.getElementById('threejs-container');
         if (!container) return;
 
-        const observer = new ResizeObserver(entries => {
-            for (let entry of entries) {
-                const width = Math.round(entry.contentRect.width);
-                const height = Math.round(entry.contentRect.height);
-                if (width > 0 && height > 0 && simCanvas) {
-                    simCanvas.width = width;
-                    simCanvas.height = height;
-                    if (window.simState.topoProfile.length !== width) {
-                        initSimTopoProfile();
-                    }
-                    window.drawSimCanvas();
-                }
-            }
-        });
-        observer.observe(container);
+        // Scena
+        scene3D = new THREE.Scene();
+        scene3D.background = new THREE.Color(0x020617);
+
+        // Camera
+        camera3D = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 1, 4000);
+        camera3D.position.set(450, 420, 520);
+
+        // Renderer cu activare clipping local hardware
+        renderer3D = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer3D.setSize(container.clientWidth, container.clientHeight);
+        renderer3D.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer3D.localClippingEnabled = true;
+        renderer3D.shadowMap.enabled = true;
+        container.appendChild(renderer3D.domElement);
+
+        // Controale Orbitare
+        controls3D = new THREE.OrbitControls(camera3D, renderer3D.domElement);
+        controls3D.enableDamping = true;
+        controls3D.dampingFactor = 0.05;
+        controls3D.target.set(0, 0, 0);
+
+        // Iluminare Scenă
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+        scene3D.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(300, 600, 400);
+        scene3D.add(dirLight);
+
+        const fillLight = new THREE.DirectionalLight(0x93c5fd, 0.4);
+        fillLight.position.set(-400, 200, -300);
+        scene3D.add(fillLight);
+
+        // Grid discret la baza blocului
+        const gridHelper = new THREE.GridHelper(800, 16, 0x334155, 0x1e293b);
+        gridHelper.position.y = -180;
+        scene3D.add(gridHelper);
+
+        // Grupuri pentru cele două blocuri tectonice
+        footwallGroup = new THREE.Group();
+        hangingwallGroup = new THREE.Group();
+        scene3D.add(footwallGroup);
+        scene3D.add(hangingwallGroup);
+
+        // Pregătire plane de tăiere (clipping)
+        clippingPlanes = [
+            new THREE.Plane(new THREE.Vector3(0, -1, 0), window.sim3DState.clipTopY), // Tăiere orizontală de sus
+            new THREE.Plane(new THREE.Vector3(-1, 0, 0), window.sim3DState.clipX),    // Felie X
+            new THREE.Plane(new THREE.Vector3(0, 0, -1), window.sim3DState.clipZ)     // Felie Z
+        ];
+
+        // Resize Observer
+        const resizeObserver = new ResizeObserver(() => onWindowResize3D());
+        resizeObserver.observe(container);
+
+        // Buclă de randare
+        function animate() {
+            requestAnimationFrame(animate);
+            controls3D.update();
+            renderer3D.render(scene3D, camera3D);
+        }
+        animate();
     }
 
-    function resizeSimCanvasToContainer() {
-        const container = document.getElementById('sim-canvas-container');
-        if (!container || !simCanvas) return;
-        const rect = container.getBoundingClientRect();
-        if (rect.width > 0 && rect.height > 0) {
-            simCanvas.width = Math.round(rect.width);
-            simCanvas.height = Math.round(rect.height);
-            initSimTopoProfile();
-        }
+    function onWindowResize3D() {
+        const container = document.getElementById('threejs-container');
+        if (!container || !renderer3D || !camera3D) return;
+        camera3D.aspect = container.clientWidth / container.clientHeight;
+        camera3D.updateProjectionMatrix();
+        renderer3D.setSize(container.clientWidth, container.clientHeight);
     }
 
-    function getBaseGroundY() {
-        const H = simCanvas ? simCanvas.height : 450;
-        const totalThickness = window.simStrata.reduce((acc, l) => acc + l.thickness, 0);
-        const anchorY = H * 0.52;
-        const baseY = anchorY + (totalThickness * 0.44);
-        return baseY - totalThickness;
+    function get3DColor(age) {
+        const k = (age || '').toLowerCase();
+        const chronodata = (window.iugsChronodata && window.iugsChronodata.length > 0) ? window.iugsChronodata : window.sim3DChronodata;
+        const found = chronodata.find(i => (i.nameEn && i.nameEn.toLowerCase() === k) || (i.nameRo && i.nameRo.toLowerCase() === k));
+        return found ? parseInt(found.hex.replace('#', '0x')) : 0x64748b;
     }
 
-    function initSimTopoProfile() {
-        const W = simCanvas ? simCanvas.width : 750;
-        const groundY = getBaseGroundY();
-        window.simState.topoProfile = new Array(W).fill(groundY + window.simState.baseCutOffset);
-        window.simState.rawNoise = new Array(W).fill(0);
-    }
+    // Reconstrucția Geometriei Bloc-Diagramei 3D
+    function rebuildGeological3DModel() {
+        if (!scene3D || !footwallGroup || !hangingwallGroup) return;
 
-    function syncControlsToState() {
-        document.getElementById('slider-fault-dip').value = window.simState.dip;
-        document.getElementById('slider-fault-slip').value = window.simState.slip;
-        document.getElementById('slider-fold-short').value = window.simState.foldShortening;
-        document.getElementById('slider-fold-wave').value = window.simState.foldWavelength;
-        document.getElementById('slider-relief-offset').value = window.simState.baseCutOffset;
+        // Curățăm vechile mesh-uri
+        while (footwallGroup.children.length > 0) footwallGroup.remove(footwallGroup.children[0]);
+        while (hangingwallGroup.children.length > 0) hangingwallGroup.remove(hangingwallGroup.children[0]);
+        if (faultPlaneMesh) scene3D.remove(faultPlaneMesh);
 
-        updateSimLabels();
-        setSimFaultProcess(window.simState.process, false);
-    }
+        const totalThickness = window.sim3DStrata.reduce((acc, s) => acc + s.thickness, 0);
+        let currentY = -150; // Punct de pornire la baza blocului
 
-    function updateSimLabels() {
-        document.getElementById('val-fault-dip').innerText = window.simState.dip + '°';
-        document.getElementById('val-dip-badge').innerText = window.simState.dip + '°';
-        document.getElementById('val-fault-slip').innerText = window.simState.slip + ' m';
-        document.getElementById('val-fold-short').innerText = window.simState.foldShortening + '%';
-        document.getElementById('val-folding-badge').innerText = window.simState.foldShortening + '%';
-        document.getElementById('val-fold-wave').innerText = window.simState.foldWavelength + ' m';
-        document.getElementById('val-relief-offset').innerText = (window.simState.baseCutOffset > 0 ? `+${window.simState.baseCutOffset}` : window.simState.baseCutOffset) + ' m';
+        // Calcul Deplasare Tectonică
+        let dipDeg = window.sim3DState.dip;
+        if (dipDeg === 0) dipDeg = 0.001;
+        const dipRad = (dipDeg * Math.PI) / 180;
+        const slip = window.sim3DState.slip;
 
-        const foldBadge = document.getElementById('sim-badge-folding');
-        if (window.simState.foldShortening > 0) {
-            foldBadge.classList.remove('hidden');
-            foldBadge.innerText = (window.currentLang === 'ro' ? 'Cutare: ' : 'Folding: ') + window.simState.foldShortening + '%';
-        } else {
-            foldBadge.classList.add('hidden');
-        }
+        let dx = slip * Math.cos(Math.abs(dipRad)) * (dipDeg >= 0 ? 1 : -1);
+        let dy = slip * Math.sin(Math.abs(dipRad));
 
-        const dipType = document.getElementById('sim-stat-dip-type');
-        const isRo = window.currentLang === 'ro';
-        if (window.simState.dip === 0) dipType.innerText = isRo ? "Orizontală / Decollement" : "Horizontal / Decollement";
-        else if (Math.abs(window.simState.dip) === 90) dipType.innerText = isRo ? "Verticală" : "Vertical Fault";
-        else if (window.simState.dip > 0) dipType.innerText = isRo ? "Cădere spre Dreapta" : "Dipping Right";
-        else dipType.innerText = isRo ? "Cădere spre Stânga" : "Dipping Left";
-    }
-
-    window.updateSimulationParams = function() {
-        window.simState.dip = parseInt(document.getElementById('slider-fault-dip').value);
-        window.simState.slip = parseInt(document.getElementById('slider-fault-slip').value);
-        window.simState.foldShortening = parseInt(document.getElementById('slider-fold-short').value);
-        window.simState.foldWavelength = parseInt(document.getElementById('slider-fold-wave').value);
-
-        updateSimLabels();
-        window.drawSimCanvas();
-    };
-
-    window.setSimFaultProcess = function(type, redraw = true) {
-        window.simState.process = type;
-        const btnN = document.getElementById('btn-fault-normal');
-        const btnR = document.getElementById('btn-fault-reverse');
-        const badge = document.getElementById('sim-badge-process');
-        const isRo = window.currentLang === 'ro';
-
-        if (type === 'normal') {
-            btnN.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-13";
-            btnN.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
-            btnR.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-13";
-            btnR.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
-            badge.innerText = isRo ? "Falie Normală (Extensie)" : "Normal Fault (Extension)";
-        } else {
-            btnR.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-13";
-            btnR.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
-            btnN.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-13";
-            btnN.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
-            badge.innerText = isRo ? "Falie Inversă (Compresiune)" : "Reverse Fault (Compression)";
-        }
-
-        if (redraw) window.drawSimCanvas();
-    };
-
-    window.toggleErosionInModal = function() {
-        window.simState.erosionActive = !window.simState.erosionActive;
-        const btn = document.getElementById('btn-modal-erosion');
-        const badge = document.getElementById('sim-badge-erosion');
-        const isRo = window.currentLang === 'ro';
-
-        if (window.simState.erosionActive) {
-            btn.className = "bg-cyan-600 text-white px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all shadow-sm";
-            badge.className = "bg-cyan-500/20 text-cyan-300 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border border-cyan-500/30";
-            badge.innerText = isRo ? "Eroziune Activă" : "Erosion Active";
-        } else {
-            btn.className = "bg-slate-800 text-slate-400 border border-slate-700 px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all";
-            badge.className = "bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border border-slate-700";
-            badge.innerText = isRo ? "Eroziune Oprită" : "Erosion Disabled";
-        }
-        window.drawSimCanvas();
-    };
-
-    window.resetSimulationInModal = function() {
-        window.simState.slip = 0;
-        window.simState.baseCutOffset = 0;
-        window.simState.foldShortening = 0;
-        window.simState.foldWavelength = 220;
-        syncControlsToState();
-        initSimTopoProfile();
-        window.drawSimCanvas();
-    };
-
-    window.applyReliefShift = function() {
-        window.simState.baseCutOffset = parseInt(document.getElementById('slider-relief-offset').value);
-        updateSimLabels();
-        recalculateSimTopo();
-        window.drawSimCanvas();
-    };
-
-    window.shiftProfileStep = function(amount) {
-        window.simState.baseCutOffset = Math.max(-200, Math.min(200, window.simState.baseCutOffset + amount));
-        document.getElementById('slider-relief-offset').value = window.simState.baseCutOffset;
-        window.applyReliefShift();
-    };
-
-    function recalculateSimTopo() {
-        const W = simCanvas ? simCanvas.width : 750;
-        const groundY = getBaseGroundY();
-        for (let x = 0; x < W; x++) {
-            window.simState.topoProfile[x] = groundY + window.simState.baseCutOffset + (window.simState.rawNoise[x] || 0);
-        }
-    }
-
-    window.generateRandomValleys = function() {
-        const depth = parseInt(document.getElementById('slider-relief-amp').value);
-        const W = simCanvas ? simCanvas.width : 750;
-        const f1 = 0.005;
-        const f2 = 0.012;
-        const p1 = Math.random() * Math.PI * 2;
-        const p2 = Math.random() * Math.PI * 2;
-
-        for (let x = 0; x < W; x++) {
-            let wave = Math.sin(x * f1 + p1) * 0.65 + Math.sin(x * f2 + p2) * 0.35;
-            window.simState.rawNoise[x] = ((wave + 1) / 2) * depth;
-        }
-        recalculateSimTopo();
-        window.drawSimCanvas();
-    };
-
-    window.animateFaultMovement = function() {
-        if (window.simState.animating) return;
-        window.simState.animating = true;
-
-        const targetSlip = parseInt(document.getElementById('slider-fault-slip').value);
-        const startTime = performance.now();
-        const duration = 1000;
-
-        function step(time) {
-            const elapsed = time - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const ease = 1 - Math.pow(1 - progress, 3);
-            
-            window.simState.slip = targetSlip * ease;
-            window.drawSimCanvas();
-
-            if (progress < 1) {
-                requestAnimationFrame(step);
-            } else {
-                window.simState.slip = targetSlip;
-                window.simState.animating = false;
-                window.drawSimCanvas();
-            }
-        }
-        requestAnimationFrame(step);
-    };
-
-    function attachCarvingEvents() {
-        if (!simCanvas) return;
-
-        function carve(clientX, clientY) {
-            if (!window.simState.erosionActive) return;
-            const rect = simCanvas.getBoundingClientRect();
-            const mouseX = Math.round(clientX - rect.left);
-            const mouseY = clientY - rect.top;
-            const radius = 35;
-            const W = simCanvas.width;
-
-            for (let x = Math.max(0, mouseX - radius); x <= Math.min(W - 1, mouseX + radius); x++) {
-                let dist = Math.abs(x - mouseX);
-                let factor = Math.cos((dist / radius) * (Math.PI / 2));
-                let targetY = mouseY * factor + (window.simState.topoProfile[x]) * (1 - factor);
-                
-                if (targetY > window.simState.topoProfile[x]) {
-                    let diff = targetY - window.simState.topoProfile[x];
-                    window.simState.rawNoise[x] = (window.simState.rawNoise[x] || 0) + diff;
-                    window.simState.topoProfile[x] = targetY;
-                }
-            }
-            window.drawSimCanvas();
-        }
-
-        simCanvas.onmousedown = (e) => { isSimCarving = true; carve(e.clientX, e.clientY); };
-        window.onmousemove = (e) => { if (isSimCarving) carve(e.clientX, e.clientY); };
-        window.onmouseup = () => { isSimCarving = false; };
-
-        simCanvas.ontouchstart = (e) => {
-            if (e.touches.length === 1) {
-                isSimCarving = true;
-                carve(e.touches[0].clientX, e.touches[0].clientY);
-                e.preventDefault();
-            }
-        };
-        window.ontouchmove = (e) => {
-            if (isSimCarving && e.touches.length === 1) {
-                carve(e.touches[0].clientX, e.touches[0].clientY);
-                e.preventDefault();
-            }
-        };
-        window.ontouchend = () => { isSimCarving = false; };
-    }
-
-    // ========================================================
-    // RANDARE GRAFICĂ TECTONICĂ 1:1 PE CANVAS
-    // ========================================================
-    window.drawSimCanvas = function() {
-        if (!simCanvas || !simCtx) return;
-        const W = simCanvas.width;
-        const H = simCanvas.height;
-        if (!W || !H) return;
-
-        simCtx.clearRect(0, 0, W, H);
-
-        // Grid
-        simCtx.strokeStyle = '#1e293b';
-        simCtx.lineWidth = 1;
-        for (let x = 0; x < W; x += 45) {
-            simCtx.beginPath(); simCtx.moveTo(x, 0); simCtx.lineTo(x, H); simCtx.stroke();
-        }
-        for (let y = 0; y < H; y += 45) {
-            simCtx.beginPath(); simCtx.moveTo(0, y); simCtx.lineTo(W, y); simCtx.stroke();
-        }
-
-        const boxPaddingX = Math.max(28, W * 0.05);
-        const modelLeftX = boxPaddingX;
-        const modelRightX = W - boxPaddingX;
-
-        let effectiveDip = window.simState.dip;
-        if (effectiveDip === 0) effectiveDip = 0.001;
-
-        const dipRad = (effectiveDip * Math.PI) / 180;
-        const anchorX = W * 0.48;
-        const anchorY = H * 0.52;
-        const getFaultX = (y) => anchorX + (y - anchorY) / Math.tan(dipRad);
-
-        let s = window.simState.slip;
-        let dx = s * Math.cos(Math.abs(dipRad)) * (effectiveDip >= 0 ? 1 : -1);
-        let dy = s * Math.sin(Math.abs(dipRad));
-
-        if (window.simState.process === 'reverse') {
+        if (window.sim3DState.process === 'reverse') {
             dx = -dx;
             dy = -dy;
         }
 
-        document.getElementById('sim-stat-throw').innerText = Math.abs(dy).toFixed(1) + 'm';
-        document.getElementById('sim-stat-heave').innerText = Math.abs(dx).toFixed(1) + 'm';
-        document.getElementById('sim-stat-net-slip').innerText = s.toFixed(1) + 'm';
+        document.getElementById('sim3d-throw').innerText = Math.abs(dy).toFixed(1) + 'm';
+        document.getElementById('sim3d-heave').innerText = Math.abs(dx).toFixed(1) + 'm';
+        document.getElementById('sim3d-slip').innerText = slip.toFixed(1) + 'm';
 
-        const totalThickness = window.simStrata.reduce((acc, l) => acc + l.thickness, 0);
-        const baseY = anchorY + (totalThickness * 0.44);
+        // Plan de falie în spațiul 3D (separație între Footwall și Hanging Wall)
+        // Ecuația faliei: x - y / tan(dipRad) = 0
+        const faultPlaneNormalFW = new THREE.Vector3(-Math.sin(dipRad), Math.cos(dipRad), 0).normalize();
+        const faultPlaneNormalHW = new THREE.Vector3(Math.sin(dipRad), -Math.cos(dipRad), 0).normalize();
 
-        let layerBounds = [];
-        let currY = baseY;
-        for (let i = 0; i < window.simStrata.length; i++) {
-            let yBot = currY;
-            let yTop = currY - window.simStrata[i].thickness;
-            layerBounds.push({ layer: window.simStrata[i], yTop, yBot });
-            currY = yTop;
-        }
+        const faultClipPlaneFW = new THREE.Plane(faultPlaneNormalFW, 0);
+        const faultClipPlaneHW = new THREE.Plane(faultPlaneNormalHW, 0);
 
-        const foldAmp = ((window.simState.foldShortening || 0) / 100) * 85;
-        const lambda = Math.max(60, window.simState.foldWavelength || 220);
-        const k = (2 * Math.PI) / lambda;
+        // Construim fiecare strat ca volum 3D
+        window.sim3DStrata.forEach((stratum) => {
+            const h = stratum.thickness;
+            const geom = new THREE.BoxGeometry(BLOCK_WIDTH, h, BLOCK_DEPTH, 24, 1, 16);
+            const colorHex = get3DColor(stratum.age);
 
-        // Estompare riguroasă pentru tăietură plană impecabilă
-        const getFoldAt = (x, yRef) => {
-            if (foldAmp === 0) return 0;
-            const faultEdgeX = getFaultX(yRef);
-            const distToFault = Math.abs(x - faultEdgeX);
-            const blend = Math.min(1, distToFault / 70);
-            return foldAmp * Math.sin((x - anchorX) * k) * blend;
-        };
+            // Deformare prin cutare pe vârfurile geometriei (Cute cilindrice paralele cu axa Z)
+            const pos = geom.attributes.position;
+            const foldAmp = (window.sim3DState.foldShortening / 100) * 45;
+            const lambda = Math.max(60, window.sim3DState.foldWavelength);
+            const k = (2 * Math.PI) / lambda;
 
-        // 1. FOOTWALL (Stânga)
-        layerBounds.forEach(({ layer, yTop, yBot }) => {
-            const xTopFault = getFaultX(yTop);
-            const xBotFault = getFaultX(yBot);
-
-            simCtx.fillStyle = getStratumColor(layer.age);
-            simCtx.strokeStyle = getStratumBorder(layer.age);
-            simCtx.lineWidth = 1.5;
-
-            simCtx.beginPath();
-            simCtx.moveTo(modelLeftX, yTop + getFoldAt(modelLeftX, yTop));
-            const step = 4;
-            for (let x = modelLeftX; x < xTopFault; x += step) {
-                simCtx.lineTo(x, yTop + getFoldAt(x, yTop));
+            for (let i = 0; i < pos.count; i++) {
+                const vx = pos.getX(i);
+                // Atenuare graduală aproape de planul faliei pentru fațetă plană rectilinie
+                const distToFault = Math.abs(vx);
+                const blend = Math.min(1, distToFault / 60);
+                const foldOffset = foldAmp * Math.sin(vx * k) * blend;
+                pos.setY(i, pos.getY(i) + foldOffset);
             }
-            simCtx.lineTo(xTopFault, yTop);
-            simCtx.lineTo(xBotFault, yBot);
+            geom.computeVertexNormals();
 
-            for (let x = xBotFault; x >= modelLeftX; x -= step) {
-                simCtx.lineTo(x, yBot + getFoldAt(x, yBot));
-            }
-            simCtx.lineTo(modelLeftX, yBot + getFoldAt(modelLeftX, yBot));
+            // Material Footwall
+            const matFW = new THREE.MeshStandardMaterial({
+                color: colorHex,
+                roughness: 0.5,
+                metalness: 0.1,
+                side: THREE.DoubleSide,
+                clippingPlanes: [faultClipPlaneFW, ...clippingPlanes],
+                clipShadows: true
+            });
+            const meshFW = new THREE.Mesh(geom, matFW);
+            meshFW.position.set(0, currentY + h / 2, 0);
+            footwallGroup.add(meshFW);
 
-            simCtx.closePath();
-            simCtx.fill();
-            simCtx.stroke();
+            // Material Hanging Wall (translatat tectonic)
+            const matHW = new THREE.MeshStandardMaterial({
+                color: colorHex,
+                roughness: 0.5,
+                metalness: 0.1,
+                side: THREE.DoubleSide,
+                clippingPlanes: [faultClipPlaneHW, ...clippingPlanes],
+                clipShadows: true
+            });
+            const meshHW = new THREE.Mesh(geom, matHW);
+            meshHW.position.set(dx, currentY + h / 2 - dy, 0);
+            hangingwallGroup.add(meshHW);
+
+            currentY += h;
         });
 
-        // 2. HANGING WALL (Dreapta)
-        layerBounds.forEach(({ layer, yTop, yBot }) => {
-            const yTopTrans = yTop + dy;
-            const yBotTrans = yBot + dy;
-            const xTopFaultTrans = getFaultX(yTop) + dx;
-            const xBotFaultTrans = getFaultX(yBot) + dx;
-
-            simCtx.fillStyle = getStratumColor(layer.age);
-            simCtx.strokeStyle = getStratumBorder(layer.age);
-            simCtx.lineWidth = 1.5;
-
-            simCtx.beginPath();
-            simCtx.moveTo(xTopFaultTrans, yTopTrans);
-
-            const step = 4;
-            for (let x = xTopFaultTrans; x <= modelRightX; x += step) {
-                simCtx.lineTo(x, yTopTrans + getFoldAt(x - dx, yTop));
-            }
-            simCtx.lineTo(modelRightX, yTopTrans + getFoldAt(modelRightX - dx, yTop));
-            simCtx.lineTo(modelRightX, yBotTrans + getFoldAt(modelRightX - dx, yBot));
-
-            for (let x = modelRightX; x >= xBotFaultTrans; x -= step) {
-                simCtx.lineTo(x, yBotTrans + getFoldAt(x - dx, yBot));
-            }
-            simCtx.lineTo(xBotFaultTrans, yBotTrans);
-
-            simCtx.closePath();
-            simCtx.fill();
-            simCtx.stroke();
+        // Reprezentare vizuală a Planului de Falie (semitransparent roșu)
+        const faultGeom = new THREE.PlaneGeometry(BLOCK_WIDTH * 1.2, BLOCK_DEPTH * 1.2);
+        const faultMat = new THREE.MeshBasicMaterial({
+            color: 0xef4444,
+            transparent: true,
+            opacity: 0.25,
+            side: THREE.DoubleSide,
+            clippingPlanes: clippingPlanes
         });
+        faultPlaneMesh = new THREE.Mesh(faultGeom, faultMat);
+        faultPlaneMesh.rotation.y = Math.PI / 2;
+        faultPlaneMesh.rotation.x = Math.PI / 2 - dipRad;
+        faultPlaneMesh.position.set(0, 0, 0);
+        scene3D.add(faultPlaneMesh);
+    }
 
-        // 3. Plan de Falie (Linie dreaptă)
-        const topOriginalY = layerBounds[window.simStrata.length - 1].yTop;
-        const topTranslatedY = topOriginalY + dy;
-        const botTranslatedY = baseY + dy;
+    // Actualizare Plane de Tăiere (Clipping)
+    window.update3DClippingPlanes = function() {
+        const topY = parseInt(document.getElementById('slider-clip-top').value);
+        const clipX = parseInt(document.getElementById('slider-clip-x').value);
+        const clipZ = parseInt(document.getElementById('slider-clip-z').value);
 
-        const faultY1 = Math.min(topOriginalY, topTranslatedY) - 50;
-        const faultY2 = Math.max(baseY, botTranslatedY) + 50;
-        const faultX1 = getFaultX(faultY1);
-        const faultX2 = getFaultX(faultY2);
+        window.sim3DState.clipTopY = topY;
+        window.sim3DState.clipX = clipX;
+        window.sim3DState.clipZ = clipZ;
 
-        simCtx.strokeStyle = '#ef4444';
-        simCtx.lineWidth = 3;
-        simCtx.setLineDash([6, 4]);
-        simCtx.beginPath();
-        simCtx.moveTo(faultX1, faultY1);
-        simCtx.lineTo(faultX2, faultY2);
-        simCtx.stroke();
-        simCtx.setLineDash([]);
+        document.getElementById('val-clip-top').innerText = topY === 180 ? 'Oprit (Complet)' : `${topY} m`;
+        document.getElementById('val-clip-x').innerText = clipX === 300 ? 'Max (600m)' : `${clipX + 300} m`;
+        document.getElementById('val-clip-z').innerText = clipZ === 200 ? 'Max (400m)' : `${clipZ + 200} m`;
 
-        // 4. Mască Eroziune & Relief Topografic (1:1)
-        const intW = Math.round(W);
-        if (window.simState.erosionActive && window.simState.topoProfile.length >= intW) {
-            const skyTopY = -200;
-            simCtx.fillStyle = '#020617';
-            simCtx.beginPath();
-            simCtx.moveTo(0, skyTopY);
-            simCtx.lineTo(W, skyTopY);
-            simCtx.lineTo(W, window.simState.topoProfile[intW - 1]);
-
-            for (let x = intW - 1; x >= 0; x--) {
-                simCtx.lineTo(x, window.simState.topoProfile[x]);
-            }
-            simCtx.closePath();
-            simCtx.fill();
-
-            simCtx.strokeStyle = '#38bdf8';
-            simCtx.lineWidth = 2.5;
-            simCtx.beginPath();
-            simCtx.moveTo(modelLeftX, window.simState.topoProfile[Math.round(modelLeftX)]);
-            for (let x = Math.round(modelLeftX); x <= Math.round(modelRightX); x++) {
-                simCtx.lineTo(x, window.simState.topoProfile[x]);
-            }
-            simCtx.stroke();
+        if (clippingPlanes.length >= 3) {
+            clippingPlanes[0].constant = topY;
+            clippingPlanes[1].constant = clipX;
+            clippingPlanes[2].constant = clipZ;
         }
 
-        // Margini exterioare
-        simCtx.strokeStyle = '#334155';
-        simCtx.lineWidth = 1.5;
-        simCtx.beginPath();
-        simCtx.moveTo(modelLeftX, topOriginalY + getFoldAt(modelLeftX, topOriginalY));
-        simCtx.lineTo(modelLeftX, baseY + getFoldAt(modelLeftX, baseY));
-        simCtx.moveTo(modelRightX, topTranslatedY + getFoldAt(modelRightX - dx, topOriginalY));
-        simCtx.lineTo(modelRightX, botTranslatedY + getFoldAt(modelRightX - dx, baseY));
-        simCtx.stroke();
-
-        // Etichete
-        const isRo = window.currentLang === 'ro';
-        simCtx.font = 'bold 11px Inter, sans-serif';
-        simCtx.fillStyle = '#94a3b8';
-        simCtx.fillText(isRo ? "FOOTWALL" : "FOOTWALL", modelLeftX + 10, topOriginalY - 12 + getFoldAt(modelLeftX, topOriginalY));
-
-        simCtx.fillStyle = '#cbd5e1';
-        let hwLabelY = topTranslatedY - 12 + getFoldAt(modelRightX - 85 - dx, topOriginalY);
-        simCtx.fillText(isRo ? "HANGING WALL" : "HANGING WALL", modelRightX - 85, hwLabelY);
+        const badge = document.getElementById('sim3d-badge-cut');
+        if (badge) {
+            if (topY < 180 || clipX < 300 || clipZ < 200) badge.classList.remove('hidden');
+            else badge.classList.add('hidden');
+        }
     };
 
-    // ========================================================
-    // GESTIUNE COLOANĂ STRATIGRAFICĂ (EDITOR STRATE)
-    // ========================================================
-    function renderSimStrataEditor() {
-        const list = document.getElementById('sim-strata-list');
-        if (!list || !window.simStrata) return;
+    window.update3DModelParams = function() {
+        window.sim3DState.dip = parseInt(document.getElementById('slider-3d-dip').value);
+        window.sim3DState.slip = parseInt(document.getElementById('slider-3d-slip').value);
+        window.sim3DState.foldShortening = parseInt(document.getElementById('slider-3d-fold-short').value);
+        window.sim3DState.foldWavelength = parseInt(document.getElementById('slider-3d-fold-wave').value);
 
-        const chronodata = getActiveChronodata();
+        document.getElementById('val-3d-dip').innerText = window.sim3DState.dip + '°';
+        document.getElementById('sim3d-val-dip-badge').innerText = window.sim3DState.dip + '°';
+        document.getElementById('val-3d-slip').innerText = window.sim3DState.slip + ' m';
+        document.getElementById('val-3d-fold-short').innerText = window.sim3DState.foldShortening + '%';
+        document.getElementById('sim3d-val-fold-badge').innerText = window.sim3DState.foldShortening + '%';
+        document.getElementById('val-3d-fold-wave').innerText = window.sim3DState.foldWavelength + ' m';
+
+        rebuildGeological3DModel();
+    };
+
+    window.setSim3DFaultProcess = function(type) {
+        window.sim3DState.process = type;
+        const btnN = document.getElementById('btn-3d-normal');
+        const btnR = document.getElementById('btn-3d-reverse');
+        const badge = document.getElementById('sim3d-badge-process');
+
+        if (type === 'normal') {
+            btnN.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-12";
+            btnN.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
+            btnR.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-12";
+            btnR.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
+            badge.innerText = "Falie Normală (Extensie)";
+        } else {
+            btnR.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-indigo-600 text-white border-indigo-500 shadow-sm flex flex-col justify-between h-12";
+            btnR.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle-check text-[10px]";
+            btnN.className = "p-2 rounded-lg text-xs font-semibold text-left border bg-slate-800 text-slate-300 border-slate-700 flex flex-col justify-between h-12";
+            btnN.querySelector('.fa-circle-check, .fa-circle').className = "fa-solid fa-circle text-[10px] opacity-0";
+            badge.innerText = "Falie Inversă (Compresiune)";
+        }
+        rebuildGeological3DModel();
+    };
+
+    // Comutare Camere Rapide
+    window.setSim3DCamera = function(view) {
+        if (!camera3D || !controls3D) return;
+        ['iso', 'top', 'front'].forEach(v => {
+            const b = document.getElementById(`cam-btn-${v}`);
+            if (b) b.className = (v === view) ? "px-2 py-1 rounded bg-indigo-600 text-white transition-all" : "px-2 py-1 rounded text-slate-400 hover:text-white transition-all";
+        });
+
+        if (view === 'iso') {
+            camera3D.position.set(450, 420, 520);
+            controls3D.target.set(0, 0, 0);
+        } else if (view === 'top') {
+            camera3D.position.set(0, 850, 0);
+            controls3D.target.set(0, 0, 0);
+        } else if (view === 'front') {
+            camera3D.position.set(0, 0, 750);
+            controls3D.target.set(0, 0, 0);
+        }
+        controls3D.update();
+    };
+
+    window.resetSim3DParams = function() {
+        window.sim3DState.slip = 0;
+        window.sim3DState.foldShortening = 0;
+        window.sim3DState.clipTopY = 180;
+        window.sim3DState.clipX = 300;
+        window.sim3DState.clipZ = 200;
+
+        document.getElementById('slider-3d-slip').value = 0;
+        document.getElementById('slider-3d-fold-short').value = 0;
+        document.getElementById('slider-clip-top').value = 180;
+        document.getElementById('slider-clip-x').value = 300;
+        document.getElementById('slider-clip-z').value = 200;
+
+        update3DClippingPlanes();
+        update3DModelParams();
+        setSim3DCamera('iso');
+    };
+
+    function sync3DControls() {
+        document.getElementById('slider-3d-dip').value = window.sim3DState.dip;
+        document.getElementById('slider-3d-slip').value = window.sim3DState.slip;
+        document.getElementById('slider-3d-fold-short').value = window.sim3DState.foldShortening;
+        document.getElementById('slider-3d-fold-wave').value = window.sim3DState.foldWavelength;
+        update3DModelParams();
+    }
+
+    // Gestiune Strate în Blocul 3D
+    function render3DStrataList() {
+        const list = document.getElementById('sim3d-strata-list');
+        if (!list || !window.sim3DStrata) return;
+
+        const chronodata = (window.iugsChronodata && window.iugsChronodata.length > 0) ? window.iugsChronodata : window.sim3DChronodata;
         list.innerHTML = '';
 
-        window.simStrata.slice().reverse().forEach((layer, origIdxReversed) => {
-            const actualIdx = window.simStrata.length - 1 - origIdxReversed;
-            const color = getStratumColor(layer.age);
-            const border = getStratumBorder(layer.age);
+        window.sim3DStrata.slice().reverse().forEach((layer, origIdxReversed) => {
+            const actualIdx = window.sim3DStrata.length - 1 - origIdxReversed;
+            const colorHex = '#' + get3DColor(layer.age).toString(16).padStart(6, '0');
 
             list.innerHTML += `
                 <div class="flex items-center space-x-1.5 bg-slate-950 p-1.5 rounded-lg border border-slate-800">
-                    <div class="w-4 h-4 rounded flex-shrink-0 border" style="background-color: ${color}; border-color: ${border}"></div>
+                    <div class="w-4 h-4 rounded flex-shrink-0 border" style="background-color: ${colorHex}; border-color: #475569"></div>
                     
-                    <input type="text" value="${layer.name}" onchange="window.simStrata[${actualIdx}].name = this.value; window.drawSimCanvas();" class="flex-1 min-w-0 bg-slate-900 border border-slate-700 px-1.5 py-0.5 rounded text-[11px] text-white focus:outline-none focus:border-indigo-500">
+                    <input type="text" value="${layer.name}" onchange="window.sim3DStrata[${actualIdx}].name = this.value; rebuildGeological3DModel();" class="flex-1 min-w-0 bg-slate-900 border border-slate-700 px-1.5 py-0.5 rounded text-[11px] text-white focus:outline-none focus:border-indigo-500">
 
-                    <select onchange="window.simStrata[${actualIdx}].age = this.value; renderSimStrataEditor(); window.drawSimCanvas();" class="w-32 bg-slate-900 border border-slate-700 px-1 py-0.5 rounded text-[10px] text-indigo-300 focus:outline-none focus:border-indigo-500">
+                    <select onchange="window.sim3DStrata[${actualIdx}].age = this.value; render3DStrataList(); rebuildGeological3DModel();" class="w-28 bg-slate-900 border border-slate-700 px-1 py-0.5 rounded text-[10px] text-indigo-300 focus:outline-none focus:border-indigo-500">
                         ${chronodata.map(it => {
-                            const isRo = window.currentLang === 'ro';
-                            const optName = isRo ? (it.nameRo || it.nameEn) : (it.nameEn || it.nameRo);
+                            const optName = it.nameRo || it.nameEn;
                             const isSelected = (layer.age && it.nameEn && layer.age.toLowerCase() === it.nameEn.toLowerCase()) || 
                                                (layer.age && it.nameRo && layer.age.toLowerCase() === it.nameRo.toLowerCase());
-                            return `<option value="${it.nameEn}" ${isSelected ? 'selected' : ''}>${optName}</option>`;
+                            return `<option value="${it.nameEn || it.nameRo}" ${isSelected ? 'selected' : ''}>${optName}</option>`;
                         }).join('')}
                     </select>
 
-                    <input type="number" min="10" max="250" value="${layer.thickness}" onchange="window.simStrata[${actualIdx}].thickness = parseInt(this.value) || 30; window.drawSimCanvas();" class="w-12 bg-slate-900 border border-slate-700 px-1 py-0.5 rounded text-[11px] text-white text-center focus:outline-none focus:border-indigo-500">
+                    <input type="number" min="10" max="250" value="${layer.thickness}" onchange="window.sim3DStrata[${actualIdx}].thickness = parseInt(this.value) || 30; rebuildGeological3DModel();" class="w-12 bg-slate-900 border border-slate-700 px-1 py-0.5 rounded text-[11px] text-white text-center focus:outline-none focus:border-indigo-500">
 
-                    <button onclick="removeSimStratum(${actualIdx})" class="text-rose-400 hover:text-rose-300 p-1 text-xs rounded hover:bg-slate-900" title="Șterge">
+                    <button onclick="remove3DStratum(${actualIdx})" class="text-rose-400 hover:text-rose-300 p-1 text-xs rounded hover:bg-slate-900" title="Șterge">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>
                 </div>
@@ -777,29 +594,23 @@
         });
     }
 
-    window.addNewStratumLayer = function() {
-        const isRo = window.currentLang === 'ro';
-        window.simStrata.push({
-            name: isRo ? "Strat Nou" : "New Layer",
+    window.addNew3DStratum = function() {
+        window.sim3DStrata.push({
+            name: "Strat Nou 3D",
             age: "Cretaceous",
             thickness: 50
         });
-        renderSimStrataEditor();
-        window.drawSimCanvas();
+        render3DStrataList();
+        rebuildGeological3DModel();
     };
 
-    window.removeSimStratum = function(index) {
-        if (window.simStrata.length <= 1) {
-            alert(window.currentLang === 'ro' ? "Trebuie să existe cel puțin un strat în secțiune." : "At least one layer must remain in section.");
+    window.remove3DStratum = function(index) {
+        if (window.sim3DStrata.length <= 1) {
+            alert("Trebuie să existe cel puțin un strat în blocul 3D.");
             return;
         }
-        window.simStrata.splice(index, 1);
-        renderSimStrataEditor();
-        window.drawSimCanvas();
+        window.sim3DStrata.splice(index, 1);
+        render3DStrataList();
+        rebuildGeological3DModel();
     };
-
-    // Inițializare automată la injectare dacă modalul este deja vizibil
-    if (document.getElementById('simulation-modal') && !document.getElementById('simulation-modal').classList.contains('hidden')) {
-        window.initSimulationEnvironment();
-    }
 </script>
